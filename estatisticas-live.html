@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>São Manços - Estatísticas</title>
+<meta name="theme-color" content="#3ddc84">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="São Manços">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #0c1610; --s1: #16241b; --s2: #1f3025;
+    --b1: rgba(61, 220, 132, 0.15); --b2: rgba(61, 220, 132, 0.3);
+    --t1: rgba(255, 255, 255, 0.95); --t2: rgba(255, 255, 255, 0.75); --t3: rgba(255, 255, 255, 0.5);
+    --acc: #3ddc84; --acc-hover: #48e58f; --red: #ff4a4a; --yel: #ffb84a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+  body { background-color: var(--bg); color: var(--t1); display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+  
+  /* Header & Tabs */
+  header { height: 54px; background: var(--s1); border-bottom: 1px solid var(--b1); display: flex; align-items: center; padding: 0 14px; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .title-icon { color: var(--acc); }
+  .title-text { display: inline; }
+  .tabs { display: flex; gap: 6px; }
+  .tab-btn { background: transparent; border: none; color: var(--t3); font-weight: 600; font-size: 13px; cursor: pointer; padding: 5px 8px; border-radius: 6px; white-space: nowrap; }
+  .tab-btn.active { color: var(--bg); background: var(--acc); }
+  .btn-export { background: var(--acc); color: var(--bg); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .btn-save-pc { background: #1f3025; color: var(--acc); border: 1px solid var(--acc); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.15s; white-space: nowrap; }
+  .btn-save-pc:hover { background: var(--acc); color: var(--bg); }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 9999; display: none; animation: fadeUp 0.3s ease; max-width: 90vw; text-align: center; }
+  #toast.ok { background: var(--acc); color: var(--bg); }
+  #toast.err { background: var(--red); color: white; }
+  @keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  /* Layout */
+  .view { display: none; flex: 1; overflow: hidden; min-height: 0; }
+  .view.active { display: flex; }
+  .panel-left { width: 65%; padding: 16px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; position: relative; }
+  .panel-right { width: 35%; background: var(--s1); border-left: 1px solid var(--b1); display: flex; flex-direction: column; min-width: 0; }
+  .section-title { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Players & Actions */
+  .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+  .player-btn { background: var(--s2); border: 1px solid var(--b1); border-radius: 12px; padding: 12px 5px; color: var(--t1); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.1s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .player-btn.selected { background: var(--acc); color: var(--bg); border-color: var(--acc); }
+  .player-btn:active { transform: scale(0.96); }
+  .player-num { font-size: 10px; opacity: 0.7; }
+  .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; opacity: 0.5; pointer-events: none; transition: 0.2s; }
+  .actions-grid.active { opacity: 1; pointer-events: auto; }
+  .action-btn { background: var(--s2); border: 1px solid var(--b1); border-radius: 12px; padding: 14px 12px; color: var(--t1); font-weight: 500; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .action-btn:active { transform: scale(0.97); }
+  .action-btn.certo { border-left: 4px solid var(--acc); }
+  .action-btn.errado { border-left: 4px solid var(--red); }
+  .action-btn.neutro { border-left: 4px solid var(--yel); }
+  .action-btn.golo { border-left: 4px solid #FFD700; background: rgba(255,215,0,0.08); color: #FFD700; font-weight: 700; }
+  .action-btn.golo-sofrido { border-left: 4px solid #c850f5; background: rgba(200,80,245,0.08); color: #c850f5; font-weight: 700; }
+
+  /* Pitch Overlay */
+  .pitch-overlay { position: fixed; inset: 0; background: rgba(12,22,16,0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); padding: 20px; }
+  .pitch-overlay.active { display: flex; }
+  .pitch-container { width: min(95vw, 420px); height: min(65vw, 280px); background: #27ae60; border: 2px solid white; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 1px; }
+  .zone-btn { background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); color: white; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 13px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .zone-btn:active { background: rgba(255,255,255,0.5); }
+  .pitch-title { margin-bottom: 14px; font-size: 17px; font-weight: bold; text-align: center; }
+  .cancel-pitch { margin-top: 14px; background: transparent; border: none; color: var(--red); cursor: pointer; font-size: 15px; text-decoration: underline; padding: 8px; }
+
+  /* Timeline */
+  .timeline-header { padding: 12px 16px; border-bottom: 1px solid var(--b1); flex-shrink: 0; }
+  .timeline-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .log-item { background: var(--bg); border: 1px solid var(--b1); border-radius: 8px; padding: 9px 10px; display: flex; align-items: center; font-size: 11px; gap: 4px; }
+  .log-min { color: var(--t3); width: 28px; flex-shrink: 0; }
+  .log-player { font-weight: 600; color: var(--acc); width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+  .log-action { color: var(--t1); flex: 1; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .log-zone { background: var(--s2); padding: 2px 5px; border-radius: 4px; font-size: 9px; color: var(--t2); flex-shrink: 0; }
+  .log-del { background: transparent; border: none; color: var(--t3); cursor: pointer; padding: 4px; flex-shrink: 0; }
+
+  /* Timer */
+  .timer-wrap { display: flex; align-items: center; gap: 8px; background: var(--s2); padding: 10px 14px; border-radius: 8px; width: fit-content; border: 1px solid var(--b1); flex-wrap: wrap; }
+  .timer-val { font-family: 'Inter', monospace; font-size: 22px; font-weight: 700; color: var(--acc); }
+  .timer-btn { background: transparent; border: 1px solid var(--t3); color: var(--t1); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; touch-action: manipulation; }
+
+  /* Settings & Stats Views */
+  .settings-view { padding: 20px; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; }
+  .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .input-row input { background: var(--s1); border: 1px solid var(--b1); color: white; padding: 10px; border-radius: 6px; font-size: 16px; }
+  .btn-danger { background: rgba(255,74,74,0.1); color: var(--red); border: 1px solid var(--red); padding: 10px; border-radius: 6px; cursor: pointer; }
+  .stats-view { padding: 20px; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; }
+  .stat-card { background: var(--s1); border: 1px solid var(--b1); padding: 18px; border-radius: 12px; margin-bottom: 16px; }
+  .stat-bar-bg { width: 100%; height: 8px; background: var(--s2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .stat-bar-fill { height: 100%; background: var(--acc); border-radius: 4px; transition: 0.5s; }
+  .stat-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 13px; }
+
+  /* ===== MOBILE (<=700px) ===== */
+  @media (max-width: 700px) {
+    header { height: auto; min-height: 50px; flex-wrap: wrap; padding: 7px 10px; gap: 5px; }
+    .title-text { display: none; }
+    .tabs { gap: 3px; }
+    .tab-btn { font-size: 11px; padding: 5px 6px; }
+    .btn-save-pc, .btn-export { font-size: 11px; padding: 6px 9px; }
+    .view.active { flex-direction: column; overflow-y: auto; }
+    .panel-left { width: 100%; padding: 10px; gap: 10px; overflow-y: visible; }
+    .panel-right { width: 100%; border-left: none; border-top: 1px solid var(--b1); min-height: 200px; max-height: 220px; flex-shrink: 0; }
+    .players-grid { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 5px; }
+    .player-btn { padding: 9px 3px; font-size: 11px; }
+    .action-btn { padding: 12px 9px; font-size: 12px; }
+    .settings-view, .stats-view { padding: 12px; }
+  }
+  @media (max-width: 400px) {
+    .players-grid { grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); }
+    .action-btn { font-size: 11px; padding: 11px 7px; }
+  }
+  
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">
+    <svg class="title-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    São Manços — Estatísticas
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('jogo')">1. Jogo Ao Vivo</button>
+    <button class="tab-btn" onclick="switchTab('stats')">2. Análise</button>
+    <button class="tab-btn" onclick="switchTab('equipa')">3. Equipa</button>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn-save-pc" onclick="saveToPC()" title="Guarda o CSV diretamente na pasta São Manços do PC">💾 Guardar no PC</button>
+    <button class="btn-export" onclick="exportCSV()" title="Descarregar CSV para o browser">Exportar CSV</button>
+  </div>
+</header>
+<div id="toast"></div>
+
+<!-- VISTA 1: JOGO AO VIVO -->
+<div id="view-jogo" class="view active container">
+  <div class="panel-left">
+    
+    <div class="timer-wrap">
+      <div class="timer-val" id="timer-display">00:00</div>
+      <button class="timer-btn" onclick="toggleTimer()" id="btn-timer-toggle">Iniciar Jogo</button>
+      <button class="timer-btn" onclick="resetTimer()">Reset</button>
+      <span style="font-size:11px;color:var(--t3);margin-left:10px;">💾 Auto-Save Ativo</span>
+    </div>
+
+    <div>
+      <div class="section-title">1. Selecionar Jogador</div>
+      <div class="players-grid" id="players-grid"></div>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <div class="section-title">2. Registar Ação</div>
+      <div class="actions-grid" id="actions-grid">
+        <button class="action-btn errado" onclick="askZone('Passe Falhado', -1)">Passe Falhado <span>✕</span></button>
+        <button class="action-btn certo" onclick="askZone('Cruzamento Certo', 1)">Cruzamento Certo <span>↗️</span></button>
+        <button class="action-btn errado" onclick="askZone('Cruzamento Falhado', -1)">Cruzamento Falhado <span>↘️</span></button>
+        <button class="action-btn certo" onclick="askZone('Remate à Baliza', 1)">Remate à Baliza <span>🎯</span></button>
+        <button class="action-btn errado" onclick="askZone('Remate Fora', -1)">Remate Fora <span>❌</span></button>
+        <button class="action-btn certo" onclick="askZone('Desarme Certo', 1)">Desarme Certo <span>🛡️</span></button>
+        <button class="action-btn errado" onclick="askZone('Perda de Bola', -1)">Perda de Bola <span>⚠️</span></button>
+        <button class="action-btn neutro" onclick="askZone('Falta Sofrida', 0)">Falta Sofrida <span>🤕</span></button>
+        <button class="action-btn neutro" onclick="askZone('Falta Cometida', 0)">Falta Cometida <span>🛑</span></button>
+        <button class="action-btn golo" onclick="askZone('Golo Marcado', 1)">Golo Marcado <span>⚽</span></button>
+        <button class="action-btn golo-sofrido" onclick="askZone('Golo Sofrido', -1)">Golo Sofrido <span>😔</span></button>
+      </div>
+    </div>
+
+    <!-- Pitch Overlay Modal -->
+    <div class="pitch-overlay" id="pitch-overlay">
+      <div class="pitch-title" id="pitch-title">Onde foi a ação?</div>
+      <div class="pitch-container">
+        <!-- Zonas (Ataque em cima) -->
+        <button class="zone-btn" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
+        <button class="zone-btn" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
+        <button class="zone-btn" onclick="recordAction('Ataque Dir.')">Ataque Dir.</button>
+        
+        <button class="zone-btn" onclick="recordAction('Meio-Campo Esq.')">Meio Esq.</button>
+        <button class="zone-btn" onclick="recordAction('Meio-Campo Centro')">Meio Centro</button>
+        <button class="zone-btn" onclick="recordAction('Meio-Campo Dir.')">Meio Dir.</button>
+
+        <button class="zone-btn" onclick="recordAction('Defesa Esq.')">Defesa Esq.</button>
+        <button class="zone-btn" onclick="recordAction('Defesa Centro')">Defesa Centro</button>
+        <button class="zone-btn" onclick="recordAction('Defesa Dir.')">Defesa Dir.</button>
+      </div>
+      <button class="cancel-pitch" onclick="cancelPitch()">Cancelar</button>
+    </div>
+
+  </div>
+
+  <div class="panel-right">
+    <div class="timeline-header">
+      <div class="section-title" style="margin:0;">Registo do Jogo (Timeline)</div>
+    </div>
+    <div class="timeline-list" id="timeline-list"></div>
+  </div>
+</div>
+
+<!-- VISTA 2: ESTATÍSTICAS -->
+<div id="view-stats" class="view stats-view">
+  <div class="section-title">Análise em Tempo Real</div>
+
+  <!-- RESULTADO -->
+  <div class="stat-card" style="display:flex; gap:20px; align-items:center; justify-content:center;">
+    <div style="text-align:center;">
+      <div style="font-size:13px; color:var(--t3); margin-bottom:4px;">GOLOS MARCADOS</div>
+      <div id="stat-golos-marcados" style="font-size:52px; font-weight:700; color:#FFD700; line-height:1;">0</div>
+    </div>
+    <div style="font-size:40px; color:var(--t3); font-weight:300;">—</div>
+    <div style="text-align:center;">
+      <div style="font-size:13px; color:var(--t3); margin-bottom:4px;">GOLOS SOFRIDOS</div>
+      <div id="stat-golos-sofridos" style="font-size:52px; font-weight:700; color:#c850f5; line-height:1;">0</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Eficácia de Cruzamento</div>
+    <div id="stat-cruz-pct" style="font-size:32px; font-weight:700; color:var(--acc);">0%</div>
+    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-cruz-bar" style="width: 0%"></div></div>
+    <div class="stat-row">
+      <span id="stat-cruz-certo">0 Certos</span>
+      <span id="stat-cruz-errado">0 Falhados</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Top 5: Mais Ações (Envolvimentos)</div>
+    <div id="top-players-list">
+      <!-- Generated -->
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Locais Frequentes de Perda de Bola</div>
+    <div id="zone-lost-list" style="color:var(--red);">
+      <!-- Generated -->
+    </div>
+  </div>
+</div>
+
+<!-- VISTA 3: EQUIPA (SETTINGS) -->
+<div id="view-equipa" class="view settings-view">
+  <div class="section-title">Configurar Plantel do São Manços</div>
+  <p style="color:var(--t2); font-size:13px; margin-bottom:20px;">Estes dados são guardados na memória do seu browser. Altere para os nomes reais.</p>
+  
+  <div id="team-editor"></div>
+  
+  <button class="btn-export" style="margin-top:20px;" onclick="addPlayerField()">+ Adicionar Jogador</button>
+  <button class="btn-export" style="margin-top:20px; background:var(--t3);" onclick="saveTeam()">Guardar Plantel</button>
+
+  <div style="margin-top: 50px; padding-top:20px; border-top:1px solid var(--red);">
+    <div class="section-title" style="color:var(--red);">Zona de Perigo</div>
+    <button class="btn-danger" onclick="hardReset()">Limpar Todos os Dados (Novo Jogo)</button>
+  </div>
+</div>
+
+<script>
+  // DEFAULT TEAM — 11 Titulares + 7 Suplentes
+  const defaultPlayers = [
+    { num: 1,  name: "GR" },
+    { num: 2,  name: "Defesa D." },
+    { num: 3,  name: "Defesa E." },
+    { num: 4,  name: "Central 1" },
+    { num: 5,  name: "Central 2" },
+    { num: 6,  name: "Trinco" },
+    { num: 8,  name: "Médio" },
+    { num: 10, name: "Médio Of." },
+    { num: 7,  name: "Extremo D." },
+    { num: 11, name: "Extremo E." },
+    { num: 9,  name: "Ponta Lança" },
+    { num: 12, name: "Suplente 12" },
+    { num: 13, name: "Suplente 13" },
+    { num: 14, name: "Suplente 14" },
+    { num: 15, name: "Suplente 15" },
+    { num: 16, name: "Suplente 16" },
+    { num: 17, name: "Suplente 17" },
+    { num: 18, name: "Suplente 18" }
+  ];
+
+  // STATE
+  let players = JSON.parse(localStorage.getItem('ls_team')) || defaultPlayers;
+  let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
+  let seconds = parseInt(localStorage.getItem('ls_time')) || 0;
+  
+  let selectedPlayer = null;
+  let pendingAction = null;
+  let pendingScore = 0; // 1 = certo, -1 = errado, 0 = neutro
+  
+  // Timer vars
+  let timerInterval = null;
+  let isRunning = false;
+
+  // INITIALIZE
+  window.onload = () => {
+    document.getElementById('timer-display').innerText = formatTime(seconds);
+    renderPlayers();
+    renderLogs();
+    renderTeamEditor();
+  };
+
+  // TABS
+  function switchTab(tabId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-' + tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    if (tabId === 'stats') updateStats();
+  }
+
+  // TIMER LOGIC
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+  function toggleTimer() {
+    if (isRunning) {
+      clearInterval(timerInterval);
+      document.getElementById('btn-timer-toggle').innerText = "Retomar";
+    } else {
+      timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById('timer-display').innerText = formatTime(seconds);
+        localStorage.setItem('ls_time', seconds); // Auto-save
+      }, 1000);
+      document.getElementById('btn-timer-toggle').innerText = "Pausar";
+    }
+    isRunning = !isRunning;
+  }
+  function resetTimer() {
+    if(confirm("Reiniciar apenas o tempo? Os registos mantêm-se.")){
+      clearInterval(timerInterval);
+      seconds = 0; isRunning = false;
+      document.getElementById('timer-display').innerText = "00:00";
+      document.getElementById('btn-timer-toggle').innerText = "Iniciar Jogo";
+      localStorage.setItem('ls_time', 0);
+    }
+  }
+
+  // JOGO AO VIVO LOGIC
+  function renderPlayers() {
+    const grid = document.getElementById('players-grid');
+    grid.innerHTML = '';
+    players.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'player-btn';
+      btn.innerHTML = `<span class="player-num">#${p.num}</span><span>${p.name}</span>`;
+      btn.onclick = () => selectPlayer(p, btn);
+      grid.appendChild(btn);
+    });
+    // Reset action grid state
+    selectedPlayer = null;
+    document.getElementById('actions-grid').classList.remove('active');
+  }
+
+  function selectPlayer(player, btnElement) {
+    selectedPlayer = player;
+    document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+    btnElement.classList.add('selected');
+    document.getElementById('actions-grid').classList.add('active'); // Unlock actions
+  }
+
+  function askZone(action, score) {
+    if (!selectedPlayer) return;
+    pendingAction = action;
+    pendingScore = score;
+    document.getElementById('pitch-title').innerText = `Onde foi: ${action}?`;
+    document.getElementById('pitch-overlay').classList.add('active');
+  }
+
+  function cancelPitch() {
+    document.getElementById('pitch-overlay').classList.remove('active');
+    pendingAction = null;
+  }
+
+  function recordAction(zone) {
+    const min = Math.floor(seconds / 60);
+    const log = {
+      id: Date.now(),
+      min: min,
+      player: selectedPlayer.name,
+      num: selectedPlayer.num,
+      action: pendingAction,
+      score: pendingScore,
+      zone: zone
+    };
+
+    logs.unshift(log);
+    saveLogs();
+    renderLogs();
+    
+    // Fechar modal e reset seleção para fluidez do jogo
+    cancelPitch();
+    selectedPlayer = null;
+    document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('actions-grid').classList.remove('active');
+  }
+
+  function deleteLog(id) {
+    logs = logs.filter(l => l.id !== id);
+    saveLogs();
+    renderLogs();
+  }
+
+  function saveLogs() {
+    localStorage.setItem('ls_logs', JSON.stringify(logs));
+  }
+
+  function renderLogs() {
+    const list = document.getElementById('timeline-list');
+    list.innerHTML = '';
+    if (logs.length === 0) { list.innerHTML = '<div style="color:var(--t3);text-align:center;">Nenhum registo ainda.</div>'; return; }
+
+    logs.forEach(l => {
+      const item = document.createElement('div');
+      item.className = 'log-item';
+      let acColor = l.score === 1 ? 'var(--acc)' : (l.score === -1 ? 'var(--red)' : 'var(--yel)');
+      
+      item.innerHTML = `
+        <span class="log-min">${l.min}'</span>
+        <span class="log-player">${l.player}</span>
+        <span class="log-action" style="color:${acColor}">${l.action}</span>
+        <span class="log-zone">${l.zone}</span>
+        <button class="log-del" onclick="deleteLog(${l.id})">✕</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  // STATS ENGINE
+  function updateStats() {
+    // Golos
+    const golosMarcados = logs.filter(l => l.action === 'Golo Marcado').length;
+    const golosSofridos = logs.filter(l => l.action === 'Golo Sofrido').length;
+    document.getElementById('stat-golos-marcados').innerText = golosMarcados;
+    document.getElementById('stat-golos-sofridos').innerText = golosSofridos;
+
+    // Cruzamentos
+    const cruzCertos = logs.filter(l => l.action === 'Cruzamento Certo').length;
+    const cruzFalhados = logs.filter(l => l.action === 'Cruzamento Falhado').length;
+    const totalCruz = cruzCertos + cruzFalhados;
+    const cruzPct = totalCruz > 0 ? Math.round((cruzCertos / totalCruz) * 100) : 0;
+    document.getElementById('stat-cruz-pct').innerText = cruzPct + '%';
+    document.getElementById('stat-cruz-bar').style.width = cruzPct + '%';
+    document.getElementById('stat-cruz-bar').style.backgroundColor = cruzPct >= 75 ? 'var(--acc)' : (cruzPct >= 50 ? 'var(--yel)' : 'var(--red)');
+    document.getElementById('stat-cruz-certo').innerText = cruzCertos + ' Certos';
+    document.getElementById('stat-cruz-errado').innerText = cruzFalhados + ' Falhados';
+
+    // Top players
+    const pCounts = {};
+    logs.forEach(l => { pCounts[l.player] = (pCounts[l.player] || 0) + 1; });
+    const topPlayers = Object.entries(pCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+    
+    let tpHTML = '';
+    topPlayers.forEach((p, idx) => {
+      tpHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b1);padding:8px 0;">
+        <span>${idx+1}. <b>${p[0]}</b></span> <span style="color:var(--t2)">${p[1]} ações</span>
+      </div>`;
+    });
+    document.getElementById('top-players-list').innerHTML = tpHTML || '<span style="color:var(--t3)">Sem dados suficientes.</span>';
+
+    // Zonas de Perda
+    const perdas = logs.filter(l => l.action === 'Perda de Bola' || l.action === 'Passe Falhado' || l.action === 'Cruzamento Falhado');
+    const zCounts = {};
+    perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
+    const topZonas = Object.entries(zCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
+    
+    let tzHTML = '';
+    topZonas.forEach((z) => {
+      tzHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,74,74,0.2);padding:8px 0;">
+        <span>${z[0]}</span> <span>${z[1]} vezes</span>
+      </div>`;
+    });
+    document.getElementById('zone-lost-list').innerHTML = tzHTML || '<span style="color:var(--t3)">Nenhuma perda registada. Excelente!</span>';
+  }
+
+  // TEAM EDITOR
+  function renderTeamEditor() {
+    const editor = document.getElementById('team-editor');
+    editor.innerHTML = '';
+    players.forEach((p, index) => {
+      const row = document.createElement('div');
+      row.className = 'input-row';
+      row.innerHTML = `
+        <input type="number" style="width:70px" value="${p.num}" id="te-num-${index}">
+        <input type="text" style="flex:1" value="${p.name}" id="te-name-${index}">
+        <button class="btn-danger" style="padding:10px" onclick="removePlayerField(${index})">✕</button>
+      `;
+      editor.appendChild(row);
+    });
+  }
+  function addPlayerField() {
+    players.push({ num: 99, name: "Novo Jogador" });
+    renderTeamEditor();
+  }
+  function removePlayerField(index) {
+    players.splice(index, 1);
+    renderTeamEditor();
+  }
+  function saveTeam() {
+    const newPlayers = [];
+    for(let i=0; i<players.length; i++) {
+      if(!document.getElementById(`te-num-${i}`)) continue;
+      newPlayers.push({
+        num: document.getElementById(`te-num-${i}`).value,
+        name: document.getElementById(`te-name-${i}`).value
+      });
+    }
+    players = newPlayers;
+    localStorage.setItem('ls_team', JSON.stringify(players));
+    renderPlayers();
+    alert("Equipa guardada com sucesso!");
+  }
+
+  // GUARDAR NO PC (via servidor local)
+  async function saveToPC() {
+    if (logs.length === 0) { showToast('Não há dados para guardar.', false); return; }
+    const csv = buildCSV();
+    const filename = `SaoMancos_${new Date().toISOString().slice(0,10)}.csv`;
+    try {
+      const resp = await fetch('http://localhost:5556/guardar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename, content: csv })
+      });
+      const data = await resp.json();
+      if (data.ok) {
+        showToast('✔ Guardado em: São manços \ ' + filename, true);
+      } else {
+        showToast('❌ Erro: ' + data.error, false);
+      }
+    } catch(e) {
+      showToast('❌ Não foi possível ligar ao servidor. Usa Exportar CSV.', false);
+    }
+  }
+
+  function buildCSV() {
+    let csv = 'Data;Minuto;Jogador;Numero;Acao;Zona\r\n';
+    const dateStr = new Date().toLocaleDateString('pt-PT');
+    [...logs].reverse().forEach(row => {
+      csv += `${dateStr};${row.min};${row.player};${row.num};${row.action};${row.zone}\r\n`;
+    });
+    return csv;
+  }
+
+  function showToast(msg, ok) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = ok ? 'ok' : 'err';
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 4000);
+  }
+
+  // EXPORT CSV (download browser)
+  function exportCSV() {
+    if (logs.length === 0) { alert('Não há dados.'); return; }
+    const csv = buildCSV();
+    const uri = encodeURI('data:text/csv;charset=utf-8,' + csv);
+    const link = document.createElement('a');
+    link.setAttribute('href', uri);
+    link.setAttribute('download', `SaoMancos_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  }
+
+  // RESET ALL
+  function hardReset() {
+    if(confirm("ATENÇÃO: Isto apaga todos os dados do jogo atual. A equipa não é apagada. Continuar?")) {
+      logs = [];
+      seconds = 0;
+      clearInterval(timerInterval); isRunning = false;
+      document.getElementById('timer-display').innerText = "00:00";
+      document.getElementById('btn-timer-toggle').innerText = "Iniciar Jogo";
+      localStorage.removeItem('ls_logs');
+      localStorage.removeItem('ls_time');
+      renderLogs();
+      switchTab('jogo');
+    }
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>

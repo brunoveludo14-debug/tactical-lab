@@ -1,0 +1,24 @@
+{
+  "name": "Tactical Lab — Quadro Tático",
+  "short_name": "Tactical Lab",
+  "description": "Quadro tático de futebol — formações, animações, exportação e notas",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1610",
+  "theme_color": "#0c1610",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
