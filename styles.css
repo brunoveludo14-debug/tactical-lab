@@ -256,12 +256,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 /* pbox-wrap: ocupa todo o espaço à esquerda do painel */
 #pbox-wrap{flex:1;min-height:0;min-width:0;display:flex;align-items:stretch;justify-content:center;}
 /* pbox-pitch: cresce para preencher o wrap, limitado pelo ratio 68:52.5 */
+/* pbox-pitch: now acts as a vertical full pitch for Bolas Paradas */
 #pbox-pitch{
-  flex:1;
-  aspect-ratio: 68 / 52.5;
-  max-width: 100%;
-  max-height: calc(100vh - 170px);
-  min-width:0;
+  flex:none; height:100%; aspect-ratio:68/105; width:auto; max-width:none;
   position:relative;border-radius:10px;overflow:hidden;
   user-select:none;-webkit-user-select:none;
   background:

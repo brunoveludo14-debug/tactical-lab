@@ -403,7 +403,9 @@ function bindToolbar() {
     btn.addEventListener('click', function() { selectSetPiece(this, this.dataset.bpZone); });
   });
 
-  // Meio Campo panel
+  // Bolas Paradas / Cenários panel
+  document.getElementById('btn-save-scenario')?.addEventListener('click', openSaveModal);
+  document.getElementById('btn-load-scenario')?.addEventListener('click', openLoadModal);
   document.getElementById('btn-pbox-att')?.addEventListener('click', () => addPboxPlayer('att'));
   document.getElementById('btn-pbox-def')?.addEventListener('click', () => addPboxPlayer('def'));
   document.getElementById('btn-pbox-gk')?.addEventListener('click',  () => addPboxPlayer('gk'));
@@ -1274,8 +1276,8 @@ function addPboxPlayer(type) {
   const p   = { id, x: vx, y: vy, n: lbl, isGk, isDef, isOpp, name: nm };
   State.pPlayers.push(p);
 
-  const el = createPlayerEl(`pb${id}`, lbl, cls, nm, vx, vy, id, 68, 52.5);
-  attachPlayerEvents(el, id, 'p', 'pbox-pitch', 68, 52.5);
+  const el = createPlayerEl(`pb${id}`, lbl, cls, nm, vx, vy, id, 68, 105);
+  attachPlayerEvents(el, id, 'p', 'pbox-pitch', 68, 105);
   document.getElementById('pbox-pitch').appendChild(el);
   scheduleAutosave();
 }
@@ -1569,8 +1571,8 @@ function rebuildAllFromState() {
   document.querySelectorAll('#pbox-pitch .pl').forEach(e => e.remove());
   State.pPlayers.forEach((pl, i) => {
     const cls = pl.isOpp ? (pl.isGk ? 'opp-gk' : 'opp') : pl.isGk ? 'gk' : 'f';
-    const el  = createPlayerEl(`pb${pl.id}`, pl.n, cls, pl.name, pl.x, pl.y, i, 68, 52.5);
-    attachPlayerEvents(el, pl.id, 'p', 'pbox-pitch', 68, 52.5);
+    const el  = createPlayerEl(`pb${pl.id}`, pl.n, cls, pl.name, pl.x, pl.y, i, 68, 105);
+    attachPlayerEvents(el, pl.id, 'p', 'pbox-pitch', 68, 105);
     document.getElementById('pbox-pitch').appendChild(el);
   });
 
@@ -1623,11 +1625,11 @@ function spawnFieldBalls() {
   document.getElementById('pbox-ball')?.remove();
   const pb = makeBallEl('pbox-ball');
   const pPos = State.pBall || { x: 34, y: 26 };
-  const pPct = { x: (pPos.x / 68) * 100, y: (pPos.y / 52.5) * 100 };
+  const pPct = { x: (pPos.x / 68) * 100, y: (pPos.y / 105) * 100 };
   pb.style.left = `${pPct.x}%`;
   pb.style.top  = `${pPct.y}%`;
-  pb.addEventListener('mousedown', e => startFieldBallDrag(e, 'pbox-ball', 'pbox-pitch', State, 'pBall', 68, 52.5));
-  pb.addEventListener('touchstart', e => startFieldBallDrag(e, 'pbox-ball', 'pbox-pitch', State, 'pBall', 68, 52.5), { passive: false });
+  pb.addEventListener('mousedown', e => startFieldBallDrag(e, 'pbox-ball', 'pbox-pitch', State, 'pBall', 68, 105));
+  pb.addEventListener('touchstart', e => startFieldBallDrag(e, 'pbox-ball', 'pbox-pitch', State, 'pBall', 68, 105), { passive: false });
   document.getElementById('pbox-pitch')?.appendChild(pb);
 }
 

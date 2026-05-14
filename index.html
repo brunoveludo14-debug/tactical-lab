@@ -51,7 +51,7 @@
   <nav role="navigation" aria-label="Vistas">
     <button class="top-btn active" data-v="tactic" aria-pressed="true"  aria-label="Vista Táticas">Táticas</button>
     <button class="top-btn"        data-v="box"    aria-pressed="false" aria-label="Vista Grande Área">Grande Área</button>
-    <button class="top-btn"        data-v="pbox"   aria-pressed="false" aria-label="Vista Meio Campo">Meio Campo</button>
+    <button class="top-btn"        data-v="pbox"   aria-pressed="false" aria-label="Vista Bolas Paradas">Bolas Paradas</button>
     <button class="top-btn"        data-v="notes"  aria-pressed="false" aria-label="Vista Notas">Notas</button>
   </nav>
   <div class="vsep" aria-hidden="true"></div>
@@ -483,50 +483,60 @@
 </div>
 
 <!-- ── MEIO CAMPO VIEW ────────────────────────────────────────────── -->
-<div id="view-pbox" class="view" role="region" aria-label="Meio campo">
+<div id="view-pbox" class="view" role="region" aria-label="Bolas Paradas">
   <div id="pbox-outer">
     <div id="pbox-wrap">
-      <div id="pbox-pitch" role="img" aria-label="Meio campo de futebol">
-        <svg id="pb-lines" viewBox="0 0 68 52.5" preserveAspectRatio="xMidYMid meet">
-          <!-- Outer border -->
-          <rect x="2" y="0" width="64" height="52.5" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
+      <div id="pbox-pitch" role="img" aria-label="Campo Bolas Paradas">
+        <svg id="pb-lines" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet">
+          <!-- Outer field border -->
+          <rect x="2" y="2" width="64" height="101" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
           <!-- Halfway line -->
           <line x1="2" y1="52.5" x2="66" y2="52.5" stroke="rgba(255,255,255,.88)" stroke-width=".65"/>
-          <!-- Centre circle -->
-          <path d="M24.85,52.5 A9.15,9.15 0 0,0 43.15,52.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
+          <!-- Centre circle (r=9.15m) -->
+          <circle cx="34" cy="52.5" r="9.15" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
           <!-- Centre spot -->
           <circle cx="34" cy="52.5" r=".55" fill="white" opacity=".9"/>
-          <!-- Goal (7.32m wide x 2.44m deep, centred) -->
-          <rect x="30.34" y="-2.44" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
-          <!-- Goal area / Small box (18.32m x 5.5m) -->
-          <rect x="24.84" y="0" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
-          <!-- Penalty area / Large box (40.32m x 16.5m) -->
-          <rect x="13.84" y="0" width="40.32" height="16.5" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.9)" stroke-width=".65"/>
-          <!-- Penalty spot -->
-          <circle cx="34" cy="11" r=".6" fill="white" opacity=".95"/>
-          <!-- Penalty arc -->
-          <path d="M26.6,16.5 A9.15,9.15 0 0,0 41.4,16.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
-          <!-- Corner arcs -->
-          <path d="M2,1.5 A1.5,1.5 0 0,0 3.5,0"  fill="none" stroke="rgba(255,255,255,.7)" stroke-width=".55"/>
-          <path d="M66,1.5 A1.5,1.5 0 0,1 64.5,0" fill="none" stroke="rgba(255,255,255,.7)" stroke-width=".55"/>
+
+          <!-- ── TOP HALF ── -->
+          <rect x="30.34" y="0" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="2" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="2" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="13" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,18.5 A9.15,9.15 0 0,0 43.7,18.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,4.5 A2.5,2.5 0 0,1 4.5,2"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,4.5 A2.5,2.5 0 0,0 63.5,2" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+          <!-- ── BOTTOM HALF ── -->
+          <rect x="30.34" y="102.56" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="97.5" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="86.5" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="92" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,86.5 A9.15,9.15 0 0,1 43.7,86.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,100.5 A2.5,2.5 0 0,0 4.5,103"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,100.5 A2.5,2.5 0 0,1 63.5,103" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
         </svg>
 
-        <svg id="pb-shapes" viewBox="0 0 68 52.5" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
-        <svg id="pb-draw"   viewBox="0 0 68 52.5" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <svg id="pb-shapes" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <svg id="pb-draw"   viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
         <div id="pb-hint" class="hide" aria-hidden="true">
           <span class="hdot"></span>
           <span id="pb-hint-txt" class="hint-txt"></span>
         </div>
       </div>
     </div>
-    <div class="box-rp" role="complementary" aria-label="Painel Meio Campo">
+    <div class="box-rp" role="complementary" aria-label="Painel Cenários">
       <div class="brp-h">
-        <div class="brp-title">Meio Campo</div>
-        <div class="brp-sub">Jogadores &amp; movimentos</div>
+        <div class="brp-title">Cenários</div>
+        <div class="brp-sub">Criar &amp; inventar jogadas</div>
       </div>
       <div class="brp-b">
+        <div style="margin-bottom:10px;">
+          <button class="pbtn p" id="btn-save-scenario" style="width:100%;margin-bottom:6px;">Guardar Cenário</button>
+          <button class="pbtn s" id="btn-load-scenario" style="width:100%;">Carregar Cenário</button>
+        </div>
+        <div class="div"></div>
         <div>
-          <div class="sec">Equipa</div>
+          <div class="sec">Criar Equipa</div>
           <div class="add-btns">
             <button class="add-btn" id="btn-pbox-att" style="color:var(--acc)" aria-label="Adicionar atacante">+Atq</button>
             <button class="add-btn" id="btn-pbox-def" style="color:var(--red)"  aria-label="Adicionar defesa">+Def</button>
