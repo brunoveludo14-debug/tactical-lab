@@ -452,7 +452,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     aspect-ratio: 68 / 105;
     max-height:100%;
   }
-  #box-wrap, #pbox-wrap{ align-items:center; justify-content:center; }
+  #box-pc, #pbox-wrap{ align-items:center; justify-content:center; }
   .view{ flex:1; min-height:0; min-width:0; }
 
   /* Box panel */
@@ -524,7 +524,7 @@ body.force-landscape #pbox-pitch{
   flex:none; height:100%; width:auto; max-width:none;
   aspect-ratio: 68 / 105; max-height:100%;
 }
-body.force-landscape #box-wrap, body.force-landscape #pbox-wrap{ align-items:center; justify-content:center; }
+body.force-landscape #box-pc, body.force-landscape #pbox-wrap{ align-items:center; justify-content:center; }
 body.force-landscape .view{ flex:1; min-height:0; min-width:0; }
 body.force-landscape .box-rp{ width:120px; }
 body.force-landscape .notes-list{ width:150px; }
