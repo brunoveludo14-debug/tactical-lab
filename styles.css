@@ -862,40 +862,66 @@ body.field-fullscreen #app{gap:0;}
 
 /* ── #9 PRESENTATION MODE ───────────────────────── */
 #presentation-overlay{
-  position:fixed;inset:0;z-index:1000;background:var(--bg);
-  display:none;flex-direction:column;
+  position:fixed;inset:0;z-index:1000;background:#0a0f14;
+  display:none;flex-direction:row;
 }
 #presentation-overlay.active{display:flex;}
 #pres-field{
-  flex:1;display:flex;align-items:stretch;justify-content:center;
-  padding:24px 24px 100px 24px;
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:24px;
 }
-#pres-field #pitch-wrap {
-  flex:1; min-height:0; min-width:0;
+.presentation-mode #pitch-wrap {
+  flex:none !important; height:100% !important; aspect-ratio:68/105 !important;
+  width:auto !important; max-width:none !important;
 }
-#pres-controls{
-  position:fixed;bottom:24px;left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(135deg,rgba(17,28,42,.95),rgba(11,18,28,.95));
-  border:1px solid rgba(255,255,255,.1);border-radius:14px;
-  padding:10px 16px;display:flex;align-items:center;gap:10px;
-  backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.6);
-  transition:opacity .3s;z-index:1001;
+.presentation-mode #pitch {
+  height:100% !important; max-width:none !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,.6), inset 0 0 80px rgba(0,0,0,.15);
 }
-#pres-controls.hidden{opacity:0;}
+.presentation-mode .pl-tok {
+  width: clamp(26px, 3.5vh, 36px) !important;
+  height: clamp(26px, 3.5vh, 36px) !important;
+  font-size: clamp(10px, 1.4vh, 14px) !important;
+}
+.presentation-mode #ball svg {
+  width: clamp(14px, 1.8vh, 22px) !important;
+  height: clamp(14px, 1.8vh, 22px) !important;
+}
+
+#pres-sidebar{
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+}
+.ps-header {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.ps-title {
+  font-size: 15px; font-weight: 700; color: var(--t1);
+}
+#pres-frame-info{font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+
+.ps-controls{
+  display:flex;align-items:center;gap:10px;
+}
 .pres-btn{
-  padding:6px 14px;border-radius:8px;border:none;cursor:pointer;
-  font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+  padding:12px 16px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
   transition:all .15s;display:flex;align-items:center;gap:5px;
 }
 .pres-btn.primary{background:var(--ag);color:var(--acc);}
-.pres-btn.primary:hover{filter:brightness(1.15);}
+.pres-btn.primary:hover{filter:brightness(1.15);transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,220,132,.3);}
 .pres-btn.danger{background:rgba(248,113,113,.12);color:var(--red);}
 .pres-btn.danger:hover{background:rgba(248,113,113,.22);}
 .pres-btn.secondary{background:rgba(255,255,255,.06);color:var(--t2);}
 .pres-btn.secondary:hover{color:var(--t1);background:rgba(255,255,255,.1);}
-.pres-sep{width:1px;height:20px;background:rgba(255,255,255,.1);}
-#pres-frame-info{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
 
 /* ── #5 TACTIC SIDE PANEL ───────────────────────── */
 #tactic-panel{
