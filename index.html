@@ -50,7 +50,7 @@
 
   <nav role="navigation" aria-label="Vistas">
     <button class="top-btn active" data-v="tactic" aria-pressed="true"  aria-label="Vista Táticas">Táticas</button>
-    <button class="top-btn"        data-v="box"    aria-pressed="false" aria-label="Vista Grande Área">Grande Área</button>
+    <button class="top-btn"        data-v="box"    aria-pressed="false" aria-label="Vista Cenários de Jogo">Cenários de Jogo</button>
     <button class="top-btn"        data-v="pbox"   aria-pressed="false" aria-label="Vista Bolas Paradas">Bolas Paradas</button>
     <button class="top-btn"        data-v="notes"  aria-pressed="false" aria-label="Vista Notas">Notas</button>
   </nav>
@@ -396,46 +396,62 @@
   </div>
 </div>
 
-<!-- ── GRANDE ÁREA VIEW ───────────────────────────────────────────── -->
-<div id="view-box" class="view" role="region" aria-label="Grande área">
+<!-- ── CENÁRIOS DE JOGO VIEW ───────────────────────────────────────────── -->
+<div id="view-box" class="view" role="region" aria-label="Cenários de Jogo">
   <div id="box-wrap">
     <div id="box-pc">
-      <div id="box-pitch" role="img" aria-label="Grande área de futebol">
+      <div id="box-pitch" role="img" aria-label="Cenários de Jogo">
         <!-- box ball is spawned dynamically -->
-        <svg id="b-lines" viewBox="0 0 68 38" preserveAspectRatio="xMidYMid meet">
-          <!-- Outer border -->
-          <rect x="2" y="0" width="64" height="38" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
-          <!-- Goal (7.32m wide x 2.44m deep, centred) -->
-          <rect x="30.34" y="-2.44" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
-          <!-- Goal area / Small box (18.32m x 5.5m) -->
-          <rect x="24.84" y="0" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
-          <!-- Penalty area / Large box (40.32m x 16.5m) -->
-          <rect x="13.84" y="0" width="40.32" height="16.5" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.9)" stroke-width=".65"/>
-          <!-- Penalty spot -->
-          <circle cx="34" cy="11" r=".6" fill="white" opacity=".95"/>
-          <!-- Penalty arc -->
-          <path d="M26.6,16.5 A9.15,9.15 0 0,0 41.4,16.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
-          <!-- Corner arcs -->
-          <path d="M2,1.5 A1.5,1.5 0 0,0 3.5,0"  fill="none" stroke="rgba(255,255,255,.7)" stroke-width=".55"/>
-          <path d="M66,1.5 A1.5,1.5 0 0,1 64.5,0" fill="none" stroke="rgba(255,255,255,.7)" stroke-width=".55"/>
+        <svg id="b-lines" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet">
+          <!-- Outer field border -->
+          <rect x="2" y="2" width="64" height="101" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
+          <!-- Halfway line -->
+          <line x1="2" y1="52.5" x2="66" y2="52.5" stroke="rgba(255,255,255,.88)" stroke-width=".65"/>
+          <!-- Centre circle (r=9.15m) -->
+          <circle cx="34" cy="52.5" r="9.15" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
+          <!-- Centre spot -->
+          <circle cx="34" cy="52.5" r=".55" fill="white" opacity=".9"/>
+
+          <!-- ── TOP HALF ── -->
+          <rect x="30.34" y="0" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="2" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="2" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="13" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,18.5 A9.15,9.15 0 0,0 43.7,18.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,4.5 A2.5,2.5 0 0,1 4.5,2"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,4.5 A2.5,2.5 0 0,0 63.5,2" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+          <!-- ── BOTTOM HALF ── -->
+          <rect x="30.34" y="102.56" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="97.5" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="86.5" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="92" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,86.5 A9.15,9.15 0 0,1 43.7,86.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,100.5 A2.5,2.5 0 0,0 4.5,103"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,100.5 A2.5,2.5 0 0,1 63.5,103" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
         </svg>
 
-        <svg id="b-shapes" viewBox="0 0 68 38" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
-        <svg id="b-draw"   viewBox="0 0 68 38" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <svg id="b-shapes" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <svg id="b-draw"   viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
         <div id="b-hint" class="hide" aria-hidden="true">
           <span class="hdot"></span>
           <span id="b-hint-txt" class="hint-txt"></span>
         </div>
       </div>
     </div>
-    <div class="box-rp" role="complementary" aria-label="Painel Grande Área">
+    <div class="box-rp" role="complementary" aria-label="Painel Cenários">
       <div class="brp-h">
-        <div class="brp-title">Grande Área</div>
-        <div class="brp-sub">Bolas paradas &amp; movimentos</div>
+        <div class="brp-title">Cenários de Jogo</div>
+        <div class="brp-sub">Dinâmicas e Movimentos</div>
       </div>
       <div class="brp-b">
+        <div style="margin-bottom:10px;">
+          <button class="pbtn p" id="btn-save-box" style="width:100%;margin-bottom:6px;">Guardar Cenário</button>
+          <button class="pbtn s" id="btn-load-box" style="width:100%;">Carregar Cenário</button>
+        </div>
+        <div class="div"></div>
         <div>
-          <div class="sec">Jogadores</div>
+          <div class="sec">Criar Equipa</div>
           <div class="add-btns">
             <button class="add-btn" id="btn-add-att" style="color:var(--acc)" aria-label="Adicionar atacante">+Atq</button>
             <button class="add-btn" id="btn-add-def" style="color:var(--red)"  aria-label="Adicionar defesa">+Def</button>
@@ -445,22 +461,26 @@
         </div>
         <div class="div"></div>
         <div>
-          <div class="sec">Bola Parada</div>
-          <button class="bpo" data-bp-zone="cr" aria-label="Canto direito">
-            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3v18h18"/></svg></div>
-            <div><div class="bpo-t">Canto Direito</div><div class="bpo-s">Lado direito</div></div>
+          <div class="sec">Situações de Jogo</div>
+          <button class="bpo" data-bp-zone="pos-off" aria-label="Posicionamento Ofensivo">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div><div class="bpo-t">Posicionamento Ofensivo</div></div>
           </button>
-          <button class="bpo" data-bp-zone="cl" aria-label="Canto esquerdo">
-            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 3v18H3"/></svg></div>
-            <div><div class="bpo-t">Canto Esquerdo</div><div class="bpo-s">Lado esquerdo</div></div>
+          <button class="bpo" data-bp-zone="pos-def" aria-label="Posicionamento Defensivo">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="bpo-t">Posicionamento Defensivo</div></div>
           </button>
-          <button class="bpo" data-bp-zone="fk" aria-label="Livre direto">
-            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>
-            <div><div class="bpo-t">Livre Direto</div><div class="bpo-s">Fora da área</div></div>
+          <button class="bpo" data-bp-zone="press" aria-label="Linha de Pressão">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+            <div><div class="bpo-t">Linha de Pressão</div></div>
           </button>
-          <button class="bpo" data-bp-zone="pen" aria-label="Penálti">
-            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg></div>
-            <div><div class="bpo-t">Penálti</div><div class="bpo-s">Marca de penálti</div></div>
+          <button class="bpo" data-bp-zone="trans" aria-label="Transição">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="20" y1="4" x2="3" y2="21"/></svg></div>
+            <div><div class="bpo-t">Transição Ofensiva/Defensiva</div></div>
+          </button>
+          <button class="bpo" data-bp-zone="saida-gk" aria-label="Saída de Bola GR">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+            <div><div class="bpo-t">Saída de Bola GR</div></div>
           </button>
         </div>
         <div class="div"></div>

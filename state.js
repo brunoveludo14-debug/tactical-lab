@@ -50,7 +50,7 @@ export const BPZ = {
 };
 export const PITCH = {
   t: { id:'pitch',      vw:68, vh:105  },
-  b: { id:'box-pitch',  vw:68, vh:38   },
+  b: { id:'box-pitch',  vw:68, vh:105  },
   p: { id:'pbox-pitch', vw:68, vh:105 }
 };
 

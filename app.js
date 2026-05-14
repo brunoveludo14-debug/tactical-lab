@@ -386,7 +386,9 @@ function bindToolbar() {
   // Mode-bar cancel
   document.getElementById('btn-mode-cancel')?.addEventListener('click', () => setMode('none'));
 
-  // Grande Área panel
+  // Cenários de Jogo panel
+  document.getElementById('btn-save-box')?.addEventListener('click', openSaveModal);
+  document.getElementById('btn-load-box')?.addEventListener('click', openLoadModal);
   document.getElementById('btn-add-att')?.addEventListener('click', () => addBoxPlayer('att'));
   document.getElementById('btn-add-def')?.addEventListener('click', () => addBoxPlayer('def'));
   document.getElementById('btn-add-gk')?.addEventListener('click',  () => addBoxPlayer('gk'));
@@ -1150,22 +1152,22 @@ function addBoxPlayer(type) {
   const nm    = isGk ? 'Guarda-Redes' : type === 'att' ? `Atacante ${counts.att}` : `Defesa ${counts.def}`;
   const cls   = isGk ? 'gk' : isDef ? 'd' : 'f';
   const bases = {
-    att: [{x:34,y:55},{x:26,y:58},{x:42,y:58},{x:20,y:62},{x:48,y:62}],
-    def: [{x:34,y:66},{x:24,y:62},{x:44,y:62},{x:16,y:58},{x:52,y:58}],
-    gk:  [{x:34,y:8}]
+    att: [{x:34,y:75},{x:26,y:78},{x:42,y:78},{x:20,y:82},{x:48,y:82}],
+    def: [{x:34,y:90},{x:24,y:86},{x:44,y:86},{x:16,y:82},{x:52,y:82}],
+    gk:  [{x:34,y:98}]
   };
   const arr = bases[type];
   const idx = ((type === 'att' ? counts.att : type === 'def' ? counts.def : 1) - 1) % arr.length;
   const jx  = counts.total > 1 ? (Math.random() - 0.5) * 6 : 0;
   const jy  = counts.total > 1 ? (Math.random() - 0.5) * 4 : 0;
   const vx  = Math.max(4, Math.min(64, arr[idx].x + jx));
-  const vy  = Math.max(4, Math.min(71, arr[idx].y + jy));
+  const vy  = Math.max(2, Math.min(103, arr[idx].y + jy));
   const id  = counts.total;
   const p   = { id, x: vx, y: vy, n: lbl, isGk, isDef, name: nm };
   State.bPlayers.push(p);
 
-  const el = createPlayerEl(`bp${id}`, lbl, cls, nm, vx, vy, id, 68, 75);
-  attachPlayerEvents(el, id, 'b', 'box-pitch', 68, 75);
+  const el = createPlayerEl(`bp${id}`, lbl, cls, nm, vx, vy, id, 68, 105);
+  attachPlayerEvents(el, id, 'b', 'box-pitch', 68, 105);
   document.getElementById('box-pitch').appendChild(el);
   scheduleAutosave();
 }
@@ -1259,19 +1261,19 @@ function addPboxPlayer(type) {
   }
 
   const bases = {
-    att:     [{x:34,y:48},{x:24,y:44},{x:44,y:44},{x:18,y:50},{x:50,y:50}],
-    def:     [{x:34,y:35},{x:22,y:32},{x:46,y:32},{x:14,y:38},{x:54,y:38}],
-    gk:      [{x:34,y:50}],
-    'opp-att': [{x:34,y:10},{x:24,y:12},{x:44,y:12},{x:16,y:8},{x:52,y:8}],
-    'opp-def': [{x:34,y:22},{x:22,y:20},{x:46,y:20},{x:14,y:24},{x:54,y:24}],
-    'opp-gk':  [{x:34,y:4}],
+    att:       [{x:34,y:80},{x:24,y:75},{x:44,y:75},{x:18,y:85},{x:50,y:85}],
+    def:       [{x:34,y:60},{x:22,y:55},{x:46,y:55},{x:14,y:65},{x:54,y:65}],
+    gk:        [{x:34,y:98}],
+    'opp-att': [{x:34,y:30},{x:24,y:35},{x:44,y:35},{x:16,y:25},{x:52,y:25}],
+    'opp-def': [{x:34,y:45},{x:22,y:40},{x:46,y:40},{x:14,y:50},{x:54,y:50}],
+    'opp-gk':  [{x:34,y:7}],
   };
   const arr = bases[type] || bases.att;
   const idx = (counts.total - 1) % arr.length;
   const jx  = counts.total > 1 ? (Math.random() - 0.5) * 5 : 0;
   const jy  = counts.total > 1 ? (Math.random() - 0.5) * 3 : 0;
   const vx  = Math.max(4, Math.min(64, arr[idx].x + jx));
-  const vy  = Math.max(2, Math.min(50.5, arr[idx].y + jy));
+  const vy  = Math.max(2, Math.min(103, arr[idx].y + jy));
   const id  = counts.total;
   const p   = { id, x: vx, y: vy, n: lbl, isGk, isDef, isOpp, name: nm };
   State.pPlayers.push(p);
@@ -1562,8 +1564,8 @@ function rebuildAllFromState() {
   document.querySelectorAll('#box-pitch .pl').forEach(e => e.remove());
   State.bPlayers.forEach((pl, i) => {
     const cls = pl.isGk ? 'gk' : pl.isDef ? 'd' : 'f';
-    const el  = createPlayerEl(`bp${pl.id}`, pl.n, cls, pl.name, pl.x, pl.y, i, 68, 75);
-    attachPlayerEvents(el, pl.id, 'b', 'box-pitch', 68, 75);
+    const el  = createPlayerEl(`bp${pl.id}`, pl.n, cls, pl.name, pl.x, pl.y, i, 68, 105);
+    attachPlayerEvents(el, pl.id, 'b', 'box-pitch', 68, 105);
     document.getElementById('box-pitch').appendChild(el);
   });
 
@@ -1614,11 +1616,11 @@ function spawnFieldBalls() {
   document.getElementById('box-ball')?.remove();
   const bb = makeBallEl('box-ball');
   const bPos = State.bBall || { x: 34, y: 11 };
-  const bPct = { x: (bPos.x / 68) * 100, y: (bPos.y / 52.5) * 100 };
+  const bPct = { x: (bPos.x / 68) * 100, y: (bPos.y / 105) * 100 };
   bb.style.left = `${bPct.x}%`;
   bb.style.top  = `${bPct.y}%`;
-  bb.addEventListener('mousedown', e => startFieldBallDrag(e, 'box-ball', 'box-pitch', State, 'bBall', 68, 52.5));
-  bb.addEventListener('touchstart', e => startFieldBallDrag(e, 'box-ball', 'box-pitch', State, 'bBall', 68, 52.5), { passive: false });
+  bb.addEventListener('mousedown', e => startFieldBallDrag(e, 'box-ball', 'box-pitch', State, 'bBall', 68, 105));
+  bb.addEventListener('touchstart', e => startFieldBallDrag(e, 'box-ball', 'box-pitch', State, 'bBall', 68, 105), { passive: false });
   document.getElementById('box-pitch')?.appendChild(bb);
 
   // Pbox ball
