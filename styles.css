@@ -441,7 +441,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     height:100%;
     width:auto;
     max-width:none;
-    aspect-ratio: 68 / 38;
+    aspect-ratio: 68 / 105;
     max-height:100%;
   }
   #pbox-pitch{
@@ -449,7 +449,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     height:100%;
     width:auto;
     max-width:none;
-    aspect-ratio: 68 / 52.5;
+    aspect-ratio: 68 / 105;
     max-height:100%;
   }
   #box-wrap, #pbox-wrap{ align-items:center; justify-content:center; }
@@ -518,11 +518,11 @@ body.force-landscape #pitch{
 }
 body.force-landscape #box-pitch{
   flex:none; height:100%; width:auto; max-width:none;
-  aspect-ratio: 68 / 38; max-height:100%;
+  aspect-ratio: 68 / 105; max-height:100%;
 }
 body.force-landscape #pbox-pitch{
   flex:none; height:100%; width:auto; max-width:none;
-  aspect-ratio: 68 / 52.5; max-height:100%;
+  aspect-ratio: 68 / 105; max-height:100%;
 }
 body.force-landscape #box-wrap, body.force-landscape #pbox-wrap{ align-items:center; justify-content:center; }
 body.force-landscape .view{ flex:1; min-height:0; min-width:0; }
@@ -567,8 +567,9 @@ body.force-portrait .fwrap-row svg{ display:block !important; }
 body.force-portrait #fsel{ writing-mode:horizontal-tb !important; transform:none !important; max-height:none !important; font-size:11.5px !important; }
 body.force-portrait #mode-bar{ height:28px !important; min-height:28px !important; padding:0 12px !important; }
 body.force-portrait #pitch{ max-width:calc((100vh - 170px) / 1.544) !important; }
-
-
+body.force-portrait #pbox-outer, body.force-portrait #box-wrap { flex-direction:column !important; align-items:center !important; overflow-y:auto !important; overflow-x:hidden !important; }
+body.force-portrait #pbox-pitch, body.force-portrait #box-pitch { max-width:calc((100vh - 170px) / 1.544) !important; width:100% !important; height:auto !important; }
+body.force-portrait .box-rp { width:100% !important; max-width:500px !important; flex-shrink:0 !important; }
 @media (max-width: 600px) {
   #app{padding:5px;gap:4px;}
   #topbar{height:44px;min-height:44px;padding:0 8px;}
