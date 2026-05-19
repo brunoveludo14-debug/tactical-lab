@@ -1018,8 +1018,25 @@ timerInterval = setInterval(() => {
   }
 
   // EXPORT TO EXCEL COMPATIBLE FORMAT
-  function exportToExcel() {
+  async function exportToExcel() {
     if (logs.length === 0) { showToast('Sem dados para exportar.', false); return; }
+    
+    // Try to sync with local server first
+    try {
+      const resp = await fetch('http://localhost:5557/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logs, opp_logs })
+      });
+      if (resp.ok) {
+        showToast('✅ Sincronizado com Excel! Dashboard atualizado.', true);
+        return;
+      }
+    } catch(e) {
+      // Server not running - fallback to CSV download
+    }
+    
+    // Fallback: download CSV compatible with Excel
     const csv = buildCSV();
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -1028,7 +1045,7 @@ timerInterval = setInterval(() => {
     link.download = `SaoMancos_Export_${new Date().toISOString().slice(0,10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    showToast('📥 Exportado! Compatible com Dashboard Excel.', true);
+    showToast('📥 Exportado! (copia para Base de Dados do Excel)', true);
   }
 
   function showZoneDetail(zone) {
