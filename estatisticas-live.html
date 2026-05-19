@@ -134,24 +134,60 @@
   .psr-bar-wrap { flex:1; height:6px; background:var(--s1); border-radius:3px; overflow:hidden; }
   .psr-bar { height:100%; background:var(--acc); border-radius:3px; }
   .psr-detail { font-size:10px; color:var(--t2); display:flex; gap:8px; }
-  .opp-add-btn { width:100%; background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.3); color:#ff6b6b; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px; }
-  .hm-zone { transition: background 0.4s; background: rgba(0,0,0,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 600; }
-  .chart-bar-row { display:flex; align-items:center; gap:8px; }
-  .chart-label { font-size:12px; min-width:120px; color:var(--t2); }
-  .chart-bar-bg { flex:1; height:8px; background:var(--s1); border-radius:4px; overflow:hidden; }
-  .chart-bar-fill { height:100%; background:var(--acc); border-radius:4px; transition: width 0.5s; }
-  .chart-count { font-size:11px; color:var(--t3); min-width:30px; text-align:right; }
-  .match-history-item { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--s2); border-radius:8px; border:1px solid var(--b1); }
-  .mhi-date { font-weight:600; font-size:13px; }
-  .mhi-score { font-size:20px; font-weight:700; color:var(--acc); }
-  .mhi-detail { font-size:11px; color:var(--t3); }
-  .stats-view { padding: 20px; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; }
-  .stat-card { background: var(--s1); border: 1px solid var(--b1); padding: 18px; border-radius: 12px; margin-bottom: 16px; }
-  .stat-bar-bg { width: 100%; height: 8px; background: var(--s2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
-  .stat-bar-fill { height: 100%; background: var(--acc); border-radius: 4px; transition: 0.5s; }
-  .stat-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 13px; }
+.opp-add-btn { width:100%; background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.3); color:#ff6b6b; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px; }
+  /* DASHBOARD V2 */
+  .dash-header { display:flex; justify-content:space-between; align-items:center; padding:10px 14px 8px; }
+  .dash-btn { background:rgba(61,220,132,.12); border:1px solid rgba(61,220,132,.25); color:var(--acc); padding:5px 10px; border-radius:7px; font-size:11px; font-weight:600; cursor:pointer; }
+  .dash-btn:hover { background:rgba(61,220,132,.2); }
+  .result-bar { display:flex; align-items:center; gap:10px; padding:8px 14px; background:var(--s1); margin:0 12px 10px; border-radius:12px; border:1px solid var(--b1); }
+  .result-big { display:flex; flex-direction:column; align-items:center; }
+  .result-num { font-size:32px; font-weight:700; color:#FFD700; line-height:1; }
+  .result-num.purple { color:#c850f5; }
+  .result-label { font-size:9px; color:var(--t3); font-weight:600; letter-spacing:.05em; margin-top:2px; }
+  .result-div { font-size:22px; color:var(--t3); font-weight:300; margin:0 2px; }
+  .half-filters { display:flex; gap:4px; margin-left:auto; }
+  .hf-btn { background:var(--s2); border:1px solid var(--b1); color:var(--t3); padding:4px 9px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; }
+  .hf-btn.active { background:var(--acc); color:var(--bg); border-color:var(--acc); }
+  .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 12px; }
+  .dash-card { background:var(--s1); border:1px solid var(--b1); border-radius:12px; padding:10px 12px; }
+  .dash-card-title { font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px; }
+  /* Eficácia */
+  .eff-row { display:flex; gap:8px; }
+  .eff-item { flex:1; }
+  .eff-label { font-size:10px; color:var(--t3); margin-bottom:4px; }
+  .eff-big { font-size:22px; font-weight:700; color:var(--acc); }
+  .eff-bar-bg { height:5px; background:var(--s2); border-radius:3px; overflow:hidden; margin:4px 0; }
+  .eff-bar { height:100%; background:var(--acc); border-radius:3px; transition:width .4s; }
+  .eff-sub { font-size:10px; color:var(--t3); }
+  /* Action list */
+  .action-list { display:flex; flex-direction:column; gap:5px; max-height:140px; overflow-y:auto; }
+  .act-row { display:flex; align-items:center; gap:6px; font-size:11px; }
+  .act-name { flex:1; color:var(--t2); }
+  .act-bar-bg { flex:1; height:5px; background:var(--s2); border-radius:3px; overflow:hidden; }
+  .act-bar { height:100%; background:var(--acc); border-radius:3px; }
+  .act-count { font-size:10px; color:var(--t3); min-width:20px; text-align:right; }
+  /* Heatmap mini */
+  .heatmap-mini { display:flex; flex-direction:column; gap:3px; }
+  .hm-row { display:flex; gap:3px; }
+  .hm-cell { flex:1; aspect-ratio:1; background:rgba(255,255,255,.08); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:9px; color:rgba(255,255,255,.4); font-weight:600; cursor:pointer; transition:background .3s; }
+  /* Player list */
+  .player-list { display:flex; flex-direction:column; gap:4px; }
+  .pl-item { display:flex; align-items:center; gap:6px; padding:5px 6px; background:var(--s2); border-radius:6px; }
+  .pl-rank { font-size:10px; color:var(--t3); font-weight:700; width:16px; }
+  .pl-name { flex:1; font-size:11px; font-weight:600; }
+  .pl-count { font-size:10px; color:var(--t3); }
+  /* Opponent */
+  .opp-quick-btn { background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.2); color:#ff6b6b; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; }
+  .opp-list { display:flex; flex-direction:column; gap:3px; max-height:80px; overflow-y:auto; }
+  .opp-item { display:flex; justify-content:space-between; font-size:11px; padding:4px 6px; background:var(--s2); border-radius:5px; }
+  .opp-name { color:#ff6b6b; }
+  .opp-zone { color:var(--t3); }
+  /* History */
+  .history-list { display:flex; flex-direction:column; gap:4px; }
+  .hist-item { display:flex; justify-content:space-between; align-items:center; padding:5px 8px; background:var(--s2); border-radius:6px; }
+  .hist-date { font-size:11px; color:var(--t3); }
+  .hist-score { font-size:16px; font-weight:700; color:var(--acc); }
 
-  /* ===== MOBILE (<=700px) ===== */
   @media (max-width: 700px) {
     .stat-card { padding: 12px; }
     .stat-row { font-size: 11px; }
@@ -258,110 +294,116 @@
   </div>
 </div>
 
-<!-- VISTA 2: ESTATÍSTICAS -->
+<!-- VISTA 2: ESTATÍSTICAS — DASHBOARD LIVE -->
 <div id="view-stats" class="view stats-view">
-  <div class="section-title">Análise em Tempo Real</div>
-
-  <!-- RESULTADO + PARTE em linha -->
-  <div class="stat-card" style="display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; padding:14px 16px;">
-    <div style="text-align:center;">
-      <div style="font-size:11px; color:var(--t3); margin-bottom:2px;">MARCADOS</div>
-      <div id="stat-golos-marcados" style="font-size:38px; font-weight:700; color:#FFD700; line-height:1;">0</div>
-    </div>
-    <div style="font-size:30px; color:var(--t3); font-weight:300;">—</div>
-    <div style="text-align:center;">
-      <div style="font-size:11px; color:var(--t3); margin-bottom:2px;">SOFRIDOS</div>
-      <div id="stat-golos-sofridos" style="font-size:38px; font-weight:700; color:#c850f5; line-height:1;">0</div>
-    </div>
-    <div style="border-left:1px solid var(--b1); height:40px; margin:0 4px;"></div>
-    <div style="display:flex; flex-direction:column; gap:6px;">
-      <div style="display:flex; gap:5px;">
-        <button class="stat-filter-btn active" id="filter-half-all" onclick="setStatHalfFilter('all', this)" style="font-size:11px;padding:4px 10px;">Jogo</button>
-        <button class="stat-filter-btn" id="filter-half-1" onclick="setStatHalfFilter(1, this)" style="font-size:11px;padding:4px 10px;">1ªP</button>
-        <button class="stat-filter-btn" id="filter-half-2" onclick="setStatHalfFilter(2, this)" style="font-size:11px;padding:4px 10px;">2ªP</button>
-      </div>
+  <div class="dash-header">
+    <span class="section-title" style="margin:0;">📊 Análise em Tempo Real</span>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <button class="dash-btn" onclick="exportToExcel()" title="Exportar para Excel">📥 Excel</button>
+      <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.15);">💾 Guardar Jogo</button>
     </div>
   </div>
 
-  <!-- Estatísticas rápidas em grelha compacta -->
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+  <!-- RESULTADO + FILTRO compacto -->
+  <div class="result-bar">
+    <div class="result-big">
+      <span class="result-num" id="stat-golos-marcados">0</span>
+      <span class="result-label">MARC.</span>
+    </div>
+    <div class="result-div">—</div>
+    <div class="result-big">
+      <span class="result-num purple" id="stat-golos-sofridos">0</span>
+      <span class="result-label">SOFR.</span>
+    </div>
+    <div class="result-div"></div>
+    <div class="half-filters">
+      <button class="hf-btn active" id="filter-half-all" onclick="setStatHalfFilter('all',this)">Todo</button>
+      <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1ªP</button>
+      <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2ªP</button>
+    </div>
+  </div>
 
-    <!-- Cruzamentos -->
-    <div class="stat-card" style="margin-bottom:0;">
-      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Cruzamentos</div>
-      <div id="stat-cruz-pct" style="font-size:28px; font-weight:700; color:var(--acc);">0%</div>
-      <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-cruz-bar" style="width:0%"></div></div>
-      <div class="stat-row">
-        <span id="stat-cruz-certo" style="font-size:11px;">0 certos</span>
-        <span id="stat-cruz-errado" style="font-size:11px;">0 falhados</span>
+  <!-- CARDS em grelha 2 colunas -->
+  <div class="dash-grid">
+
+    <!-- CARD: Eficácia (Cruzamentos + Remates) -->
+    <div class="dash-card">
+      <div class="dash-card-title">📈 Eficácia</div>
+      <div class="eff-row">
+        <div class="eff-item">
+          <div class="eff-label">Cruzamentos</div>
+          <div class="eff-big" id="stat-cruz-pct">0%</div>
+          <div class="eff-bar-bg"><div class="eff-bar" id="stat-cruz-bar" style="width:0%"></div></div>
+          <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
+        </div>
+        <div class="eff-item">
+          <div class="eff-label">Remates</div>
+          <div class="eff-big" id="stat-remates-pct">0%</div>
+          <div class="eff-bar-bg"><div class="eff-bar" id="stat-remates-bar" style="width:0%"></div></div>
+          <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza · <span id="stat-remates-errado">0</span> fora</div>
+        </div>
       </div>
     </div>
 
-    <!-- Remates -->
-    <div class="stat-card" style="margin-bottom:0;">
-      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Remates</div>
-      <div id="stat-remates-pct" style="font-size:28px; font-weight:700; color:var(--acc);">0%</div>
-      <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-remates-bar" style="width:0%; background:var(--acc);"></div></div>
-      <div class="stat-row">
-        <span id="stat-remates-certo" style="font-size:11px;">0 à baliza</span>
-        <span id="stat-remates-errado" style="font-size:11px;">0 fora</span>
+    <!-- CARD: Distribuição de Ações -->
+    <div class="dash-card">
+      <div class="dash-card-title">📊 Ações por Tipo</div>
+      <div id="action-chart" class="action-list"></div>
+    </div>
+
+    <!-- CARD: Mapa de Calor -->
+    <div class="dash-card">
+      <div class="dash-card-title">🗺️ Zonas Críticas</div>
+      <div class="heatmap-mini">
+        <div class="hm-row">
+          <div class="hm-cell" id="hm-0" onclick="showZoneDetail('Ataque Esq.')"></div>
+          <div class="hm-cell" id="hm-1" onclick="showZoneDetail('Ataque Centro')"></div>
+          <div class="hm-cell" id="hm-2" onclick="showZoneDetail('Ataque Dir.')"></div>
+        </div>
+        <div class="hm-row">
+          <div class="hm-cell" id="hm-3" onclick="showZoneDetail('Meio Esq.')"></div>
+          <div class="hm-cell" id="hm-4" onclick="showZoneDetail('Meio Centro')"></div>
+          <div class="hm-cell" id="hm-5" onclick="showZoneDetail('Meio Dir.')"></div>
+        </div>
+        <div class="hm-row">
+          <div class="hm-cell" id="hm-6" onclick="showZoneDetail('Defesa Esq.')"></div>
+          <div class="hm-cell" id="hm-7" onclick="showZoneDetail('Defesa Centro')"></div>
+          <div class="hm-cell" id="hm-8" onclick="showZoneDetail('Defesa Dir.')"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Mais ações -->
-    <div class="stat-card" style="margin-bottom:0;">
-      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Top Envolve.</div>
-      <div id="top-players-list">
-        <!-- Generated -->
-      </div>
-    </div>
-
-    <!-- Zonas problema -->
-    <div class="stat-card" style="margin-bottom:0;">
-      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Zonas Críticas</div>
-      <div id="zone-lost-list" style="color:var(--red);">
-        <!-- Generated -->
-      </div>
+    <!-- CARD: Top Jogadores -->
+    <div class="dash-card">
+      <div class="dash-card-title">👥 Mais Envolve.</div>
+      <div id="top-players-list" class="player-list"></div>
     </div>
 
   </div>
 
-  <!-- Adversário — compacto -->
-  <div class="stat-card" style="margin-top:10px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <span style="font-size:14px; font-weight:600; color:#ff6b6b;">🟥 Adversário</span>
-      <button class="opp-add-btn" onclick="addOppAction()" style="margin:0; padding:5px 12px; font-size:12px;">+ Registar</button>
+  <!-- Adversário -->
+  <div class="dash-card" style="margin-top:8px;">
+    <div class="dash-card-title" style="color:#ff6b6b;">🟥 Adversário <span style="font-size:11px;opacity:0.6;font-weight:400;">(regista ações)</span></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+      <button class="opp-quick-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
+      <button class="opp-quick-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
+      <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
+      <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
     </div>
-    <div id="opp-actions-list" style="display:flex; flex-direction:column; gap:4px;"></div>
-  </div>
-
-  <!-- Mapa de calor pequeno -->
-  <div class="stat-card" style="margin-top:10px; padding:12px 14px;">
-    <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:10px;">🗺️ Zonas de Perda</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr 1fr; gap:3px; height:120px;">
-      <div class="hm-zone" data-zone="Ataque Esq." id="hm-0"></div>
-      <div class="hm-zone" data-zone="Ataque Centro" id="hm-1"></div>
-      <div class="hm-zone" data-zone="Ataque Dir." id="hm-2"></div>
-      <div class="hm-zone" data-zone="Meio Esq." id="hm-3"></div>
-      <div class="hm-zone" data-zone="Meio Centro" id="hm-4"></div>
-      <div class="hm-zone" data-zone="Meio Dir." id="hm-5"></div>
-      <div class="hm-zone" data-zone="Defesa Esq." id="hm-6"></div>
-      <div class="hm-zone" data-zone="Defesa Centro" id="hm-7"></div>
-      <div class="hm-zone" data-zone="Defesa Dir." id="hm-8"></div>
-    </div>
+    <div id="opp-actions-list" class="opp-list"></div>
   </div>
 
   <!-- Histórico jogos -->
-  <div class="stat-card" style="margin-top:10px;">
-    <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">📁 Últimos Jogos</div>
-    <div id="match-history-list" style="display:flex; flex-direction:column; gap:5px;"></div>
-    <button class="opp-add-btn" onclick="saveMatchToHistory()" style="margin-top:8px; background:rgba(61,220,132,.1);border-color:rgba(61,220,132,.3);color:var(--acc);padding:7px 12px;font-size:12px;">💾 Guardar</button>
+  <div class="dash-card" style="margin-top:8px;">
+    <div class="dash-card-title">📁 Histórico <span style="font-weight:400;opacity:0.6;font-size:12px;">— resultados anteriores</span></div>
+    <div id="match-history-list" class="history-list"></div>
   </div>
 
   <!-- Offline indicator -->
-  <div id="offline-status" style="display:none; text-align:center; padding:10px; color:var(--red); font-size:12px;">
-    📴 Modo Offline — dados guardados localmente
+  <div id="offline-status" style="display:none; text-align:center; padding:8px; color:var(--red); font-size:11px; background:rgba(255,74,74,.08); border-radius:8px; margin-top:8px;">
+    📴 Sem internet — dados guardados localmente
   </div>
+</div>
     <div id="player-stats-list">
       <!-- Generated -->
     </div>
@@ -770,13 +812,13 @@ timerInterval = setInterval(() => {
     const container = document.getElementById('opp-actions-list');
     if (!container) return;
     if (oppLogs.length === 0) {
-      container.innerHTML = '<span style="color:var(--t3); font-size:12px;">Nenhuma ação do adversário.</span>';
+      container.innerHTML = '<span style="color:var(--t3);font-size:11px;">Nenhuma ação registada.</span>';
       return;
     }
     container.innerHTML = oppLogs.slice(0, 10).map(o => `
-      <div style="display:flex; justify-content:space-between; padding:6px 8px; background:var(--s2); border-radius:6px; font-size:12px;">
-        <span style="color:var(--opp,#ff6b6b)">${o.min}' ${o.action}</span>
-        <span style="color:var(--t3)">${o.zone}</span>
+      <div class="opp-item">
+        <span class="opp-name">${o.min}' ${o.action}</span>
+        <span class="opp-zone">${o.zone}</span>
       </div>
     `).join('');
   }
@@ -810,15 +852,25 @@ timerInterval = setInterval(() => {
     actionTypes.forEach(a => { counts[a] = logs.filter(l => l.action === a).length; });
     const maxCount = Math.max(1, ...Object.values(counts));
 
-    container.innerHTML = actionTypes.map(a => {
+    container.innerHTML = actionTypes.filter(a => counts[a] > 0).map(a => {
       const c = counts[a];
       const pct = maxCount > 0 ? (c / maxCount) * 100 : 0;
-      return `<div class="chart-bar-row">
-        <span class="chart-label">${a}</span>
-        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${pct}%; background:${actionColors[a] || 'var(--acc)'}"></div></div>
-        <span class="chart-count">${c}</span>
+      return `<div class="act-row">
+        <span class="act-name">${a}</span>
+        <div class="act-bar-bg"><div class="act-bar" style="width:${pct}%; background:${actionColors[a] || 'var(--acc)'}"></div></div>
+        <span class="act-count">${c}</span>
       </div>`;
-    }).join('');
+    }).join('') || '<span style="color:var(--t3);font-size:11px;">Sem dados ainda.</span>';
+  }
+
+  // QUICK OPPONENT REGISTRATION
+  function addOppQuick(action) {
+    const min = Math.floor(seconds / 60);
+    const zone = prompt("Zona:", "Meio Centro") || "Meio Centro";
+    const oppLog = { id: Date.now(), min, action, zone, half };
+    oppLogs.unshift(oppLog);
+    localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
+    renderOppActions();
   }
 
   // MATCH HISTORY
@@ -956,7 +1008,34 @@ timerInterval = setInterval(() => {
     [...logs].reverse().forEach(row => {
       csv += `${dateStr};${row.min};${row.player};${row.num};${row.action};${row.zone}\r\n`;
     });
+    // Include opponent logs
+    if (oppLogs.length > 0) {
+      csv += '\r\n--- ACCOES ADVERSARIO ---\r\n';
+      csv += 'Minuto;Acao;Zona\r\n';
+      oppLogs.forEach(o => { csv += `${o.min};${o.action};${o.zone}\r\n`; });
+    }
     return csv;
+  }
+
+  // EXPORT TO EXCEL COMPATIBLE FORMAT
+  function exportToExcel() {
+    if (logs.length === 0) { showToast('Sem dados para exportar.', false); return; }
+    const csv = buildCSV();
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SaoMancos_Export_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast('📥 Exportado! Compatible com Dashboard Excel.', true);
+  }
+
+  function showZoneDetail(zone) {
+    const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
+    if (perdas.length === 0) { showToast(`${zone}: sem perdas`, true); return; }
+    const detalhes = perdas.map(p => `${p.min}' ${p.player}: ${p.action}`).join('\n');
+    alert(`${zone} — ${perdas.length} perdas:\n\n${detalhes}`);
   }
 
   function showToast(msg, ok) {
