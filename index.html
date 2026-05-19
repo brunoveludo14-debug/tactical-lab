@@ -11,6 +11,7 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   /* Light mode vars */
   :root {
@@ -316,7 +317,7 @@
   <div class="dash-header">
     <span class="section-title" style="margin:0;">📊 Análise em Tempo Real</span>
     <div style="display:flex; gap:6px; align-items:center;">
-      <button class="dash-btn" onclick="exportToExcel()" title="Exportar para Excel">📥 Excel</button>
+      <button class="dash-btn" onclick="exportDirectExcel()" title="Descarregar .xlsx para Excel">📊 Excel .xlsx</button>
       <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.15);">💾 Guardar Jogo</button>
     </div>
   </div>
@@ -1034,35 +1035,76 @@ timerInterval = setInterval(() => {
     return csv;
   }
 
-  // EXPORT TO EXCEL COMPATIBLE FORMAT
-  async function exportToExcel() {
-    if (logs.length === 0) { showToast('Sem dados para exportar.', false); return; }
-    
-    // Try to sync with local server first
-    try {
-      const resp = await fetch('http://localhost:5557/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logs, opp_logs })
-      });
-      if (resp.ok) {
-        showToast('✅ Sincronizado com Excel! Dashboard atualizado.', true);
-        return;
-      }
-    } catch(e) {
-      // Server not running - fallback to CSV download
+  // DIRECT EXCEL EXPORT — writes .xlsx without server
+  function exportDirectExcel() {
+    if (typeof XLSX === 'undefined') {
+      showToast('A carregar biblioteca... tenta novamente.', false);
+      setTimeout(exportDirectExcel, 1000);
+      return;
     }
-    
-    // Fallback: download CSV compatible with Excel
-    const csv = buildCSV();
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `SaoMancos_Export_${new Date().toISOString().slice(0,10)}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-    showToast('📥 Exportado! (copia para Base de Dados do Excel)', true);
+    if (logs.length === 0) { showToast('Sem dados para exportar.', false); return; }
+
+    // Build workbook with 2 sheets
+    const dateStr = new Date().toLocaleDateString('pt-PT');
+
+    // Sheet 1: Base de Dados
+    const dataRows = [[
+      'Data', 'Minuto', 'Jogador', 'Numero', 'Acao', 'Zona', 'Parte'
+    ]];
+    logs.forEach(log => {
+      dataRows.push([
+        dateStr, log.min, log.player, log.num, log.action, log.zone, log.half || 1
+      ]);
+    });
+    // Add opponent logs
+    if (oppLogs.length > 0) {
+      dataRows.push(['--- ACCOES ADVERSARIO ---']);
+      oppLogs.forEach(o => {
+        dataRows.push(['', o.min, '', '', o.action, o.zone, o.half || '']);
+      });
+    }
+
+    // Sheet 2: Resumo
+    const golosMarcados = logs.filter(l => l.action === 'Golo Marcado').length;
+    const golosSofridos = oppLogs.filter(o => o.action === 'Golo Sofrido').length;
+    const cruzCertos = logs.filter(l => l.action === 'Cruzamento Certo').length;
+    const cruzFalhados = logs.filter(l => l.action === 'Cruzamento Falhado').length;
+    const rematesBaliza = logs.filter(l => l.action === 'Remate à Baliza').length;
+    const rematesFora = logs.filter(l => l.action === 'Remate Fora').length;
+
+    const resumoRows = [
+      ['RESUMO SÃO MANÇOS', dateStr],
+      ['Golos Marcados', golosMarcados],
+      ['Golos Sofridos', golosSofridos],
+      ['Cruzamentos Certos', cruzCertos],
+      ['Cruzamentos Falhados', cruzFalhados],
+      ['Remates à Baliza', rematesBaliza],
+      ['Remates Fora', rematesFora],
+      ['', ''],
+      ['Jogador', 'Total Ações'],
+    ];
+    const pCounts = {};
+    logs.forEach(l => { pCounts[l.player] = (pCounts[l.player] || 0) + 1; });
+    Object.entries(pCounts).sort((a,b) => b[1]-a[1]).forEach(([name, count]) => {
+      resumoRows.push([name, count]);
+    });
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    const ws1 = XLSX.utils.aoa_to_sheet(dataRows);
+    const ws2 = XLSX.utils.aoa_to_sheet(resumoRows);
+
+    // Set column widths
+    ws1['!cols'] = [{wch:12},{wch:8},{wch:15},{wch:8},{wch:18},{wch:15},{wch:6}];
+    ws2['!cols'] = [{wch:20},{wch:12}];
+
+    XLSX.utils.book_append_sheet(wb, ws1, 'Base de Dados');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
+
+    // Download
+    const filename = `SaoMancos_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    showToast('📊 Excel descarregado! Abre no Excel.', true);
   }
 
   function showZoneDetail(zone) {
