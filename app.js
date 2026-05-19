@@ -1997,6 +1997,10 @@ function renderCustomFmtList() {
   }
 
   html += `<button class="cfmt-save-btn" id="cfmt-save-now">＋ Guardar formação atual</button>`;
+  html += `<div style="display:flex;gap:4px;margin-top:6px;">`;
+  html += `<button class="cfmt-save-btn" id="cfmt-export" style="flex:1;font-size:10px;background:var(--b2);">Exportar JSON</button>`;
+  html += `<button class="cfmt-save-btn" id="cfmt-import" style="flex:1;font-size:10px;background:var(--b2);">Importar JSON</button>`;
+  html += `</div>`;
   list.innerHTML = html;
 
   // Load custom formation
@@ -2046,6 +2050,55 @@ function renderCustomFmtList() {
     localStorage.setItem('tl_custom_fmts', JSON.stringify(State.customFmts));
     renderCustomFmtList();
     showToast(`Formação "${name.trim()}" guardada`);
+  });
+
+  // Export
+  document.getElementById('cfmt-export')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!State.customFmts?.length) return showToast('Nenhuma formação para exportar');
+    const json = JSON.stringify({ _type: 'tl-custom-fmts', v: 1, fmts: State.customFmts }, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = `tl-formacoes-${Date.now()}.json`; a.click();
+    URL.revokeObjectURL(url);
+    showToast('Formações exportadas!');
+    list.classList.remove('open');
+  });
+
+  // Import
+  document.getElementById('cfmt-import')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = () => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data._type !== 'tl-custom-fmts' || !Array.isArray(data.fmts)) throw new Error('Formato inválido');
+          const existing = State.customFmts || [];
+          const existingNames = new Set(existing.map(f => f.name));
+          let imported = 0;
+          for (const f of data.fmts) {
+            if (!existingNames.has(f.name)) {
+              existing.push(f);
+              existingNames.add(f.name);
+              imported++;
+            }
+          }
+          State.customFmts = existing;
+          localStorage.setItem('tl_custom_fmts', JSON.stringify(State.customFmts));
+          renderCustomFmtList();
+          showToast(`${imported} formação(ões) importada(s)`);
+        } catch (err) {
+          showToast(`Erro: ${err.message}`);
+        }
+      };
+      reader.readAsText(input.files[0]);
+    };
+    input.click();
+    list.classList.remove('open');
   });
 }
 
