@@ -12,11 +12,19 @@
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
+  /* Light mode vars */
   :root {
     --bg: #0c1610; --s1: #16241b; --s2: #1f3025;
     --b1: rgba(61, 220, 132, 0.15); --b2: rgba(61, 220, 132, 0.3);
     --t1: rgba(255, 255, 255, 0.95); --t2: rgba(255, 255, 255, 0.75); --t3: rgba(255, 255, 255, 0.5);
     --acc: #3ddc84; --acc-hover: #48e58f; --red: #ff4a4a; --yel: #ffb84a;
+    --pitch-bg: #27ae60;
+  }
+  body.light-mode {
+    --bg: #f4f7f4; --s1: #ffffff; --s2: #edf3ed;
+    --b1: rgba(61, 220, 132, 0.15); --b2: rgba(61, 220, 132, 0.3);
+    --t1: rgba(15, 30, 18, 0.95); --t2: rgba(15, 30, 18, 0.65); --t3: rgba(15, 30, 18, 0.4);
+    --acc: #2cb870; --pitch-bg: #4ade80;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
   body { background-color: var(--bg); color: var(--t1); display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
@@ -32,6 +40,8 @@
   .btn-export { background: var(--acc); color: var(--bg); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; }
   .btn-save-pc { background: #1f3025; color: var(--acc); border: 1px solid var(--acc); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.15s; white-space: nowrap; }
   .btn-save-pc:hover { background: var(--acc); color: var(--bg); }
+  .btn-theme { background: var(--s2); color: var(--t1); border: 1px solid var(--b1); padding: 8px 12px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.15s; }
+  .btn-theme:hover { background: var(--acc); }
 
   /* Toast */
   #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 9999; display: none; animation: fadeUp 0.3s ease; max-width: 90vw; text-align: center; }
@@ -54,7 +64,7 @@
   .player-num { font-size: 10px; opacity: 0.7; }
   .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; opacity: 0.5; pointer-events: none; transition: 0.2s; }
   .actions-grid.active { opacity: 1; pointer-events: auto; }
-  .action-btn { background: var(--s2); border: 1px solid var(--b1); border-radius: 12px; padding: 14px 12px; color: var(--t1); font-weight: 500; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .action-btn { background: var(--s2); border: 1px solid var(--b1); border-radius: 12px; padding: 18px 14px; color: var(--t1); font-weight: 500; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; min-height: 56px; }
   .action-btn:active { transform: scale(0.97); }
   .action-btn.certo { border-left: 4px solid var(--acc); }
   .action-btn.errado { border-left: 4px solid var(--red); }
@@ -65,11 +75,36 @@
   /* Pitch Overlay */
   .pitch-overlay { position: fixed; inset: 0; background: rgba(12,22,16,0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); padding: 20px; }
   .pitch-overlay.active { display: flex; }
-  .pitch-container { width: min(95vw, 420px); height: min(65vw, 280px); background: #27ae60; border: 2px solid white; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 1px; }
+  .pitch-container { width: min(95vw, 420px); height: min(65vw, 280px); background: var(--pitch-bg); border: 2px solid white; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 1px; }
   .zone-btn { background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); color: white; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 13px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .zone-btn:active { background: rgba(255,255,255,0.5); }
   .pitch-title { margin-bottom: 14px; font-size: 17px; font-weight: bold; text-align: center; }
   .cancel-pitch { margin-top: 14px; background: transparent; border: none; color: var(--red); cursor: pointer; font-size: 15px; text-decoration: underline; padding: 8px; }
+
+  /* Quick-Action Floating Bar */
+  .quick-bar {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg,rgba(22,36,27,.98),rgba(16,28,20,.98));
+    border: 1px solid rgba(61,220,132,.35);
+    border-radius: 16px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 6px;
+    z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    animation: slideUp .25s ease;
+    flex-wrap: wrap; max-width: 95vw; justify-content: center;
+  }
+  @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  .quick-label { font-size: 10px; color: var(--t3); font-weight: 600; margin-right: 4px; }
+  .qb-btn {
+    background: var(--s2); border: 1px solid var(--b1); border-radius: 10px;
+    padding: 8px 12px; color: var(--t1); font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: 0.15s;
+  }
+  .qb-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+  @media (max-width: 700px) {
+    .quick-bar { bottom: 220px; padding: 8px; gap: 4px; }
+    .qb-btn { padding: 6px 10px; font-size: 11px; }
+    .quick-label { display: none; }
+  }
 
   /* Timeline */
   .timeline-header { padding: 12px 16px; border-bottom: 1px solid var(--b1); flex-shrink: 0; }
@@ -132,7 +167,8 @@
     <button class="tab-btn" onclick="switchTab('stats')">2. Análise</button>
     <button class="tab-btn" onclick="switchTab('equipa')">3. Equipa</button>
   </div>
-  <div style="display:flex;gap:8px;">
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn-theme" id="btn-theme" onclick="toggleDarkMode()" title="Alternar modo escuro">🌙</button>
     <button class="btn-save-pc" onclick="saveToPC()" title="Guarda o CSV diretamente na pasta São Manços do PC">💾 Guardar no PC</button>
     <button class="btn-export" onclick="exportCSV()" title="Descarregar CSV para o browser">Exportar CSV</button>
   </div>
@@ -144,8 +180,9 @@
   <div class="panel-left">
     
     <div class="timer-wrap">
-      <div class="timer-val" id="timer-display">00:00</div>
+      <div class="timer-val" id="timer-display">00:00 (1ªP)</div>
       <button class="timer-btn" onclick="toggleTimer()" id="btn-timer-toggle">Iniciar Jogo</button>
+      <button class="timer-btn" id="btn-end-half" onclick="endHalf()" style="display:none;">Encerrar 1ªP</button>
       <button class="timer-btn" onclick="resetTimer()">Reset</button>
       <span style="font-size:11px;color:var(--t3);margin-left:10px;">💾 Auto-Save Ativo</span>
     </div>
@@ -172,8 +209,19 @@
       </div>
     </div>
 
-    <!-- Pitch Overlay Modal -->
-    <div class="pitch-overlay" id="pitch-overlay">
+<!-- Floating Quick-Action Bar -->
+  <div id="quick-bar" class="quick-bar" style="display:none;">
+    <div class="quick-label">Ação Rápida</div>
+    <button class="qb-btn" style="background:rgba(57,224,122,.2);border-color:#3ddc84;" onclick="qba('Passe Falhado', -1)">✕ Passe</button>
+    <button class="qb-btn" style="background:rgba(57,224,122,.2);border-color:#3ddc84;" onclick="qba('Desarme Certo', 1)">🛡️ Desarme</button>
+    <button class="qb-btn" style="background:rgba(57,224,122,.2);border-color:#3ddc84;" onclick="qba('Remate à Baliza', 1)">🎯 Remate</button>
+    <button class="qb-btn" style="background:rgba(255,215,0,.15);border-color:#FFD700;" onclick="qba('Golo Marcado', 1)">⚽ Golo</button>
+    <button class="qb-btn" style="background:rgba(255,74,74,.12);border-color:#ff4a4a;" onclick="qba('Golo Sofrido', -1)">😔 Sofrido</button>
+    <button class="qb-btn" onclick="closeQuickBar()">✕</button>
+  </div>
+
+  <!-- Pitch Overlay Modal -->
+  <div class="pitch-overlay" id="pitch-overlay">
       <div class="pitch-title" id="pitch-title">Onde foi a ação?</div>
       <div class="pitch-container">
         <!-- Zonas (Ataque em cima) -->
@@ -314,31 +362,58 @@
     if (tabId === 'stats') updateStats();
   }
 
+  // LIGHT/DARK MODE
+  let isDarkMode = localStorage.getItem('ls_dark') !== 'false';
+  function applyTheme() {
+    document.body.classList.toggle('light-mode', !isDarkMode);
+    document.getElementById('btn-theme').textContent = isDarkMode ? '🌙' : '☀️';
+  }
+  function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    localStorage.setItem('ls_dark', isDarkMode);
+    applyTheme();
+  }
+  applyTheme();
+
   // TIMER LOGIC
   function formatTime(sec) {
     const m = Math.floor(sec / 60).toString().padStart(2, '0');
     const s = (sec % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   }
+  let half = 1;
   function toggleTimer() {
     if (isRunning) {
       clearInterval(timerInterval);
       document.getElementById('btn-timer-toggle').innerText = "Retomar";
     } else {
-      timerInterval = setInterval(() => {
+timerInterval = setInterval(() => {
         seconds++;
-        document.getElementById('timer-display').innerText = formatTime(seconds);
+        document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
         localStorage.setItem('ls_time', seconds); // Auto-save
       }, 1000);
       document.getElementById('btn-timer-toggle').innerText = "Pausar";
+      if (half === 1) document.getElementById('btn-end-half').style.display = 'block';
     }
     isRunning = !isRunning;
+  }
+  function endHalf() {
+    if (!confirm("Terminar 1ª Parte e iniciar 2ª?")) return;
+    clearInterval(timerInterval);
+    isRunning = false;
+    half = 2;
+    seconds = 0;
+    document.getElementById('timer-display').innerText = "00:00 (2ªP)";
+    document.getElementById('btn-timer-toggle').innerText = "Iniciar 2ª Parte";
+    localStorage.setItem('ls_time', 0);
+    localStorage.setItem('ls_half', 2);
+    showToast("2ª Parte iniciada!", true);
   }
   function resetTimer() {
     if(confirm("Reiniciar apenas o tempo? Os registos mantêm-se.")){
       clearInterval(timerInterval);
       seconds = 0; isRunning = false;
-      document.getElementById('timer-display').innerText = "00:00";
+      document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
       document.getElementById('btn-timer-toggle').innerText = "Iniciar Jogo";
       localStorage.setItem('ls_time', 0);
     }
@@ -365,6 +440,7 @@
     document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
     btnElement.classList.add('selected');
     document.getElementById('actions-grid').classList.add('active'); // Unlock actions
+    showQuickBar(); // Show floating quick-action bar
   }
 
   function askZone(action, score) {
@@ -573,16 +649,50 @@
   function hardReset() {
     if(confirm("ATENÇÃO: Isto apaga todos os dados do jogo atual. A equipa não é apagada. Continuar?")) {
       logs = [];
-      seconds = 0;
-      clearInterval(timerInterval); isRunning = false;
-      document.getElementById('timer-display').innerText = "00:00";
+      seconds = 0; isRunning = false; half = 1;
+      clearInterval(timerInterval);
+      document.getElementById('timer-display').innerText = "00:00 (1ªP)";
       document.getElementById('btn-timer-toggle').innerText = "Iniciar Jogo";
+      document.getElementById('btn-end-half').style.display = 'none';
       localStorage.removeItem('ls_logs');
       localStorage.removeItem('ls_time');
+      localStorage.removeItem('ls_half');
       renderLogs();
       switchTab('jogo');
     }
   }
+
+  // QUICK ACTION BAR
+  let quickBarTimeout = null;
+  function showQuickBar() {
+    const bar = document.getElementById('quick-bar');
+    bar.style.display = 'flex';
+    clearTimeout(quickBarTimeout);
+    quickBarTimeout = setTimeout(closeQuickBar, 8000);
+  }
+  function closeQuickBar() {
+    document.getElementById('quick-bar').style.display = 'none';
+    clearTimeout(quickBarTimeout);
+  }
+  function qba(action, score) {
+    if (!selectedPlayer) {
+      // Use last used player or first player
+      if (logs.length > 0 && logs[0].player) {
+        selectedPlayer = players.find(p => p.name === logs[0].player) || players[0];
+      } else {
+        selectedPlayer = players[0];
+      }
+      if (!selectedPlayer) return;
+    }
+    askZone(action, score);
+    clearTimeout(quickBarTimeout);
+    quickBarTimeout = setTimeout(closeQuickBar, 8000);
+  }
+
+  // Load half from localStorage
+  half = parseInt(localStorage.getItem('ls_half')) || 1;
+  document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
+  if (half === 2) document.getElementById('btn-timer-toggle').innerText = "Iniciar 2ª Parte";
 </script>
 <script>
   if ('serviceWorker' in navigator) {
