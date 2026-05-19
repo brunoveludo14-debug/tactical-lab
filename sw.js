@@ -1,5 +1,5 @@
-const CACHE = 'saomancos-v4';
-const FILES = ['/', '/manifest.json', '/icon-192.png', '/icon-512.png',
+const CACHE = 'saomancos-v5';
+const FILES = ['/', '/estatisticas-live.html', '/manifest.json', '/icon-192.png', '/icon-512.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'];
 
 self.addEventListener('install', e => {

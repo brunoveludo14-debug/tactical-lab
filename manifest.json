@@ -1,12 +1,12 @@
 {
-  "name": "Tactical Lab — Quadro Tático",
-  "short_name": "Tactical Lab",
-  "description": "Quadro tático de futebol — formações, animações, exportação e notas",
-  "start_url": "/",
+  "name": "São Manços — Estatísticas",
+  "short_name": "São Manços",
+  "description": "App de estatísticas de jogo de futebol — registo ao vivo, análise, heatmaps",
+  "start_url": "/estatisticas-live.html",
   "display": "standalone",
   "background_color": "#0c1610",
-  "theme_color": "#0c1610",
-  "orientation": "any",
+  "theme_color": "#3ddc84",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icons/icon-192.png",

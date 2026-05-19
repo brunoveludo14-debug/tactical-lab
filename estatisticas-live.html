@@ -135,6 +135,16 @@
   .psr-bar { height:100%; background:var(--acc); border-radius:3px; }
   .psr-detail { font-size:10px; color:var(--t2); display:flex; gap:8px; }
   .opp-add-btn { width:100%; background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.3); color:#ff6b6b; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px; }
+  .hm-zone { transition: background 0.5s; }
+  .chart-bar-row { display:flex; align-items:center; gap:8px; }
+  .chart-label { font-size:12px; min-width:120px; color:var(--t2); }
+  .chart-bar-bg { flex:1; height:8px; background:var(--s1); border-radius:4px; overflow:hidden; }
+  .chart-bar-fill { height:100%; background:var(--acc); border-radius:4px; transition: width 0.5s; }
+  .chart-count { font-size:11px; color:var(--t3); min-width:30px; text-align:right; }
+  .match-history-item { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--s2); border-radius:8px; border:1px solid var(--b1); }
+  .mhi-date { font-weight:600; font-size:13px; }
+  .mhi-score { font-size:20px; font-weight:700; color:var(--acc); }
+  .mhi-detail { font-size:11px; color:var(--t3); }
   .stats-view { padding: 20px; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; }
   .stat-card { background: var(--s1); border: 1px solid var(--b1); padding: 18px; border-radius: 12px; margin-bottom: 16px; }
   .stat-bar-bg { width: 100%; height: 8px; background: var(--s2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
@@ -314,11 +324,54 @@
   </div>
 
   <!-- PLAYER STATS BREAKDOWN -->
+<div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:4px; color:var(--opp, #ff6b6b);">🟥 Adversário</div>
+    <div style="font-size:12px; color:var(--t3); margin-bottom:14px;">Regista ações do adversário (cantos, finalizações, etc.)</div>
+    <div id="opp-actions-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+    <button class="opp-add-btn" onclick="addOppAction()">+ Adicionar ação do adversário</button>
+  </div>
+
+  <!-- HEATMAP -->
   <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Estatísticas por Jogador</div>
-    <div style="margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;" id="player-stat-filters">
-      <button class="stat-filter-btn active" onclick="filterPlayerStats('all', this)">Todos</button>
+    <div style="font-size:16px; font-weight:600; margin-bottom:14px;">🗺️ Mapa de Calor — Zonas de Perda</div>
+    <div id="heatmap-container" style="position:relative; background:var(--pitch-bg,#27ae60); border:2px solid rgba(255,255,255,.3); border-radius:10px; overflow:hidden; height:160px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr 1fr; height:100%;">
+        <div class="hm-zone" data-zone="Ataque Esq." id="hm-0" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Ataque Centro" id="hm-1" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Ataque Dir." id="hm-2" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Meio Esq." id="hm-3" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Meio Centro" id="hm-4" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Meio Dir." id="hm-5" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Defesa Esq." id="hm-6" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Defesa Centro" id="hm-7" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+        <div class="hm-zone" data-zone="Defesa Dir." id="hm-8" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:14px;">📊 Ação por Tipo</div>
+    <div id="action-chart" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </div>
+
+  <!-- MATCH HISTORY -->
+  <div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:14px;">📁 Histórico de Jogos</div>
+    <div id="match-history-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+    <button class="opp-add-btn" style="background:rgba(61,220,132,.1);border-color:rgba(61,220,132,.3);color:var(--acc);" onclick="saveMatchToHistory()">💾 Guardar jogo atual no histórico</button>
+  </div>
+
+  <!-- PWA OFFLINE STATUS -->
+  <div id="offline-status" class="stat-card" style="display:none; border:1px solid rgba(255,74,74,.3);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:24px;">📴</span>
+      <div>
+        <div style="font-weight:600; color:var(--red);">Modo Offline</div>
+        <div style="font-size:12px; color:var(--t3);">Sem ligação à internet — todos os dados estão guardados localmente.</div>
+      </div>
+    </div>
+  </div>
     <div id="player-stats-list">
       <!-- Generated -->
     </div>
@@ -387,8 +440,7 @@
   let timerInterval = null;
   let isRunning = false;
 
-// AUTO-SAVE on interval (backup every 30s)
-  function startAutoSave() {
+function startAutoSave() {
     if (autoSaveInterval) clearInterval(autoSaveInterval);
     autoSaveInterval = setInterval(() => {
       saveLogs();
@@ -401,13 +453,17 @@
   startAutoSave();
 
   // INITIALIZE
-  window.onload = () => {
+  window.initApp = function() {
     document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
     renderPlayers();
     renderLogs();
     renderTeamEditor();
     renderPlayerStatFilters();
     renderOppActions();
+    checkOnlineStatus();
+    renderMatchHistory();
+    renderHeatmap();
+    renderActionChart();
   };
 
   // TABS
@@ -724,6 +780,115 @@ timerInterval = setInterval(() => {
     `).join('');
   }
 
+  // HEATMAP
+  function renderHeatmap() {
+    const zonas = ['Ataque Esq.', 'Ataque Centro', 'Ataque Dir.', 'Meio Esq.', 'Meio Centro', 'Meio Dir.', 'Defesa Esq.', 'Defesa Centro', 'Defesa Dir.'];
+    const perdas = logs.filter(l => l.action === 'Perda de Bola' || l.action === 'Passe Falhado' || l.action === 'Cruzamento Falhado');
+    const zCounts = {};
+    perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
+    const maxCount = Math.max(1, ...Object.values(zCounts));
+
+    zonas.forEach((z, i) => {
+      const el = document.getElementById(`hm-${i}`);
+      if (!el) return;
+      const count = zCounts[z] || 0;
+      const opacity = count > 0 ? 0.3 + (count / maxCount) * 0.7 : 0;
+      el.style.backgroundColor = `rgba(255, 74, 74, ${opacity})`;
+      el.textContent = count > 0 ? count : '';
+    });
+  }
+
+  // ACTION CHARTS
+  function renderActionChart() {
+    const container = document.getElementById('action-chart');
+    if (!container) return;
+    const actionTypes = ['Passe Falhado', 'Cruzamento Certo', 'Cruzamento Falhado', 'Remate à Baliza', 'Remate Fora', 'Desarme Certo', 'Perda de Bola', 'Falta Sofrida', 'Falta Cometida', 'Golo Marcado'];
+    const actionColors = { 'Passe Falhado': 'var(--red)', 'Cruzamento Certo': 'var(--acc)', 'Cruzamento Falhado': 'var(--red)', 'Remate à Baliza': 'var(--acc)', 'Remate Fora': 'var(--yel)', 'Desarme Certo': 'var(--acc)', 'Perda de Bola': 'var(--red)', 'Falta Sofrida': 'var(--yel)', 'Falta Cometida': 'var(--yel)', 'Golo Marcado': '#FFD700' };
+    
+    const counts = {};
+    actionTypes.forEach(a => { counts[a] = logs.filter(l => l.action === a).length; });
+    const maxCount = Math.max(1, ...Object.values(counts));
+
+    container.innerHTML = actionTypes.map(a => {
+      const c = counts[a];
+      const pct = maxCount > 0 ? (c / maxCount) * 100 : 0;
+      return `<div class="chart-bar-row">
+        <span class="chart-label">${a}</span>
+        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${pct}%; background:${actionColors[a] || 'var(--acc)'}"></div></div>
+        <span class="chart-count">${c}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // MATCH HISTORY
+  function saveMatchToHistory() {
+    const golosMarcados = logs.filter(l => l.action === 'Golo Marcado').length;
+    const golosSofridos = oppLogs.filter(o => o.action === 'Golo Sofrido').length;
+    const entry = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('pt-PT'),
+      golos: golosMarcados,
+      sofridos: golosSofridos,
+      totalActions: logs.length,
+      opponentActions: oppLogs.length
+    };
+    const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
+    history.unshift(entry);
+    if (history.length > 20) history.pop(); // Keep last 20 matches
+    localStorage.setItem('ls_match_history', JSON.stringify(history));
+    renderMatchHistory();
+    showToast(`Jogo guardado: ${golosMarcados} - ${golosSofridos}`, true);
+  }
+
+  function renderMatchHistory() {
+    const container = document.getElementById('match-history-list');
+    if (!container) return;
+    const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
+    if (history.length === 0) {
+      container.innerHTML = '<span style="color:var(--t3); font-size:12px;">Nenhum jogo guardado ainda.</span>';
+      return;
+    }
+    container.innerHTML = history.slice(0, 5).map(m => `
+      <div class="match-history-item">
+        <div>
+          <div class="mhi-date">${m.date}</div>
+          <div class="mhi-detail">${m.totalActions} ações • ${m.opponentActions} advers.</div>
+        </div>
+        <div class="mhi-score">${m.golos} - ${m.sofridos}</div>
+      </div>
+    `).join('');
+  }
+
+  // OFFLINE DETECTION
+  function checkOnlineStatus() {
+    const el = document.getElementById('offline-status');
+    if (!el) return;
+    if (!navigator.onLine) {
+      el.style.display = 'block';
+      document.body.classList.add('offline');
+    } else {
+      el.style.display = 'none';
+      document.body.classList.remove('offline');
+    }
+  }
+  window.addEventListener('online', checkOnlineStatus);
+  window.addEventListener('offline', checkOnlineStatus);
+
+  // Call renderHeatmap & charts when stats update
+  const origUpdateStats = updateStats;
+  updateStats = function() {
+    origUpdateStats.apply(this, arguments);
+    renderHeatmap();
+    renderActionChart();
+  };
+  window.onload = function() {
+    origOnload.apply(this, arguments);
+    checkOnlineStatus();
+    renderMatchHistory();
+    renderHeatmap();
+    renderActionChart();
+  };
+
   // TEAM EDITOR
   function renderTeamEditor() {
     const editor = document.getElementById('team-editor');
@@ -860,6 +1025,7 @@ timerInterval = setInterval(() => {
   half = parseInt(localStorage.getItem('ls_half')) || 1;
   document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
   if (half === 2) document.getElementById('btn-timer-toggle').innerText = "Iniciar 2ª Parte";
+  window.onload = window.initApp;
 </script>
 <script>
   if ('serviceWorker' in navigator) {
