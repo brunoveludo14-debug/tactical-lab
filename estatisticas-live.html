@@ -135,7 +135,7 @@
   .psr-bar { height:100%; background:var(--acc); border-radius:3px; }
   .psr-detail { font-size:10px; color:var(--t2); display:flex; gap:8px; }
   .opp-add-btn { width:100%; background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.3); color:#ff6b6b; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px; }
-  .hm-zone { transition: background 0.5s; }
+  .hm-zone { transition: background 0.4s; background: rgba(0,0,0,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 600; }
   .chart-bar-row { display:flex; align-items:center; gap:8px; }
   .chart-label { font-size:12px; min-width:120px; color:var(--t2); }
   .chart-bar-bg { flex:1; height:8px; background:var(--s1); border-radius:4px; overflow:hidden; }
@@ -153,22 +153,8 @@
 
   /* ===== MOBILE (<=700px) ===== */
   @media (max-width: 700px) {
-    header { height: auto; min-height: 50px; flex-wrap: wrap; padding: 7px 10px; gap: 5px; }
-    .title-text { display: none; }
-    .tabs { gap: 3px; }
-    .tab-btn { font-size: 11px; padding: 5px 6px; }
-    .btn-save-pc, .btn-export { font-size: 11px; padding: 6px 9px; }
-    .view.active { flex-direction: column; overflow-y: auto; }
-    .panel-left { width: 100%; padding: 10px; gap: 10px; overflow-y: visible; }
-    .panel-right { width: 100%; border-left: none; border-top: 1px solid var(--b1); min-height: 200px; max-height: 220px; flex-shrink: 0; }
-    .players-grid { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 5px; }
-    .player-btn { padding: 9px 3px; font-size: 11px; }
-    .action-btn { padding: 12px 9px; font-size: 12px; }
-    .settings-view, .stats-view { padding: 12px; }
-  }
-  @media (max-width: 400px) {
-    .players-grid { grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); }
-    .action-btn { font-size: 11px; padding: 11px 7px; }
+    .stat-card { padding: 12px; }
+    .stat-row { font-size: 11px; }
   }
   
 
@@ -276,101 +262,105 @@
 <div id="view-stats" class="view stats-view">
   <div class="section-title">Análise em Tempo Real</div>
 
-  <!-- RESULTADO -->
-  <div class="stat-card" style="display:flex; gap:20px; align-items:center; justify-content:center;">
+  <!-- RESULTADO + PARTE em linha -->
+  <div class="stat-card" style="display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; padding:14px 16px;">
     <div style="text-align:center;">
-      <div style="font-size:13px; color:var(--t3); margin-bottom:4px;">GOLOS MARCADOS</div>
-      <div id="stat-golos-marcados" style="font-size:52px; font-weight:700; color:#FFD700; line-height:1;">0</div>
+      <div style="font-size:11px; color:var(--t3); margin-bottom:2px;">MARCADOS</div>
+      <div id="stat-golos-marcados" style="font-size:38px; font-weight:700; color:#FFD700; line-height:1;">0</div>
     </div>
-    <div style="font-size:40px; color:var(--t3); font-weight:300;">—</div>
+    <div style="font-size:30px; color:var(--t3); font-weight:300;">—</div>
     <div style="text-align:center;">
-      <div style="font-size:13px; color:var(--t3); margin-bottom:4px;">GOLOS SOFRIDOS</div>
-      <div id="stat-golos-sofridos" style="font-size:52px; font-weight:700; color:#c850f5; line-height:1;">0</div>
+      <div style="font-size:11px; color:var(--t3); margin-bottom:2px;">SOFRIDOS</div>
+      <div id="stat-golos-sofridos" style="font-size:38px; font-weight:700; color:#c850f5; line-height:1;">0</div>
     </div>
-  </div>
-
-  <!-- Half filter -->
-  <div class="stat-card" style="padding:10px 14px;">
-    <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
-      <span style="font-size:12px; color:var(--t3); font-weight:600;">FILTRAR POR PARTE:</span>
-      <button class="stat-filter-btn active" id="filter-half-all" onclick="setStatHalfFilter('all', this)">Todo o Jogo</button>
-      <button class="stat-filter-btn" id="filter-half-1" onclick="setStatHalfFilter(1, this)">1ª Parte</button>
-      <button class="stat-filter-btn" id="filter-half-2" onclick="setStatHalfFilter(2, this)">2ª Parte</button>
-    </div>
-  </div>
-
-  <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Eficácia de Cruzamento</div>
-    <div id="stat-cruz-pct" style="font-size:32px; font-weight:700; color:var(--acc);">0%</div>
-    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-cruz-bar" style="width: 0%"></div></div>
-    <div class="stat-row">
-      <span id="stat-cruz-certo">0 Certos</span>
-      <span id="stat-cruz-errado">0 Falhados</span>
-    </div>
-  </div>
-
-  <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Top 5: Mais Ações (Envolvimentos)</div>
-    <div id="top-players-list">
-      <!-- Generated -->
-    </div>
-  </div>
-
-  <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Locais Frequentes de Perda de Bola</div>
-    <div id="zone-lost-list" style="color:var(--red);">
-      <!-- Generated -->
-    </div>
-  </div>
-
-  <!-- PLAYER STATS BREAKDOWN -->
-<div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:4px; color:var(--opp, #ff6b6b);">🟥 Adversário</div>
-    <div style="font-size:12px; color:var(--t3); margin-bottom:14px;">Regista ações do adversário (cantos, finalizações, etc.)</div>
-    <div id="opp-actions-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-    <button class="opp-add-btn" onclick="addOppAction()">+ Adicionar ação do adversário</button>
-  </div>
-
-  <!-- HEATMAP -->
-  <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:14px;">🗺️ Mapa de Calor — Zonas de Perda</div>
-    <div id="heatmap-container" style="position:relative; background:var(--pitch-bg,#27ae60); border:2px solid rgba(255,255,255,.3); border-radius:10px; overflow:hidden; height:160px;">
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr 1fr; height:100%;">
-        <div class="hm-zone" data-zone="Ataque Esq." id="hm-0" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Ataque Centro" id="hm-1" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Ataque Dir." id="hm-2" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Meio Esq." id="hm-3" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Meio Centro" id="hm-4" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Meio Dir." id="hm-5" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Defesa Esq." id="hm-6" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Defesa Centro" id="hm-7" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
-        <div class="hm-zone" data-zone="Defesa Dir." id="hm-8" style="display:flex; align-items:center; justify-content:center; font-size:11px; color:rgba(0,0,0,.5); border:1px dashed rgba(0,0,0,.1);"></div>
+    <div style="border-left:1px solid var(--b1); height:40px; margin:0 4px;"></div>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <div style="display:flex; gap:5px;">
+        <button class="stat-filter-btn active" id="filter-half-all" onclick="setStatHalfFilter('all', this)" style="font-size:11px;padding:4px 10px;">Jogo</button>
+        <button class="stat-filter-btn" id="filter-half-1" onclick="setStatHalfFilter(1, this)" style="font-size:11px;padding:4px 10px;">1ªP</button>
+        <button class="stat-filter-btn" id="filter-half-2" onclick="setStatHalfFilter(2, this)" style="font-size:11px;padding:4px 10px;">2ªP</button>
       </div>
     </div>
   </div>
 
-  <!-- CHARTS -->
-  <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:14px;">📊 Ação por Tipo</div>
-    <div id="action-chart" style="display:flex; flex-direction:column; gap:8px;"></div>
-  </div>
+  <!-- Estatísticas rápidas em grelha compacta -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
 
-  <!-- MATCH HISTORY -->
-  <div class="stat-card">
-    <div style="font-size:16px; font-weight:600; margin-bottom:14px;">📁 Histórico de Jogos</div>
-    <div id="match-history-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-    <button class="opp-add-btn" style="background:rgba(61,220,132,.1);border-color:rgba(61,220,132,.3);color:var(--acc);" onclick="saveMatchToHistory()">💾 Guardar jogo atual no histórico</button>
-  </div>
-
-  <!-- PWA OFFLINE STATUS -->
-  <div id="offline-status" class="stat-card" style="display:none; border:1px solid rgba(255,74,74,.3);">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <span style="font-size:24px;">📴</span>
-      <div>
-        <div style="font-weight:600; color:var(--red);">Modo Offline</div>
-        <div style="font-size:12px; color:var(--t3);">Sem ligação à internet — todos os dados estão guardados localmente.</div>
+    <!-- Cruzamentos -->
+    <div class="stat-card" style="margin-bottom:0;">
+      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Cruzamentos</div>
+      <div id="stat-cruz-pct" style="font-size:28px; font-weight:700; color:var(--acc);">0%</div>
+      <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-cruz-bar" style="width:0%"></div></div>
+      <div class="stat-row">
+        <span id="stat-cruz-certo" style="font-size:11px;">0 certos</span>
+        <span id="stat-cruz-errado" style="font-size:11px;">0 falhados</span>
       </div>
     </div>
+
+    <!-- Remates -->
+    <div class="stat-card" style="margin-bottom:0;">
+      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Remates</div>
+      <div id="stat-remates-pct" style="font-size:28px; font-weight:700; color:var(--acc);">0%</div>
+      <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-remates-bar" style="width:0%; background:var(--acc);"></div></div>
+      <div class="stat-row">
+        <span id="stat-remates-certo" style="font-size:11px;">0 à baliza</span>
+        <span id="stat-remates-errado" style="font-size:11px;">0 fora</span>
+      </div>
+    </div>
+
+    <!-- Mais ações -->
+    <div class="stat-card" style="margin-bottom:0;">
+      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Top Envolve.</div>
+      <div id="top-players-list">
+        <!-- Generated -->
+      </div>
+    </div>
+
+    <!-- Zonas problema -->
+    <div class="stat-card" style="margin-bottom:0;">
+      <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">Zonas Críticas</div>
+      <div id="zone-lost-list" style="color:var(--red);">
+        <!-- Generated -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Adversário — compacto -->
+  <div class="stat-card" style="margin-top:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:14px; font-weight:600; color:#ff6b6b;">🟥 Adversário</span>
+      <button class="opp-add-btn" onclick="addOppAction()" style="margin:0; padding:5px 12px; font-size:12px;">+ Registar</button>
+    </div>
+    <div id="opp-actions-list" style="display:flex; flex-direction:column; gap:4px;"></div>
+  </div>
+
+  <!-- Mapa de calor pequeno -->
+  <div class="stat-card" style="margin-top:10px; padding:12px 14px;">
+    <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:10px;">🗺️ Zonas de Perda</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr 1fr; gap:3px; height:120px;">
+      <div class="hm-zone" data-zone="Ataque Esq." id="hm-0"></div>
+      <div class="hm-zone" data-zone="Ataque Centro" id="hm-1"></div>
+      <div class="hm-zone" data-zone="Ataque Dir." id="hm-2"></div>
+      <div class="hm-zone" data-zone="Meio Esq." id="hm-3"></div>
+      <div class="hm-zone" data-zone="Meio Centro" id="hm-4"></div>
+      <div class="hm-zone" data-zone="Meio Dir." id="hm-5"></div>
+      <div class="hm-zone" data-zone="Defesa Esq." id="hm-6"></div>
+      <div class="hm-zone" data-zone="Defesa Centro" id="hm-7"></div>
+      <div class="hm-zone" data-zone="Defesa Dir." id="hm-8"></div>
+    </div>
+  </div>
+
+  <!-- Histórico jogos -->
+  <div class="stat-card" style="margin-top:10px;">
+    <div style="font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px;">📁 Últimos Jogos</div>
+    <div id="match-history-list" style="display:flex; flex-direction:column; gap:5px;"></div>
+    <button class="opp-add-btn" onclick="saveMatchToHistory()" style="margin-top:8px; background:rgba(61,220,132,.1);border-color:rgba(61,220,132,.3);color:var(--acc);padding:7px 12px;font-size:12px;">💾 Guardar</button>
+  </div>
+
+  <!-- Offline indicator -->
+  <div id="offline-status" style="display:none; text-align:center; padding:10px; color:var(--red); font-size:12px;">
+    📴 Modo Offline — dados guardados localmente
   </div>
     <div id="player-stats-list">
       <!-- Generated -->
@@ -653,8 +643,19 @@ timerInterval = setInterval(() => {
     document.getElementById('stat-cruz-pct').innerText = cruzPct + '%';
     document.getElementById('stat-cruz-bar').style.width = cruzPct + '%';
     document.getElementById('stat-cruz-bar').style.backgroundColor = cruzPct >= 75 ? 'var(--acc)' : (cruzPct >= 50 ? 'var(--yel)' : 'var(--red)');
-    document.getElementById('stat-cruz-certo').innerText = cruzCertos + ' Certos';
-    document.getElementById('stat-cruz-errado').innerText = cruzFalhados + ' Falhados';
+    document.getElementById('stat-cruz-certo').innerText = cruzCertos + ' certos';
+    document.getElementById('stat-cruz-errado').innerText = cruzFalhados + ' falhados';
+
+    // Remates
+    const rematesBaliza = filteredLogs.filter(l => l.action === 'Remate à Baliza').length;
+    const rematesFora = filteredLogs.filter(l => l.action === 'Remate Fora').length;
+    const totalRem = rematesBaliza + rematesFora;
+    const remPct = totalRem > 0 ? Math.round((rematesBaliza / totalRem) * 100) : 0;
+    document.getElementById('stat-remates-pct').innerText = remPct + '%';
+    document.getElementById('stat-remates-bar').style.width = remPct + '%';
+    document.getElementById('stat-remates-bar').style.backgroundColor = remPct >= 50 ? 'var(--acc)' : 'var(--yel)';
+    document.getElementById('stat-remates-certo').innerText = rematesBaliza + ' à baliza';
+    document.getElementById('stat-remates-errado').innerText = rematesFora + ' fora';
 
     // Top players
     const pCounts = {};
