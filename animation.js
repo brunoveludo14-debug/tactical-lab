@@ -361,12 +361,15 @@ export async function exportPNG(view) {
     img.src = url;
   });
 
-  for (const svg of pitch.querySelectorAll('svg')) await drawSVG(svg);
+  const svgEls = Array.from(pitch.querySelectorAll('svg')).filter(s => !s.closest('#ball, .field-ball'));
+  for (const svg of svgEls) await drawSVG(svg);
 
   // Players
   const vw = 68;
-  const vh = view === 'box' ? 75 : view === 'pbox' ? 52.5 : 105;
-  const allPlayers = view === 'tactic' ? [...State.players, ...State.opp] : [];
+  const vh = 105;
+  const allPlayers = view === 'tactic' ? [...State.players, ...State.opp]
+                   : view === 'box' ? State.bPlayers
+                   : State.pPlayers;
 
   allPlayers.forEach(p => {
     const px = (p.x / vw) * W;
@@ -390,21 +393,20 @@ export async function exportPNG(view) {
   });
 
   // Ball
-  if (view === 'tactic') {
-    const ball = document.getElementById('ball');
-    if (ball) {
-      const br = ball.getBoundingClientRect();
-      const pr = pitch.getBoundingClientRect();
-      const bx = br.left + br.width  / 2 - pr.left;
-      const by = br.top  + br.height / 2 - pr.top;
-      ctx.beginPath();
-      ctx.arc(bx, by, 11, 0, Math.PI * 2);
-      ctx.fillStyle   = 'white';
-      ctx.shadowColor = 'rgba(0,0,0,.5)';
-      ctx.shadowBlur  = 8;
-      ctx.fill();
-      ctx.shadowBlur  = 0;
-    }
+  const ballId = view === 'box' ? 'box-ball' : view === 'pbox' ? 'pbox-ball' : 'ball';
+  const ball = document.getElementById(ballId);
+  if (ball) {
+    const br = ball.getBoundingClientRect();
+    const pr = pitch.getBoundingClientRect();
+    const bx = br.left + br.width  / 2 - pr.left;
+    const by = br.top  + br.height / 2 - pr.top;
+    ctx.beginPath();
+    ctx.arc(bx, by, 11, 0, Math.PI * 2);
+    ctx.fillStyle   = 'white';
+    ctx.shadowColor = 'rgba(0,0,0,.5)';
+    ctx.shadowBlur  = 8;
+    ctx.fill();
+    ctx.shadowBlur  = 0;
   }
 
   // Trails
