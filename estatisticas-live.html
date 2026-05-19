@@ -126,6 +126,15 @@
   .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
   .input-row input { background: var(--s1); border: 1px solid var(--b1); color: white; padding: 10px; border-radius: 6px; font-size: 16px; }
   .btn-danger { background: rgba(255,74,74,0.1); color: var(--red); border: 1px solid var(--red); padding: 10px; border-radius: 6px; cursor: pointer; }
+  .stat-filter-btn { background: var(--s2); border: 1px solid var(--b1); color: var(--t2); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; }
+  .stat-filter-btn.active { background: var(--acc); color: var(--bg); border-color: var(--acc); }
+  .player-stat-row { display:flex; align-items:center; gap:8px; padding:10px; border-radius:8px; background:var(--s2); margin-bottom:6px; }
+  .psr-name { font-weight:600; min-width:90px; }
+  .psr-actions { font-size:11px; color:var(--t3); min-width:60px; }
+  .psr-bar-wrap { flex:1; height:6px; background:var(--s1); border-radius:3px; overflow:hidden; }
+  .psr-bar { height:100%; background:var(--acc); border-radius:3px; }
+  .psr-detail { font-size:10px; color:var(--t2); display:flex; gap:8px; }
+  .opp-add-btn { width:100%; background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.3); color:#ff6b6b; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px; }
   .stats-view { padding: 20px; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; }
   .stat-card { background: var(--s1); border: 1px solid var(--b1); padding: 18px; border-radius: 12px; margin-bottom: 16px; }
   .stat-bar-bg { width: 100%; height: 8px; background: var(--s2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
@@ -184,7 +193,10 @@
       <button class="timer-btn" onclick="toggleTimer()" id="btn-timer-toggle">Iniciar Jogo</button>
       <button class="timer-btn" id="btn-end-half" onclick="endHalf()" style="display:none;">Encerrar 1ªP</button>
       <button class="timer-btn" onclick="resetTimer()">Reset</button>
-      <span style="font-size:11px;color:var(--t3);margin-left:10px;">💾 Auto-Save Ativo</span>
+      <span style="font-size:11px;color:var(--t3);margin-left:10px;">
+        💾 Auto-Save
+        <span id="autosave-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc);opacity:0.4;vertical-align:middle;margin-left:3px;"></span>
+      </span>
     </div>
 
     <div>
@@ -267,6 +279,16 @@
     </div>
   </div>
 
+  <!-- Half filter -->
+  <div class="stat-card" style="padding:10px 14px;">
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+      <span style="font-size:12px; color:var(--t3); font-weight:600;">FILTRAR POR PARTE:</span>
+      <button class="stat-filter-btn active" id="filter-half-all" onclick="setStatHalfFilter('all', this)">Todo o Jogo</button>
+      <button class="stat-filter-btn" id="filter-half-1" onclick="setStatHalfFilter(1, this)">1ª Parte</button>
+      <button class="stat-filter-btn" id="filter-half-2" onclick="setStatHalfFilter(2, this)">2ª Parte</button>
+    </div>
+  </div>
+
   <div class="stat-card">
     <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Eficácia de Cruzamento</div>
     <div id="stat-cruz-pct" style="font-size:32px; font-weight:700; color:var(--acc);">0%</div>
@@ -289,6 +311,25 @@
     <div id="zone-lost-list" style="color:var(--red);">
       <!-- Generated -->
     </div>
+  </div>
+
+  <!-- PLAYER STATS BREAKDOWN -->
+  <div class="stat-card">
+    <div style="font-size:16px; font-weight:600; margin-bottom:15px;">Estatísticas por Jogador</div>
+    <div style="margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;" id="player-stat-filters">
+      <button class="stat-filter-btn active" onclick="filterPlayerStats('all', this)">Todos</button>
+    </div>
+    <div id="player-stats-list">
+      <!-- Generated -->
+    </div>
+  </div>
+
+  <!-- OPPONENT TRACKING -->
+  <div class="stat-card" style="border-color:rgba(255,96,96,.3);">
+    <div style="font-size:16px; font-weight:600; margin-bottom:4px; color:var(--opp, #ff6b6b);">🟥 Adversário</div>
+    <div style="font-size:12px; color:var(--t3); margin-bottom:14px;">Regista ações do adversário (cantos, finalizações, etc.)</div>
+    <div id="opp-actions-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+    <button class="opp-add-btn" onclick="addOppAction()">+ Adicionar ação do adversário</button>
   </div>
 </div>
 
@@ -335,21 +376,38 @@
   let players = JSON.parse(localStorage.getItem('ls_team')) || defaultPlayers;
   let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
   let seconds = parseInt(localStorage.getItem('ls_time')) || 0;
-  
+  let oppLogs = JSON.parse(localStorage.getItem('ls_opp_logs')) || []; // opponent stats
   let selectedPlayer = null;
   let pendingAction = null;
   let pendingScore = 0; // 1 = certo, -1 = errado, 0 = neutro
+  let playerStatFilter = 'all';
+  let autoSaveInterval = null;
   
   // Timer vars
   let timerInterval = null;
   let isRunning = false;
 
+// AUTO-SAVE on interval (backup every 30s)
+  function startAutoSave() {
+    if (autoSaveInterval) clearInterval(autoSaveInterval);
+    autoSaveInterval = setInterval(() => {
+      saveLogs();
+      localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
+      // Visual indicator
+      const indicator = document.getElementById('autosave-dot');
+      if (indicator) { indicator.style.opacity = '1'; setTimeout(() => indicator.style.opacity = '0.4', 800); }
+    }, 30000);
+  }
+  startAutoSave();
+
   // INITIALIZE
   window.onload = () => {
-    document.getElementById('timer-display').innerText = formatTime(seconds);
+    document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
     renderPlayers();
     renderLogs();
     renderTeamEditor();
+    renderPlayerStatFilters();
+    renderOppActions();
   };
 
   // TABS
@@ -461,6 +519,7 @@ timerInterval = setInterval(() => {
     const log = {
       id: Date.now(),
       min: min,
+      half: half,
       player: selectedPlayer.name,
       num: selectedPlayer.num,
       action: pendingAction,
@@ -511,16 +570,28 @@ timerInterval = setInterval(() => {
   }
 
   // STATS ENGINE
+  let statHalfFilter = 'all';
+  function setStatHalfFilter(halfVal, btn) {
+    statHalfFilter = halfVal;
+    document.querySelectorAll('[id^="filter-half-"]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateStats();
+  }
+
   function updateStats() {
+    // Apply half filter
+    let filteredLogs = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
+    let filteredOpp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
+
     // Golos
-    const golosMarcados = logs.filter(l => l.action === 'Golo Marcado').length;
-    const golosSofridos = logs.filter(l => l.action === 'Golo Sofrido').length;
+    const golosMarcados = filteredLogs.filter(l => l.action === 'Golo Marcado').length;
+    const golosSofridos = filteredOpp.filter(o => o.action === 'Golo Sofrido').length;
     document.getElementById('stat-golos-marcados').innerText = golosMarcados;
     document.getElementById('stat-golos-sofridos').innerText = golosSofridos;
 
     // Cruzamentos
-    const cruzCertos = logs.filter(l => l.action === 'Cruzamento Certo').length;
-    const cruzFalhados = logs.filter(l => l.action === 'Cruzamento Falhado').length;
+    const cruzCertos = filteredLogs.filter(l => l.action === 'Cruzamento Certo').length;
+    const cruzFalhados = filteredLogs.filter(l => l.action === 'Cruzamento Falhado').length;
     const totalCruz = cruzCertos + cruzFalhados;
     const cruzPct = totalCruz > 0 ? Math.round((cruzCertos / totalCruz) * 100) : 0;
     document.getElementById('stat-cruz-pct').innerText = cruzPct + '%';
@@ -531,7 +602,7 @@ timerInterval = setInterval(() => {
 
     // Top players
     const pCounts = {};
-    logs.forEach(l => { pCounts[l.player] = (pCounts[l.player] || 0) + 1; });
+    filteredLogs.forEach(l => { pCounts[l.player] = (pCounts[l.player] || 0) + 1; });
     const topPlayers = Object.entries(pCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
     
     let tpHTML = '';
@@ -543,7 +614,7 @@ timerInterval = setInterval(() => {
     document.getElementById('top-players-list').innerHTML = tpHTML || '<span style="color:var(--t3)">Sem dados suficientes.</span>';
 
     // Zonas de Perda
-    const perdas = logs.filter(l => l.action === 'Perda de Bola' || l.action === 'Passe Falhado' || l.action === 'Cruzamento Falhado');
+    const perdas = filteredLogs.filter(l => l.action === 'Perda de Bola' || l.action === 'Passe Falhado' || l.action === 'Cruzamento Falhado');
     const zCounts = {};
     perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
     const topZonas = Object.entries(zCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
@@ -555,6 +626,102 @@ timerInterval = setInterval(() => {
       </div>`;
     });
     document.getElementById('zone-lost-list').innerHTML = tzHTML || '<span style="color:var(--t3)">Nenhuma perda registada. Excelente!</span>';
+
+    // Player-specific stats
+    renderPlayerStats();
+  }
+
+  // PLAYER STATS RENDERING
+  function renderPlayerStatFilters() {
+    const container = document.getElementById('player-stat-filters');
+    if (!container) return;
+    container.innerHTML = `<button class="stat-filter-btn ${playerStatFilter === 'all' ? 'active' : ''}" onclick="filterPlayerStats('all', this)">Todos</button>`;
+    players.slice(0, 11).forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = `stat-filter-btn ${playerStatFilter === p.num ? 'active' : ''}`;
+      btn.textContent = `#${p.num}`;
+      btn.onclick = () => filterPlayerStats(p.num, btn);
+      container.appendChild(btn);
+    });
+  }
+
+  function filterPlayerStats(filter, btn) {
+    playerStatFilter = filter;
+    document.querySelectorAll('.stat-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderPlayerStats();
+  }
+
+  function renderPlayerStats() {
+    const container = document.getElementById('player-stats-list');
+    if (!container) return;
+    let filteredLogs = playerStatFilter === 'all' ? logs : logs.filter(l => l.num === playerStatFilter);
+    if (statHalfFilter !== 'all') filteredLogs = filteredLogs.filter(l => l.half === statHalfFilter);
+    
+    // Build per-player stats
+    const pStats = {};
+    players.forEach(p => { pStats[p.num] = { name: p.name, num: p.num, total: 0, certo: 0, errado: 0, golo: 0, passe: 0, cruzado: 0, desarme: 0, falta: 0 }; });
+    filteredLogs.forEach(l => {
+      if (!pStats[l.num]) return;
+      pStats[l.num].total++;
+      if (l.score === 1) pStats[l.num].certo++;
+      if (l.score === -1) pStats[l.num].errado++;
+      if (l.action === 'Golo Marcado') pStats[l.num].golo++;
+      if (l.action.includes('Passe')) pStats[l.num].passe++;
+      if (l.action.includes('Cruzamento')) pStats[l.num].cruzado++;
+      if (l.action.includes('Desarme')) pStats[l.num].desarme++;
+      if (l.action.includes('Falta')) pStats[l.num].falta++;
+    });
+
+    const sorted = Object.values(pStats).filter(p => p.total > 0).sort((a, b) => b.total - a.total);
+    const maxTotal = sorted.length > 0 ? sorted[0].total : 1;
+
+    if (sorted.length === 0) { container.innerHTML = '<span style="color:var(--t3)">Sem ações registadas.</span>'; return; }
+
+    container.innerHTML = sorted.map(p => {
+      const pct = Math.round((p.total / maxTotal) * 100);
+      return `<div class="player-stat-row">
+        <span class="psr-name">${p.name}</span>
+        <span class="psr-actions">${p.total} ações</span>
+        <div class="psr-bar-wrap"><div class="psr-bar" style="width:${pct}%; background:${p.golo > 0 ? '#FFD700' : 'var(--acc)'}"></div></div>
+        <span class="psr-detail">
+          <span style="color:var(--acc)">✓${p.certo}</span>
+          <span style="color:var(--red)">✕${p.errado}</span>
+          <span style="color:#FFD700">⚽${p.golo}</span>
+        </span>
+      </div>`;
+    }).join('');
+  }
+
+  // OPPONENT TRACKING
+  function addOppAction() {
+    const min = Math.floor(seconds / 60);
+    const act = prompt("Ação do adversário:\n1=Canto, 2=Remate à baliza, 3=Remate fora, 4=Falta sofrida, 5=Golo");
+    if (!act) return;
+    const actions = { '1': 'Canto', '2': 'Remate à Baliza (Adv)', '3': 'Remate Fora (Adv)', '4': 'Falta Sofrida (Adv)', '5': 'Golo Sofrido' };
+    const actionName = actions[act];
+    if (!actionName) return;
+    const zone = prompt("Zona (ex: Ataque Centro, Meio Esq.)") || 'Meio Centro';
+    const oppLog = { id: Date.now(), min, action: actionName, zone, half };
+    oppLogs.unshift(oppLog);
+    localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
+    renderOppActions();
+    showToast(`Registo adversário: ${actionName}`, true);
+  }
+
+  function renderOppActions() {
+    const container = document.getElementById('opp-actions-list');
+    if (!container) return;
+    if (oppLogs.length === 0) {
+      container.innerHTML = '<span style="color:var(--t3); font-size:12px;">Nenhuma ação do adversário.</span>';
+      return;
+    }
+    container.innerHTML = oppLogs.slice(0, 10).map(o => `
+      <div style="display:flex; justify-content:space-between; padding:6px 8px; background:var(--s2); border-radius:6px; font-size:12px;">
+        <span style="color:var(--opp,#ff6b6b)">${o.min}' ${o.action}</span>
+        <span style="color:var(--t3)">${o.zone}</span>
+      </div>
+    `).join('');
   }
 
   // TEAM EDITOR
