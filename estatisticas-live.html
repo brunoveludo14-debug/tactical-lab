@@ -4,1130 +4,517 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>São Manços - Estatísticas</title>
-<meta name="theme-color" content="#3ddc84">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="São Manços">
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  /* Light mode vars */
-  :root {
-    --bg: #0c1610; --s1: #16241b; --s2: #1f3025;
-    --b1: rgba(61, 220, 132, 0.15); --b2: rgba(61, 220, 132, 0.3);
-    --t1: rgba(255, 255, 255, 0.95); --t2: rgba(255, 255, 255, 0.75); --t3: rgba(255, 255, 255, 0.5);
-    --acc: #3ddc84; --acc-hover: #48e58f; --red: #ff4a4a; --yel: #ffb84a;
-    --pitch-bg: #27ae60;
-  }
-  body.light-mode {
-    --bg: #f4f7f4; --s1: #ffffff; --s2: #edf3ed;
-    --b1: rgba(61, 220, 132, 0.15); --b2: rgba(61, 220, 132, 0.3);
-    --t1: rgba(15, 30, 18, 0.95); --t2: rgba(15, 30, 18, 0.65); --t3: rgba(15, 30, 18, 0.4);
-    --acc: #2cb870; --pitch-bg: #4ade80;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-  body { background-color: var(--bg); color: var(--t1); display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
-  
-  /* Header & Tabs */
-  header { height: 54px; background: var(--s1); border-bottom: 1px solid var(--b1); display: flex; align-items: center; padding: 0 14px; justify-content: space-between; gap: 8px; flex-shrink: 0; }
-  .title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-  .title-icon { color: var(--acc); }
-  .title-text { display: inline; }
-  .tabs { display: flex; gap: 6px; }
-  .tab-btn { background: transparent; border: none; color: var(--t3); font-weight: 600; font-size: 13px; cursor: pointer; padding: 5px 8px; border-radius: 6px; white-space: nowrap; }
-  .tab-btn.active { color: var(--bg); background: var(--acc); }
-  .btn-export { background: var(--acc); color: var(--bg); border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; }
-  .btn-save-pc { background: #1f3025; color: var(--acc); border: 1px solid var(--acc); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.15s; white-space: nowrap; }
-  .btn-save-pc:hover { background: var(--acc); color: var(--bg); }
-  .btn-theme { background: var(--s2); color: var(--t1); border: 1px solid var(--b1); padding: 8px 12px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.15s; }
-  .btn-theme:hover { background: var(--acc); }
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif}
+body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
+.title{text-align:center;font-weight:700;font-size:18px;margin-bottom:12px;color:#3ddc84}
 
-  /* Toast */
-  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 9999; display: none; animation: fadeUp 0.3s ease; max-width: 90vw; text-align: center; }
-  #toast.ok { background: var(--acc); color: var(--bg); }
-  #toast.err { background: var(--red); color: white; }
-  @keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+/* Header */
+.dash-header{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:8px}
+.dash-btn{background:rgba(61,220,132,.15);border:1px solid rgba(61,220,132,.3);color:#3ddc84;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
 
-  /* Layout */
-  .view { display: none; flex: 1; overflow: hidden; min-height: 0; }
-  .view.active { display: flex; }
-  .panel-left { width: 65%; padding: 16px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; position: relative; }
-  .panel-right { width: 35%; background: var(--s1); border-left: 1px solid var(--b1); display: flex; flex-direction: column; min-width: 0; }
-  .section-title { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* Result bar */
+.result-bar{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#16241b;border-radius:12px;margin-bottom:10px;border:1px solid rgba(61,220,132,.15)}
+.result-big{text-align:center}
+.result-num{font-size:36px;font-weight:700;color:#FFD700;line-height:1}
+.result-num.purple{color:#c850f5}
+.result-label{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.05em;margin-top:2px}
+.result-div{font-size:24px;color:rgba(255,255,255,.3)}
+.half-filters{display:flex;gap:4px;margin-left:auto}
+.hf-btn{background:#1f3025;border:1px solid rgba(61,220,132,.2);color:rgba(255,255,255,.5);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+.hf-btn.active{background:#3ddc84;color:#0c1610;border-color:#3ddc84}
 
-  /* Players & Actions */
-  .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
-  .player-btn { background: var(--s2); border: 1px solid var(--b1); border-radius: 12px; padding: 12px 5px; color: var(--t1); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.1s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-  .player-btn.selected { background: var(--acc); color: var(--bg); border-color: var(--acc); }
-  .player-btn:active { transform: scale(0.96); }
-  .player-num { font-size: 10px; opacity: 0.7; }
-  .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; opacity: 0.5; pointer-events: none; transition: 0.2s; }
-  .actions-grid.active { opacity: 1; pointer-events: auto; }
-  .action-btn { background: var(--s2); border: 1px solid var(--b1); border-radius: 12px; padding: 18px 14px; color: var(--t1); font-weight: 500; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; min-height: 56px; }
-  .action-btn:active { transform: scale(0.97); }
-  .action-btn.certo { border-left: 4px solid var(--acc); }
-  .action-btn.errado { border-left: 4px solid var(--red); }
-  .action-btn.neutro { border-left: 4px solid var(--yel); }
-  .action-btn.golo { border-left: 4px solid #FFD700; background: rgba(255,215,0,0.08); color: #FFD700; font-weight: 700; }
-  .action-btn.golo-sofrido { border-left: 4px solid #c850f5; background: rgba(200,80,245,0.08); color: #c850f5; font-weight: 700; }
+/* Cards */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.dash-card{background:#16241b;border:1px solid rgba(61,220,132,.12);border-radius:10px;padding:10px}
+.dash-card-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:8px}
 
-  /* Pitch Overlay */
-  .pitch-overlay { position: fixed; inset: 0; background: rgba(12,22,16,0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); padding: 20px; }
-  .pitch-overlay.active { display: flex; }
-  .pitch-container { width: min(95vw, 420px); height: min(65vw, 280px); background: var(--pitch-bg); border: 2px solid white; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 1px; }
-  .zone-btn { background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); color: white; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 13px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-  .zone-btn:active { background: rgba(255,255,255,0.5); }
-  .pitch-title { margin-bottom: 14px; font-size: 17px; font-weight: bold; text-align: center; }
-  .cancel-pitch { margin-top: 14px; background: transparent; border: none; color: var(--red); cursor: pointer; font-size: 15px; text-decoration: underline; padding: 8px; }
+/* Eficácia */
+.eff-row{display:flex;gap:10px}
+.eff-item{flex:1}
+.eff-label{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:3px}
+.eff-big{font-size:22px;font-weight:700;color:#3ddc84}
+.eff-bar-bg{height:5px;background:#1f3025;border-radius:3px;overflow:hidden;margin:4px 0}
+.eff-bar{height:100%;background:#3ddc84;border-radius:3px;width:0%;transition:width .4s}
+.eff-sub{font-size:10px;color:rgba(255,255,255,.4)}
 
-  /* Quick-Action Floating Bar */
-  .quick-bar {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg,rgba(22,36,27,.98),rgba(16,28,20,.98));
-    border: 1px solid rgba(61,220,132,.35);
-    border-radius: 16px; padding: 10px 12px;
-    display: flex; align-items: center; gap: 6px;
-    z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,.5);
-    animation: slideUp .25s ease;
-    flex-wrap: wrap; max-width: 95vw; justify-content: center;
-  }
-  @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
-  .quick-label { font-size: 10px; color: var(--t3); font-weight: 600; margin-right: 4px; }
-  .qb-btn {
-    background: var(--s2); border: 1px solid var(--b1); border-radius: 10px;
-    padding: 8px 12px; color: var(--t1); font-size: 12px; font-weight: 600;
-    cursor: pointer; white-space: nowrap; transition: 0.15s;
-  }
-  .qb-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
-  @media (max-width: 700px) {
-    .quick-bar { bottom: 220px; padding: 8px; gap: 4px; }
-    .qb-btn { padding: 6px 10px; font-size: 11px; }
-    .quick-label { display: none; }
-  }
+/* Action list */
+.action-list{display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;font-size:11px}
+.act-row{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.act-name{flex:1;color:rgba(255,255,255,.6)}
+.act-bar-bg{flex:1;height:4px;background:#1f3025;border-radius:2px;overflow:hidden}
+.act-bar{height:100%;background:#3ddc84;border-radius:2px}
+.act-count{font-size:10px;color:rgba(255,255,255,.4);min-width:18px;text-align:right}
 
-  /* Timeline */
-  .timeline-header { padding: 12px 16px; border-bottom: 1px solid var(--b1); flex-shrink: 0; }
-  .timeline-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
-  .log-item { background: var(--bg); border: 1px solid var(--b1); border-radius: 8px; padding: 9px 10px; display: flex; align-items: center; font-size: 11px; gap: 4px; }
-  .log-min { color: var(--t3); width: 28px; flex-shrink: 0; }
-  .log-player { font-weight: 600; color: var(--acc); width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
-  .log-action { color: var(--t1); flex: 1; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .log-zone { background: var(--s2); padding: 2px 5px; border-radius: 4px; font-size: 9px; color: var(--t2); flex-shrink: 0; }
-  .log-del { background: transparent; border: none; color: var(--t3); cursor: pointer; padding: 4px; flex-shrink: 0; }
+/* Heatmap */
+.heatmap-mini{display:flex;flex-direction:column;gap:3px}
+.hm-row{display:flex;gap:3px}
+.hm-cell{flex:1;aspect-ratio:1;background:rgba(255,255,255,.06);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,.3);font-weight:600;cursor:pointer;transition:background .3s}
 
-  /* Timer */
-  .timer-wrap { display: flex; align-items: center; gap: 8px; background: var(--s2); padding: 10px 14px; border-radius: 8px; width: fit-content; border: 1px solid var(--b1); flex-wrap: wrap; }
-  .timer-val { font-family: 'Inter', monospace; font-size: 22px; font-weight: 700; color: var(--acc); }
-  .timer-btn { background: transparent; border: 1px solid var(--t3); color: var(--t1); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; touch-action: manipulation; }
+/* Player list */
+.player-list{display:flex;flex-direction:column;gap:3px}
+.pl-item{display:flex;align-items:center;gap:6px;padding:4px 6px;background:#1f3025;border-radius:6px;font-size:11px}
+.pl-rank{font-size:10px;color:rgba(255,255,255,.4);font-weight:700;width:16px}
+.pl-name{flex:1;font-weight:600;color:rgba(255,255,255,.8)}
+.pl-count{font-size:10px;color:rgba(255,255,255,.4)}
 
-  /* Settings & Stats Views */
-  .settings-view { padding: 20px; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; }
-  .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
-  .input-row input { background: var(--s1); border: 1px solid var(--b1); color: white; padding: 10px; border-radius: 6px; font-size: 16px; }
-  .btn-danger { background: rgba(255,74,74,0.1); color: var(--red); border: 1px solid var(--red); padding: 10px; border-radius: 6px; cursor: pointer; }
-  .stat-filter-btn { background: var(--s2); border: 1px solid var(--b1); color: var(--t2); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; }
-  .stat-filter-btn.active { background: var(--acc); color: var(--bg); border-color: var(--acc); }
-  .player-stat-row { display:flex; align-items:center; gap:8px; padding:10px; border-radius:8px; background:var(--s2); margin-bottom:6px; }
-  .psr-name { font-weight:600; min-width:90px; }
-  .psr-actions { font-size:11px; color:var(--t3); min-width:60px; }
-  .psr-bar-wrap { flex:1; height:6px; background:var(--s1); border-radius:3px; overflow:hidden; }
-  .psr-bar { height:100%; background:var(--acc); border-radius:3px; }
-  .psr-detail { font-size:10px; color:var(--t2); display:flex; gap:8px; }
-.opp-add-btn { width:100%; background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.3); color:#ff6b6b; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px; }
-  /* DASHBOARD V2 */
-  .dash-header { display:flex; justify-content:space-between; align-items:center; padding:10px 14px 8px; }
-  .dash-btn { background:rgba(61,220,132,.12); border:1px solid rgba(61,220,132,.25); color:var(--acc); padding:5px 10px; border-radius:7px; font-size:11px; font-weight:600; cursor:pointer; }
-  .dash-btn:hover { background:rgba(61,220,132,.2); }
-  .result-bar { display:flex; align-items:center; gap:10px; padding:8px 14px; background:var(--s1); margin:0 12px 10px; border-radius:12px; border:1px solid var(--b1); }
-  .result-big { display:flex; flex-direction:column; align-items:center; }
-  .result-num { font-size:32px; font-weight:700; color:#FFD700; line-height:1; }
-  .result-num.purple { color:#c850f5; }
-  .result-label { font-size:9px; color:var(--t3); font-weight:600; letter-spacing:.05em; margin-top:2px; }
-  .result-div { font-size:22px; color:var(--t3); font-weight:300; margin:0 2px; }
-  .half-filters { display:flex; gap:4px; margin-left:auto; }
-  .hf-btn { background:var(--s2); border:1px solid var(--b1); color:var(--t3); padding:4px 9px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; }
-  .hf-btn.active { background:var(--acc); color:var(--bg); border-color:var(--acc); }
-  .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 12px; }
-  .dash-card { background:var(--s1); border:1px solid var(--b1); border-radius:12px; padding:10px 12px; }
-  .dash-card-title { font-size:12px; font-weight:600; color:var(--t2); margin-bottom:8px; }
-  /* Eficácia */
-  .eff-row { display:flex; gap:8px; }
-  .eff-item { flex:1; }
-  .eff-label { font-size:10px; color:var(--t3); margin-bottom:4px; }
-  .eff-big { font-size:22px; font-weight:700; color:var(--acc); }
-  .eff-bar-bg { height:5px; background:var(--s2); border-radius:3px; overflow:hidden; margin:4px 0; }
-  .eff-bar { height:100%; background:var(--acc); border-radius:3px; transition:width .4s; }
-  .eff-sub { font-size:10px; color:var(--t3); }
-  /* Action list */
-  .action-list { display:flex; flex-direction:column; gap:5px; max-height:140px; overflow-y:auto; }
-  .act-row { display:flex; align-items:center; gap:6px; font-size:11px; }
-  .act-name { flex:1; color:var(--t2); }
-  .act-bar-bg { flex:1; height:5px; background:var(--s2); border-radius:3px; overflow:hidden; }
-  .act-bar { height:100%; background:var(--acc); border-radius:3px; }
-  .act-count { font-size:10px; color:var(--t3); min-width:20px; text-align:right; }
-  /* Heatmap mini */
-  .heatmap-mini { display:flex; flex-direction:column; gap:3px; }
-  .hm-row { display:flex; gap:3px; }
-  .hm-cell { flex:1; aspect-ratio:1; background:rgba(255,255,255,.08); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:9px; color:rgba(255,255,255,.4); font-weight:600; cursor:pointer; transition:background .3s; }
-  /* Player list */
-  .player-list { display:flex; flex-direction:column; gap:4px; }
-  .pl-item { display:flex; align-items:center; gap:6px; padding:5px 6px; background:var(--s2); border-radius:6px; }
-  .pl-rank { font-size:10px; color:var(--t3); font-weight:700; width:16px; }
-  .pl-name { flex:1; font-size:11px; font-weight:600; }
-  .pl-count { font-size:10px; color:var(--t3); }
-  /* Opponent */
-  .opp-quick-btn { background:rgba(255,96,96,.1); border:1px solid rgba(255,96,96,.2); color:#ff6b6b; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; }
-  .opp-list { display:flex; flex-direction:column; gap:3px; max-height:80px; overflow-y:auto; }
-  .opp-item { display:flex; justify-content:space-between; font-size:11px; padding:4px 6px; background:var(--s2); border-radius:5px; }
-  .opp-name { color:#ff6b6b; }
-  .opp-zone { color:var(--t3); }
-  /* History */
-  .history-list { display:flex; flex-direction:column; gap:4px; }
-  .hist-item { display:flex; justify-content:space-between; align-items:center; padding:5px 8px; background:var(--s2); border-radius:6px; }
-  .hist-date { font-size:11px; color:var(--t3); }
-  .hist-score { font-size:16px; font-weight:700; color:var(--acc); }
+/* Opponent */
+.opp-quick-btn{background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);color:#ff6b6b;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+.opp-list{display:flex;flex-direction:column;gap:3px;max-height:60px;overflow-y:auto}
+.opp-item{display:flex;justify-content:space-between;font-size:11px;padding:4px 6px;background:#1f3025;border-radius:5px}
+.opp-name{color:#ff6b6b}
+.opp-zone{color:rgba(255,255,255,.4)}
 
-  @media (max-width: 700px) {
-    .stat-card { padding: 12px; }
-    .stat-row { font-size: 11px; }
-  }
-  
+/* History */
+.history-list{display:flex;flex-direction:column;gap:4px}
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#1f3025;border-radius:6px;font-size:12px}
+.hist-date{color:rgba(255,255,255,.5)}
+.hist-score{font-size:16px;font-weight:700;color:#3ddc84}
 
+/* Toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:#3ddc84;color:#0c1610;border-radius:8px;font-weight:600;font-size:13px;z-index:999;display:none}
+#toast.err{background:#ff4a4a;color:#fff}
+
+@media(max-width:500px){
+.result-bar{flex-wrap:wrap;justify-content:center;gap:10px}
+.half-filters{width:100%;justify-content:center;margin-top:4px}
+.dash-grid{grid-template-columns:1fr}
+.result-num{font-size:28px}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="title">
-    <svg class="title-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    São Manços — Estatísticas
+<div class="title">🏆 São Manços — Estatísticas</div>
+
+<div class="dash-header">
+  <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6);">📊 Análise em Tempo Real</span>
+  <div style="display:flex;gap:6px;">
+    <button class="dash-btn" onclick="exportDirectExcel()">📊 Excel .xlsx</button>
+    <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.1);">💾 Guardar</button>
   </div>
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('jogo')">1. Jogo Ao Vivo</button>
-    <button class="tab-btn" onclick="switchTab('stats')">2. Análise</button>
-    <button class="tab-btn" onclick="switchTab('equipa')">3. Equipa</button>
+</div>
+
+<!-- Result bar -->
+<div class="result-bar">
+  <div class="result-big">
+    <span class="result-num" id="stat-golos-marcados">0</span>
+    <div class="result-label">MARC.</div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center;">
-    <button class="btn-theme" id="btn-theme" onclick="toggleDarkMode()" title="Alternar modo escuro">🌙</button>
-    <button class="btn-save-pc" onclick="saveToPC()" title="Guarda o CSV diretamente na pasta São Manços do PC">💾 Guardar no PC</button>
-    <button class="btn-export" onclick="exportCSV()" title="Descarregar CSV para o browser">Exportar CSV</button>
+  <div class="result-div">—</div>
+  <div class="result-big">
+    <span class="result-num purple" id="stat-golos-sofridos">0</span>
+    <div class="result-label">SOFR.</div>
   </div>
-</header>
+  <div style="flex:1"></div>
+  <div class="half-filters">
+    <button class="hf-btn active" id="filter-half-all" onclick="setStatHalfFilter('all',this)">Todo</button>
+    <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1ªP</button>
+    <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2ªP</button>
+  </div>
+</div>
+
+<!-- Grid 2x2 -->
+<div class="dash-grid">
+
+  <!-- Eficácia -->
+  <div class="dash-card">
+    <div class="dash-card-title">📈 Eficácia</div>
+    <div class="eff-row">
+      <div class="eff-item">
+        <div class="eff-label">Cruzamentos</div>
+        <div class="eff-big" id="stat-cruz-pct">0%</div>
+        <div class="eff-bar-bg"><div class="eff-bar" id="stat-cruz-bar" style="width:0%"></div></div>
+        <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
+      </div>
+      <div class="eff-item">
+        <div class="eff-label">Remates</div>
+        <div class="eff-big" id="stat-remates-pct">0%</div>
+        <div class="eff-bar-bg"><div class="eff-bar" id="stat-remates-bar" style="width:0%"></div></div>
+        <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza · <span id="stat-remates-errado">0</span> fora</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ações por tipo -->
+  <div class="dash-card">
+    <div class="dash-card-title">📊 Ações</div>
+    <div id="action-chart" class="action-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
+  </div>
+
+  <!-- Mapa de calor -->
+  <div class="dash-card">
+    <div class="dash-card-title">🗺️ Zonas</div>
+    <div class="heatmap-mini">
+      <div class="hm-row">
+        <div class="hm-cell" id="hm-0" onclick="showZoneDetail('Ataque Esq.')">0</div>
+        <div class="hm-cell" id="hm-1" onclick="showZoneDetail('Ataque Centro')">0</div>
+        <div class="hm-cell" id="hm-2" onclick="showZoneDetail('Ataque Dir.')">0</div>
+      </div>
+      <div class="hm-row">
+        <div class="hm-cell" id="hm-3" onclick="showZoneDetail('Meio Esq.')">0</div>
+        <div class="hm-cell" id="hm-4" onclick="showZoneDetail('Meio Centro')">0</div>
+        <div class="hm-cell" id="hm-5" onclick="showZoneDetail('Meio Dir.')">0</div>
+      </div>
+      <div class="hm-row">
+        <div class="hm-cell" id="hm-6" onclick="showZoneDetail('Defesa Esq.')">0</div>
+        <div class="hm-cell" id="hm-7" onclick="showZoneDetail('Defesa Centro')">0</div>
+        <div class="hm-cell" id="hm-8" onclick="showZoneDetail('Defesa Dir.')">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top jogadores -->
+  <div class="dash-card">
+    <div class="dash-card-title">👥 Mais Envolve.</div>
+    <div id="top-players-list" class="player-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
+  </div>
+
+</div>
+
+<!-- Adversário -->
+<div class="dash-card" style="margin-top:6px;">
+  <div class="dash-card-title" style="color:#ff6b6b;">🟥 Adversário</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+    <button class="opp-quick-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
+  </div>
+  <div id="opp-actions-list" class="opp-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span></div>
+</div>
+
+<!-- Histórico -->
+<div class="dash-card" style="margin-top:6px;">
+  <div class="dash-card-title">📁 Histórico</div>
+  <div id="match-history-list" class="history-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span></div>
+</div>
+
+<!-- Offline -->
+<div id="offline-status" style="display:none;text-align:center;padding:8px;color:#ff4a4a;font-size:11px;margin-top:8px;background:rgba(255,74,74,.08);border-radius:8px;">📴 Sem internet — dados guardados localmente</div>
+</div>
+
 <div id="toast"></div>
 
-<!-- VISTA 1: JOGO AO VIVO -->
-<div id="view-jogo" class="view active container">
-  <div class="panel-left">
-    
-    <div class="timer-wrap">
-      <div class="timer-val" id="timer-display">00:00 (1ªP)</div>
-      <button class="timer-btn" onclick="toggleTimer()" id="btn-timer-toggle">Iniciar Jogo</button>
-      <button class="timer-btn" id="btn-end-half" onclick="endHalf()" style="display:none;">Encerrar 1ªP</button>
-      <button class="timer-btn" onclick="resetTimer()">Reset</button>
-      <span style="font-size:11px;color:var(--t3);margin-left:10px;">
-        💾 Auto-Save
-        <span id="autosave-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc);opacity:0.4;vertical-align:middle;margin-left:3px;"></span>
-      </span>
-    </div>
-
-    <div>
-      <div class="section-title">1. Selecionar Jogador</div>
-      <div class="players-grid" id="players-grid"></div>
-    </div>
-
-    <div style="margin-top: 10px;">
-      <div class="section-title">2. Registar Ação</div>
-      <div class="actions-grid" id="actions-grid">
-        <button class="action-btn errado" onclick="askZone('Passe Falhado', -1)">Passe Falhado <span>✕</span></button>
-        <button class="action-btn certo" onclick="askZone('Cruzamento Certo', 1)">Cruzamento Certo <span>↗️</span></button>
-        <button class="action-btn errado" onclick="askZone('Cruzamento Falhado', -1)">Cruzamento Falhado <span>↘️</span></button>
-        <button class="action-btn certo" onclick="askZone('Remate à Baliza', 1)">Remate à Baliza <span>🎯</span></button>
-        <button class="action-btn errado" onclick="askZone('Remate Fora', -1)">Remate Fora <span>❌</span></button>
-        <button class="action-btn certo" onclick="askZone('Desarme Certo', 1)">Desarme Certo <span>🛡️</span></button>
-        <button class="action-btn errado" onclick="askZone('Perda de Bola', -1)">Perda de Bola <span>⚠️</span></button>
-        <button class="action-btn neutro" onclick="askZone('Falta Sofrida', 0)">Falta Sofrida <span>🤕</span></button>
-        <button class="action-btn neutro" onclick="askZone('Falta Cometida', 0)">Falta Cometida <span>🛑</span></button>
-        <button class="action-btn golo" onclick="askZone('Golo Marcado', 1)">Golo Marcado <span>⚽</span></button>
-        <button class="action-btn golo-sofrido" onclick="askZone('Golo Sofrido', -1)">Golo Sofrido <span>😔</span></button>
-      </div>
-    </div>
-
-<!-- Floating Quick-Action Bar -->
-  <div id="quick-bar" class="quick-bar" style="display:none;">
-    <div class="quick-label">Ação Rápida</div>
-    <button class="qb-btn" style="background:rgba(57,224,122,.2);border-color:#3ddc84;" onclick="qba('Passe Falhado', -1)">✕ Passe</button>
-    <button class="qb-btn" style="background:rgba(57,224,122,.2);border-color:#3ddc84;" onclick="qba('Desarme Certo', 1)">🛡️ Desarme</button>
-    <button class="qb-btn" style="background:rgba(57,224,122,.2);border-color:#3ddc84;" onclick="qba('Remate à Baliza', 1)">🎯 Remate</button>
-    <button class="qb-btn" style="background:rgba(255,215,0,.15);border-color:#FFD700;" onclick="qba('Golo Marcado', 1)">⚽ Golo</button>
-    <button class="qb-btn" style="background:rgba(255,74,74,.12);border-color:#ff4a4a;" onclick="qba('Golo Sofrido', -1)">😔 Sofrido</button>
-    <button class="qb-btn" onclick="closeQuickBar()">✕</button>
-  </div>
-
-  <!-- Pitch Overlay Modal -->
-  <div class="pitch-overlay" id="pitch-overlay">
-      <div class="pitch-title" id="pitch-title">Onde foi a ação?</div>
-      <div class="pitch-container">
-        <!-- Zonas (Ataque em cima) -->
-        <button class="zone-btn" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
-        <button class="zone-btn" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
-        <button class="zone-btn" onclick="recordAction('Ataque Dir.')">Ataque Dir.</button>
-        
-        <button class="zone-btn" onclick="recordAction('Meio-Campo Esq.')">Meio Esq.</button>
-        <button class="zone-btn" onclick="recordAction('Meio-Campo Centro')">Meio Centro</button>
-        <button class="zone-btn" onclick="recordAction('Meio-Campo Dir.')">Meio Dir.</button>
-
-        <button class="zone-btn" onclick="recordAction('Defesa Esq.')">Defesa Esq.</button>
-        <button class="zone-btn" onclick="recordAction('Defesa Centro')">Defesa Centro</button>
-        <button class="zone-btn" onclick="recordAction('Defesa Dir.')">Defesa Dir.</button>
-      </div>
-      <button class="cancel-pitch" onclick="cancelPitch()">Cancelar</button>
-    </div>
-
-  </div>
-
-  <div class="panel-right">
-    <div class="timeline-header">
-      <div class="section-title" style="margin:0;">Registo do Jogo (Timeline)</div>
-    </div>
-    <div class="timeline-list" id="timeline-list"></div>
-  </div>
-</div>
-
-<!-- VISTA 2: ESTATÍSTICAS — DASHBOARD LIVE -->
-<div id="view-stats" class="view stats-view">
-  <div class="dash-header">
-    <span class="section-title" style="margin:0;">📊 Análise em Tempo Real</span>
-    <div style="display:flex; gap:6px; align-items:center;">
-      <button class="dash-btn" onclick="exportToExcel()" title="Exportar para Excel">📥 Excel</button>
-      <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.15);">💾 Guardar Jogo</button>
-    </div>
-  </div>
-
-  <!-- RESULTADO + FILTRO compacto -->
-  <div class="result-bar">
-    <div class="result-big">
-      <span class="result-num" id="stat-golos-marcados">0</span>
-      <span class="result-label">MARC.</span>
-    </div>
-    <div class="result-div">—</div>
-    <div class="result-big">
-      <span class="result-num purple" id="stat-golos-sofridos">0</span>
-      <span class="result-label">SOFR.</span>
-    </div>
-    <div class="result-div"></div>
-    <div class="half-filters">
-      <button class="hf-btn active" id="filter-half-all" onclick="setStatHalfFilter('all',this)">Todo</button>
-      <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1ªP</button>
-      <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2ªP</button>
-    </div>
-  </div>
-
-  <!-- CARDS em grelha 2 colunas -->
-  <div class="dash-grid">
-
-    <!-- CARD: Eficácia (Cruzamentos + Remates) -->
-    <div class="dash-card">
-      <div class="dash-card-title">📈 Eficácia</div>
-      <div class="eff-row">
-        <div class="eff-item">
-          <div class="eff-label">Cruzamentos</div>
-          <div class="eff-big" id="stat-cruz-pct">0%</div>
-          <div class="eff-bar-bg"><div class="eff-bar" id="stat-cruz-bar" style="width:0%"></div></div>
-          <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
-        </div>
-        <div class="eff-item">
-          <div class="eff-label">Remates</div>
-          <div class="eff-big" id="stat-remates-pct">0%</div>
-          <div class="eff-bar-bg"><div class="eff-bar" id="stat-remates-bar" style="width:0%"></div></div>
-          <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza · <span id="stat-remates-errado">0</span> fora</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARD: Distribuição de Ações -->
-    <div class="dash-card">
-      <div class="dash-card-title">📊 Ações por Tipo</div>
-      <div id="action-chart" class="action-list"></div>
-    </div>
-
-    <!-- CARD: Mapa de Calor -->
-    <div class="dash-card">
-      <div class="dash-card-title">🗺️ Zonas Críticas</div>
-      <div class="heatmap-mini">
-        <div class="hm-row">
-          <div class="hm-cell" id="hm-0" onclick="showZoneDetail('Ataque Esq.')"></div>
-          <div class="hm-cell" id="hm-1" onclick="showZoneDetail('Ataque Centro')"></div>
-          <div class="hm-cell" id="hm-2" onclick="showZoneDetail('Ataque Dir.')"></div>
-        </div>
-        <div class="hm-row">
-          <div class="hm-cell" id="hm-3" onclick="showZoneDetail('Meio Esq.')"></div>
-          <div class="hm-cell" id="hm-4" onclick="showZoneDetail('Meio Centro')"></div>
-          <div class="hm-cell" id="hm-5" onclick="showZoneDetail('Meio Dir.')"></div>
-        </div>
-        <div class="hm-row">
-          <div class="hm-cell" id="hm-6" onclick="showZoneDetail('Defesa Esq.')"></div>
-          <div class="hm-cell" id="hm-7" onclick="showZoneDetail('Defesa Centro')"></div>
-          <div class="hm-cell" id="hm-8" onclick="showZoneDetail('Defesa Dir.')"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARD: Top Jogadores -->
-    <div class="dash-card">
-      <div class="dash-card-title">👥 Mais Envolve.</div>
-      <div id="top-players-list" class="player-list"></div>
-    </div>
-
-  </div>
-
-  <!-- Adversário -->
-  <div class="dash-card" style="margin-top:8px;">
-    <div class="dash-card-title" style="color:#ff6b6b;">🟥 Adversário <span style="font-size:11px;opacity:0.6;font-weight:400;">(regista ações)</span></div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-      <button class="opp-quick-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
-      <button class="opp-quick-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
-      <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
-      <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
-    </div>
-    <div id="opp-actions-list" class="opp-list"></div>
-  </div>
-
-  <!-- Histórico jogos -->
-  <div class="dash-card" style="margin-top:8px;">
-    <div class="dash-card-title">📁 Histórico <span style="font-weight:400;opacity:0.6;font-size:12px;">— resultados anteriores</span></div>
-    <div id="match-history-list" class="history-list"></div>
-  </div>
-
-  <!-- Offline indicator -->
-  <div id="offline-status" style="display:none; text-align:center; padding:8px; color:var(--red); font-size:11px; background:rgba(255,74,74,.08); border-radius:8px; margin-top:8px;">
-    📴 Sem internet — dados guardados localmente
-  </div>
-</div>
-    <div id="player-stats-list">
-      <!-- Generated -->
-    </div>
-  </div>
-
-  <!-- OPPONENT TRACKING -->
-  <div class="stat-card" style="border-color:rgba(255,96,96,.3);">
-    <div style="font-size:16px; font-weight:600; margin-bottom:4px; color:var(--opp, #ff6b6b);">🟥 Adversário</div>
-    <div style="font-size:12px; color:var(--t3); margin-bottom:14px;">Regista ações do adversário (cantos, finalizações, etc.)</div>
-    <div id="opp-actions-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-    <button class="opp-add-btn" onclick="addOppAction()">+ Adicionar ação do adversário</button>
-  </div>
-</div>
-
-<!-- VISTA 3: EQUIPA (SETTINGS) -->
-<div id="view-equipa" class="view settings-view">
-  <div class="section-title">Configurar Plantel do São Manços</div>
-  <p style="color:var(--t2); font-size:13px; margin-bottom:20px;">Estes dados são guardados na memória do seu browser. Altere para os nomes reais.</p>
-  
-  <div id="team-editor"></div>
-  
-  <button class="btn-export" style="margin-top:20px;" onclick="addPlayerField()">+ Adicionar Jogador</button>
-  <button class="btn-export" style="margin-top:20px; background:var(--t3);" onclick="saveTeam()">Guardar Plantel</button>
-
-  <div style="margin-top: 50px; padding-top:20px; border-top:1px solid var(--red);">
-    <div class="section-title" style="color:var(--red);">Zona de Perigo</div>
-    <button class="btn-danger" onclick="hardReset()">Limpar Todos os Dados (Novo Jogo)</button>
-  </div>
-</div>
-
 <script>
-  // DEFAULT TEAM — 11 Titulares + 7 Suplentes
-  const defaultPlayers = [
-    { num: 1,  name: "GR" },
-    { num: 2,  name: "Defesa D." },
-    { num: 3,  name: "Defesa E." },
-    { num: 4,  name: "Central 1" },
-    { num: 5,  name: "Central 2" },
-    { num: 6,  name: "Trinco" },
-    { num: 8,  name: "Médio" },
-    { num: 10, name: "Médio Of." },
-    { num: 7,  name: "Extremo D." },
-    { num: 11, name: "Extremo E." },
-    { num: 9,  name: "Ponta Lança" },
-    { num: 12, name: "Suplente 12" },
-    { num: 13, name: "Suplente 13" },
-    { num: 14, name: "Suplente 14" },
-    { num: 15, name: "Suplente 15" },
-    { num: 16, name: "Suplente 16" },
-    { num: 17, name: "Suplente 17" },
-    { num: 18, name: "Suplente 18" }
-  ];
+// DEFAULT TEAM
+const defaultPlayers = [
+  {num:1,name:"GR"},{num:2,name:"Defesa D."},{num:3,name:"Defesa E."},
+  {num:4,name:"Central 1"},{num:5,name:"Central 2"},{num:6,name:"Trinco"},
+  {num:8,name:"Médio"},{num:10,name:"Médio Of."},{num:7,name:"Extremo D."},
+  {num:11,name:"Extremo E."},{num:9,name:"Ponta Lança"},
+  {num:12,name:"Suplente 12"},{num:13,name:"Suplente 13"},{num:14,name:"Suplente 14"},
+  {num:15,name:"Suplente 15"},{num:16,name:"Suplente 16"},{num:17,name:"Suplente 17"},{num:18,name:"Suplente 18"}
+];
 
-  // STATE
-  let players = JSON.parse(localStorage.getItem('ls_team')) || defaultPlayers;
-  let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
-  let seconds = parseInt(localStorage.getItem('ls_time')) || 0;
-  let oppLogs = JSON.parse(localStorage.getItem('ls_opp_logs')) || []; // opponent stats
-  let selectedPlayer = null;
-  let pendingAction = null;
-  let pendingScore = 0; // 1 = certo, -1 = errado, 0 = neutro
-  let playerStatFilter = 'all';
-  let autoSaveInterval = null;
-  
-  // Timer vars
-  let timerInterval = null;
-  let isRunning = false;
+// STATE
+let players = JSON.parse(localStorage.getItem('ls_team')) || defaultPlayers;
+let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
+let oppLogs = JSON.parse(localStorage.getItem('ls_opp_logs')) || [];
+let seconds = parseInt(localStorage.getItem('ls_time')) || 0;
+let selectedPlayer = null;
+let pendingAction = null;
+let pendingScore = 0;
+let timerInterval = null;
+let isRunning = false;
+let half = parseInt(localStorage.getItem('ls_half')) || 1;
+let autoSaveInterval = null;
+let statHalfFilter = 'all';
 
+// AUTO-SAVE
 function startAutoSave() {
-    if (autoSaveInterval) clearInterval(autoSaveInterval);
-    autoSaveInterval = setInterval(() => {
-      saveLogs();
-      localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
-      // Visual indicator
-      const indicator = document.getElementById('autosave-dot');
-      if (indicator) { indicator.style.opacity = '1'; setTimeout(() => indicator.style.opacity = '0.4', 800); }
-    }, 30000);
-  }
-  startAutoSave();
-
-  // INITIALIZE
-  window.initApp = function() {
-    document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
-    renderPlayers();
-    renderLogs();
-    renderTeamEditor();
-    renderPlayerStatFilters();
-    renderOppActions();
-    checkOnlineStatus();
-    renderMatchHistory();
-    renderHeatmap();
-    renderActionChart();
-  };
-
-  // TABS
-  function switchTab(tabId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('view-' + tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
-
-    if (tabId === 'stats') updateStats();
-  }
-
-  // LIGHT/DARK MODE
-  let isDarkMode = localStorage.getItem('ls_dark') !== 'false';
-  function applyTheme() {
-    document.body.classList.toggle('light-mode', !isDarkMode);
-    document.getElementById('btn-theme').textContent = isDarkMode ? '🌙' : '☀️';
-  }
-  function toggleDarkMode() {
-    isDarkMode = !isDarkMode;
-    localStorage.setItem('ls_dark', isDarkMode);
-    applyTheme();
-  }
-  applyTheme();
-
-  // TIMER LOGIC
-  function formatTime(sec) {
-    const m = Math.floor(sec / 60).toString().padStart(2, '0');
-    const s = (sec % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  }
-  let half = 1;
-  function toggleTimer() {
-    if (isRunning) {
-      clearInterval(timerInterval);
-      document.getElementById('btn-timer-toggle').innerText = "Retomar";
-    } else {
-timerInterval = setInterval(() => {
-        seconds++;
-        document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
-        localStorage.setItem('ls_time', seconds); // Auto-save
-      }, 1000);
-      document.getElementById('btn-timer-toggle').innerText = "Pausar";
-      if (half === 1) document.getElementById('btn-end-half').style.display = 'block';
-    }
-    isRunning = !isRunning;
-  }
-  function endHalf() {
-    if (!confirm("Terminar 1ª Parte e iniciar 2ª?")) return;
-    clearInterval(timerInterval);
-    isRunning = false;
-    half = 2;
-    seconds = 0;
-    document.getElementById('timer-display').innerText = "00:00 (2ªP)";
-    document.getElementById('btn-timer-toggle').innerText = "Iniciar 2ª Parte";
-    localStorage.setItem('ls_time', 0);
-    localStorage.setItem('ls_half', 2);
-    showToast("2ª Parte iniciada!", true);
-  }
-  function resetTimer() {
-    if(confirm("Reiniciar apenas o tempo? Os registos mantêm-se.")){
-      clearInterval(timerInterval);
-      seconds = 0; isRunning = false;
-      document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
-      document.getElementById('btn-timer-toggle').innerText = "Iniciar Jogo";
-      localStorage.setItem('ls_time', 0);
-    }
-  }
-
-  // JOGO AO VIVO LOGIC
-  function renderPlayers() {
-    const grid = document.getElementById('players-grid');
-    grid.innerHTML = '';
-    players.forEach(p => {
-      const btn = document.createElement('button');
-      btn.className = 'player-btn';
-      btn.innerHTML = `<span class="player-num">#${p.num}</span><span>${p.name}</span>`;
-      btn.onclick = () => selectPlayer(p, btn);
-      grid.appendChild(btn);
-    });
-    // Reset action grid state
-    selectedPlayer = null;
-    document.getElementById('actions-grid').classList.remove('active');
-  }
-
-  function selectPlayer(player, btnElement) {
-    selectedPlayer = player;
-    document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
-    btnElement.classList.add('selected');
-    document.getElementById('actions-grid').classList.add('active'); // Unlock actions
-    showQuickBar(); // Show floating quick-action bar
-  }
-
-  function askZone(action, score) {
-    if (!selectedPlayer) return;
-    pendingAction = action;
-    pendingScore = score;
-    document.getElementById('pitch-title').innerText = `Onde foi: ${action}?`;
-    document.getElementById('pitch-overlay').classList.add('active');
-  }
-
-  function cancelPitch() {
-    document.getElementById('pitch-overlay').classList.remove('active');
-    pendingAction = null;
-  }
-
-  function recordAction(zone) {
-    const min = Math.floor(seconds / 60);
-    const log = {
-      id: Date.now(),
-      min: min,
-      half: half,
-      player: selectedPlayer.name,
-      num: selectedPlayer.num,
-      action: pendingAction,
-      score: pendingScore,
-      zone: zone
-    };
-
-    logs.unshift(log);
-    saveLogs();
-    renderLogs();
-    
-    // Fechar modal e reset seleção para fluidez do jogo
-    cancelPitch();
-    selectedPlayer = null;
-    document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
-    document.getElementById('actions-grid').classList.remove('active');
-  }
-
-  function deleteLog(id) {
-    logs = logs.filter(l => l.id !== id);
-    saveLogs();
-    renderLogs();
-  }
-
-  function saveLogs() {
+  autoSaveInterval = setInterval(() => {
     localStorage.setItem('ls_logs', JSON.stringify(logs));
-  }
-
-  function renderLogs() {
-    const list = document.getElementById('timeline-list');
-    list.innerHTML = '';
-    if (logs.length === 0) { list.innerHTML = '<div style="color:var(--t3);text-align:center;">Nenhum registo ainda.</div>'; return; }
-
-    logs.forEach(l => {
-      const item = document.createElement('div');
-      item.className = 'log-item';
-      let acColor = l.score === 1 ? 'var(--acc)' : (l.score === -1 ? 'var(--red)' : 'var(--yel)');
-      
-      item.innerHTML = `
-        <span class="log-min">${l.min}'</span>
-        <span class="log-player">${l.player}</span>
-        <span class="log-action" style="color:${acColor}">${l.action}</span>
-        <span class="log-zone">${l.zone}</span>
-        <button class="log-del" onclick="deleteLog(${l.id})">✕</button>
-      `;
-      list.appendChild(item);
-    });
-  }
-
-  // STATS ENGINE
-  let statHalfFilter = 'all';
-  function setStatHalfFilter(halfVal, btn) {
-    statHalfFilter = halfVal;
-    document.querySelectorAll('[id^="filter-half-"]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    updateStats();
-  }
-
-  function updateStats() {
-    // Apply half filter
-    let filteredLogs = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
-    let filteredOpp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
-
-    // Golos
-    const golosMarcados = filteredLogs.filter(l => l.action === 'Golo Marcado').length;
-    const golosSofridos = filteredOpp.filter(o => o.action === 'Golo Sofrido').length;
-    document.getElementById('stat-golos-marcados').innerText = golosMarcados;
-    document.getElementById('stat-golos-sofridos').innerText = golosSofridos;
-
-    // Cruzamentos
-    const cruzCertos = filteredLogs.filter(l => l.action === 'Cruzamento Certo').length;
-    const cruzFalhados = filteredLogs.filter(l => l.action === 'Cruzamento Falhado').length;
-    const totalCruz = cruzCertos + cruzFalhados;
-    const cruzPct = totalCruz > 0 ? Math.round((cruzCertos / totalCruz) * 100) : 0;
-    document.getElementById('stat-cruz-pct').innerText = cruzPct + '%';
-    document.getElementById('stat-cruz-bar').style.width = cruzPct + '%';
-    document.getElementById('stat-cruz-bar').style.backgroundColor = cruzPct >= 75 ? 'var(--acc)' : (cruzPct >= 50 ? 'var(--yel)' : 'var(--red)');
-    document.getElementById('stat-cruz-certo').innerText = cruzCertos + ' certos';
-    document.getElementById('stat-cruz-errado').innerText = cruzFalhados + ' falhados';
-
-    // Remates
-    const rematesBaliza = filteredLogs.filter(l => l.action === 'Remate à Baliza').length;
-    const rematesFora = filteredLogs.filter(l => l.action === 'Remate Fora').length;
-    const totalRem = rematesBaliza + rematesFora;
-    const remPct = totalRem > 0 ? Math.round((rematesBaliza / totalRem) * 100) : 0;
-    document.getElementById('stat-remates-pct').innerText = remPct + '%';
-    document.getElementById('stat-remates-bar').style.width = remPct + '%';
-    document.getElementById('stat-remates-bar').style.backgroundColor = remPct >= 50 ? 'var(--acc)' : 'var(--yel)';
-    document.getElementById('stat-remates-certo').innerText = rematesBaliza + ' à baliza';
-    document.getElementById('stat-remates-errado').innerText = rematesFora + ' fora';
-
-    // Top players
-    const pCounts = {};
-    filteredLogs.forEach(l => { pCounts[l.player] = (pCounts[l.player] || 0) + 1; });
-    const topPlayers = Object.entries(pCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
-    
-    let tpHTML = '';
-    topPlayers.forEach((p, idx) => {
-      tpHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b1);padding:8px 0;">
-        <span>${idx+1}. <b>${p[0]}</b></span> <span style="color:var(--t2)">${p[1]} ações</span>
-      </div>`;
-    });
-    document.getElementById('top-players-list').innerHTML = tpHTML || '<span style="color:var(--t3)">Sem dados suficientes.</span>';
-
-    // Zonas de Perda
-    const perdas = filteredLogs.filter(l => l.action === 'Perda de Bola' || l.action === 'Passe Falhado' || l.action === 'Cruzamento Falhado');
-    const zCounts = {};
-    perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
-    const topZonas = Object.entries(zCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
-    
-    let tzHTML = '';
-    topZonas.forEach((z) => {
-      tzHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,74,74,0.2);padding:8px 0;">
-        <span>${z[0]}</span> <span>${z[1]} vezes</span>
-      </div>`;
-    });
-    document.getElementById('zone-lost-list').innerHTML = tzHTML || '<span style="color:var(--t3)">Nenhuma perda registada. Excelente!</span>';
-
-    // Player-specific stats
-    renderPlayerStats();
-  }
-
-  // PLAYER STATS RENDERING
-  function renderPlayerStatFilters() {
-    const container = document.getElementById('player-stat-filters');
-    if (!container) return;
-    container.innerHTML = `<button class="stat-filter-btn ${playerStatFilter === 'all' ? 'active' : ''}" onclick="filterPlayerStats('all', this)">Todos</button>`;
-    players.slice(0, 11).forEach(p => {
-      const btn = document.createElement('button');
-      btn.className = `stat-filter-btn ${playerStatFilter === p.num ? 'active' : ''}`;
-      btn.textContent = `#${p.num}`;
-      btn.onclick = () => filterPlayerStats(p.num, btn);
-      container.appendChild(btn);
-    });
-  }
-
-  function filterPlayerStats(filter, btn) {
-    playerStatFilter = filter;
-    document.querySelectorAll('.stat-filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderPlayerStats();
-  }
-
-  function renderPlayerStats() {
-    const container = document.getElementById('player-stats-list');
-    if (!container) return;
-    let filteredLogs = playerStatFilter === 'all' ? logs : logs.filter(l => l.num === playerStatFilter);
-    if (statHalfFilter !== 'all') filteredLogs = filteredLogs.filter(l => l.half === statHalfFilter);
-    
-    // Build per-player stats
-    const pStats = {};
-    players.forEach(p => { pStats[p.num] = { name: p.name, num: p.num, total: 0, certo: 0, errado: 0, golo: 0, passe: 0, cruzado: 0, desarme: 0, falta: 0 }; });
-    filteredLogs.forEach(l => {
-      if (!pStats[l.num]) return;
-      pStats[l.num].total++;
-      if (l.score === 1) pStats[l.num].certo++;
-      if (l.score === -1) pStats[l.num].errado++;
-      if (l.action === 'Golo Marcado') pStats[l.num].golo++;
-      if (l.action.includes('Passe')) pStats[l.num].passe++;
-      if (l.action.includes('Cruzamento')) pStats[l.num].cruzado++;
-      if (l.action.includes('Desarme')) pStats[l.num].desarme++;
-      if (l.action.includes('Falta')) pStats[l.num].falta++;
-    });
-
-    const sorted = Object.values(pStats).filter(p => p.total > 0).sort((a, b) => b.total - a.total);
-    const maxTotal = sorted.length > 0 ? sorted[0].total : 1;
-
-    if (sorted.length === 0) { container.innerHTML = '<span style="color:var(--t3)">Sem ações registadas.</span>'; return; }
-
-    container.innerHTML = sorted.map(p => {
-      const pct = Math.round((p.total / maxTotal) * 100);
-      return `<div class="player-stat-row">
-        <span class="psr-name">${p.name}</span>
-        <span class="psr-actions">${p.total} ações</span>
-        <div class="psr-bar-wrap"><div class="psr-bar" style="width:${pct}%; background:${p.golo > 0 ? '#FFD700' : 'var(--acc)'}"></div></div>
-        <span class="psr-detail">
-          <span style="color:var(--acc)">✓${p.certo}</span>
-          <span style="color:var(--red)">✕${p.errado}</span>
-          <span style="color:#FFD700">⚽${p.golo}</span>
-        </span>
-      </div>`;
-    }).join('');
-  }
-
-  // OPPONENT TRACKING
-  function addOppAction() {
-    const min = Math.floor(seconds / 60);
-    const act = prompt("Ação do adversário:\n1=Canto, 2=Remate à baliza, 3=Remate fora, 4=Falta sofrida, 5=Golo");
-    if (!act) return;
-    const actions = { '1': 'Canto', '2': 'Remate à Baliza (Adv)', '3': 'Remate Fora (Adv)', '4': 'Falta Sofrida (Adv)', '5': 'Golo Sofrido' };
-    const actionName = actions[act];
-    if (!actionName) return;
-    const zone = prompt("Zona (ex: Ataque Centro, Meio Esq.)") || 'Meio Centro';
-    const oppLog = { id: Date.now(), min, action: actionName, zone, half };
-    oppLogs.unshift(oppLog);
     localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
-    renderOppActions();
-    showToast(`Registo adversário: ${actionName}`, true);
-  }
+  }, 15000);
+}
+startAutoSave();
 
-  function renderOppActions() {
-    const container = document.getElementById('opp-actions-list');
-    if (!container) return;
-    if (oppLogs.length === 0) {
-      container.innerHTML = '<span style="color:var(--t3);font-size:11px;">Nenhuma ação registada.</span>';
-      return;
+// INIT
+window.onload = () => {
+  renderPlayerGrid();
+  renderHeatmap();
+  renderActionChart();
+  renderTopPlayers();
+  renderOppActions();
+  renderMatchHistory();
+  checkOnlineStatus();
+};
+
+// PLAYERS GRID
+function renderPlayerGrid() {
+  let html = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Jogador:</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
+  players.forEach(p => {
+    html += `<button onclick="selectPlayer(${p.num})" id="btn-p${p.num}" style="background:#16241b;border:1px solid rgba(61,220,132,.2);color:#fff;padding:10px 6px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">#${p.num}<br><span style="font-size:10px;opacity:.7">${p.name}</span></button>`;
+  });
+  html += '</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function selectPlayer(num) {
+  selectedPlayer = players.find(p => p.num === num);
+  document.querySelectorAll('[id^="btn-p"]').forEach(b => b.style.background='#16241b');
+  document.getElementById('btn-p' + num).style.background='#3ddc84';
+  document.getElementById('btn-p' + num).style.color='#0c1610';
+}
+
+// ACTION BUTTONS
+let actionsHTML = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Registar ação:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+const actions = [
+  {name:'Passe Falhado',score:-1,color:'#ff4a4a'},
+  {name:'Cruzamento Certo',score:1,color:'#3ddc84'},
+  {name:'Cruzamento Falhado',score:-1,color:'#ff4a4a'},
+  {name:'Remate à Baliza',score:1,color:'#3ddc84'},
+  {name:'Remate Fora',score:-1,color:'#ff4a4a'},
+  {name:'Desarme Certo',score:1,color:'#3ddc84'},
+  {name:'Perda de Bola',score:-1,color:'#ff4a4a'},
+  {name:'Falta Sofrida',score:0,color:'#ffb84a'},
+  {name:'Falta Cometida',score:0,color:'#ffb84a'},
+  {name:'Golo Marcado',score:1,color:'#FFD700'},
+  {name:'Golo Sofrido',score:-1,color:'#c850f5'}
+];
+actions.forEach(a => {
+  actionsHTML += `<button onclick="askZone('${a.name}',${a.score})" style="background:#16241b;border:1px solid ${a.color};color:${a.color};padding:12px 8px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">${a.name}</button>`;
+});
+actionsHTML += '</div></div>';
+document.body.insertAdjacentHTML('beforeend', actionsHTML);
+
+// ZONE MODAL
+document.body.insertAdjacentHTML('beforeend', `
+<div id="zone-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;flex-direction:column;justify-content:center;align-items:center;padding:20px;">
+  <div style="background:#16241b;border:1px solid rgba(61,220,132,.3);border-radius:12px;padding:20px;max-width:320px;width:100%;">
+    <div id="zone-title" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center;">Onde foi a ação?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+      <button class="zone-btn" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
+      <button class="zone-btn" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
+      <button class="zone-btn" onclick="recordAction('Ataque Dir.')">Ataque Dir.</button>
+      <button class="zone-btn" onclick="recordAction('Meio Esq.')">Meio Esq.</button>
+      <button class="zone-btn" onclick="recordAction('Meio Centro')">Meio Centro</button>
+      <button class="zone-btn" onclick="recordAction('Meio Dir.')">Meio Dir.</button>
+      <button class="zone-btn" onclick="recordAction('Defesa Esq.')">Defesa Esq.</button>
+      <button class="zone-btn" onclick="recordAction('Defesa Centro')">Defesa Centro</button>
+      <button class="zone-btn" onclick="recordAction('Defesa Dir.')">Defesa Dir.</button>
+    </div>
+    <button onclick="closeZoneModal()" style="width:100%;background:transparent;border:1px solid #ff4a4a;color:#ff4a4a;padding:8px;border-radius:6px;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+<style>.zone-btn{background:#1f3025;border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px;border-radius:6px;cursor:pointer;font-size:11px}</style>`);
+
+function askZone(action, score) {
+  if (!selectedPlayer) { showToast('Seleciona um jogador primeiro!'); return; }
+  pendingAction = action; pendingScore = score;
+  document.getElementById('zone-title').textContent = action;
+  document.getElementById('zone-modal').style.display = 'flex';
+}
+function closeZoneModal() { document.getElementById('zone-modal').style.display = 'none'; pendingAction = null; }
+function recordAction(zone) {
+  if (!selectedPlayer) return;
+  const min = Math.floor(seconds / 60);
+  const log = {id:Date.now(),min,half,player:selectedPlayer.name,num:selectedPlayer.num,action:pendingAction,score:pendingScore,zone};
+  logs.unshift(log);
+  localStorage.setItem('ls_logs', JSON.stringify(logs));
+  closeZoneModal();
+  selectedPlayer = null;
+  document.querySelectorAll('[id^="btn-p"]').forEach(b => {b.style.background='#16241b';b.style.color='#fff';});
+  updateStats();
+  showToast('✅ ação registada');
+}
+
+// STATS ENGINE
+function setStatHalfFilter(val, btn) {
+  statHalfFilter = val;
+  document.querySelectorAll('.hf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateStats();
+}
+
+function updateStats() {
+  let filtered = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
+  let filteredOpp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
+
+  document.getElementById('stat-golos-marcados').textContent = filtered.filter(l => l.action === 'Golo Marcado').length;
+  document.getElementById('stat-golos-sofridos').textContent = filteredOpp.filter(o => o.action === 'Golo Sofrido').length;
+
+  const cruzC = filtered.filter(l => l.action === 'Cruzamento Certo').length;
+  const cruzF = filtered.filter(l => l.action === 'Cruzamento Falhado').length;
+  const cruzPct = cruzC + cruzF > 0 ? Math.round((cruzC / (cruzC + cruzF)) * 100) : 0;
+  document.getElementById('stat-cruz-pct').textContent = cruzPct + '%';
+  document.getElementById('stat-cruz-bar').style.width = cruzPct + '%';
+  document.getElementById('stat-cruz-certo').textContent = cruzC;
+  document.getElementById('stat-cruz-errado').textContent = cruzF;
+
+  const remC = filtered.filter(l => l.action === 'Remate à Baliza').length;
+  const remF = filtered.filter(l => l.action === 'Remate Fora').length;
+  const remPct = remC + remF > 0 ? Math.round((remC / (remC + remF)) * 100) : 0;
+  document.getElementById('stat-remates-pct').textContent = remPct + '%';
+  document.getElementById('stat-remates-bar').style.width = remPct + '%';
+  document.getElementById('stat-remates-certo').textContent = remC;
+  document.getElementById('stat-remates-errado').textContent = remF;
+
+  renderHeatmap();
+  renderActionChart();
+  renderTopPlayers();
+}
+
+function renderHeatmap() {
+  const zonas = ['Ataque Esq.','Ataque Centro','Ataque Dir.','Meio Esq.','Meio Centro','Meio Dir.','Defesa Esq.','Defesa Centro','Defesa Dir.'];
+  const perdas = logs.filter(l => ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
+  const zCounts = {};
+  perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
+  const maxC = Math.max(1, ...Object.values(zCounts));
+  zonas.forEach((z, i) => {
+    const c = zCounts[z] || 0;
+    const el = document.getElementById('hm-' + i);
+    if (el) {
+      el.textContent = c || '·';
+      el.style.background = c > 0 ? `rgba(255,74,74,${0.2 + (c/maxC)*0.8})` : 'rgba(255,255,255,.06)';
+      el.style.color = c > 0 ? '#fff' : 'rgba(255,255,255,.3)';
     }
-    container.innerHTML = oppLogs.slice(0, 10).map(o => `
-      <div class="opp-item">
-        <span class="opp-name">${o.min}' ${o.action}</span>
-        <span class="opp-zone">${o.zone}</span>
-      </div>
-    `).join('');
-  }
+  });
+}
 
-  // HEATMAP
-  function renderHeatmap() {
-    const zonas = ['Ataque Esq.', 'Ataque Centro', 'Ataque Dir.', 'Meio Esq.', 'Meio Centro', 'Meio Dir.', 'Defesa Esq.', 'Defesa Centro', 'Defesa Dir.'];
-    const perdas = logs.filter(l => l.action === 'Perda de Bola' || l.action === 'Passe Falhado' || l.action === 'Cruzamento Falhado');
-    const zCounts = {};
-    perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
-    const maxCount = Math.max(1, ...Object.values(zCounts));
+function renderActionChart() {
+  const types = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate à Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
+  const counts = {};
+  types.forEach(t => { counts[t] = logs.filter(l => l.action === t).length; });
+  const max = Math.max(1, ...Object.values(counts));
+  const filtered = logs;
+  const html = types.filter(t => counts[t] > 0).map(t => {
+    const pct = (counts[t] / max) * 100;
+    const color = t.includes('Certo') || t === 'Remate à Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? '#3ddc84' : (t === 'Falta Sofrida' ? '#ffb84a' : '#ff4a4a');
+    return `<div class="act-row"><span class="act-name">${t}</span><div class="act-bar-bg"><div class="act-bar" style="width:${pct}%;background:${color}"></div></div><span class="act-count">${counts[t]}</span></div>`;
+  }).join('');
+  document.getElementById('action-chart').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
+}
 
-    zonas.forEach((z, i) => {
-      const el = document.getElementById(`hm-${i}`);
-      if (!el) return;
-      const count = zCounts[z] || 0;
-      const opacity = count > 0 ? 0.3 + (count / maxCount) * 0.7 : 0;
-      el.style.backgroundColor = `rgba(255, 74, 74, ${opacity})`;
-      el.textContent = count > 0 ? count : '';
-    });
-  }
+function renderTopPlayers() {
+  const counts = {};
+  logs.forEach(l => { counts[l.player] = (counts[l.player] || 0) + 1; });
+  const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const html = top.map(([name, count], i) => `
+    <div class="pl-item">
+      <span class="pl-rank">${i+1}</span>
+      <span class="pl-name">${name}</span>
+      <span class="pl-count">${count}</span>
+    </div>
+  `).join('');
+  document.getElementById('top-players-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
+}
 
-  // ACTION CHARTS
-  function renderActionChart() {
-    const container = document.getElementById('action-chart');
-    if (!container) return;
-    const actionTypes = ['Passe Falhado', 'Cruzamento Certo', 'Cruzamento Falhado', 'Remate à Baliza', 'Remate Fora', 'Desarme Certo', 'Perda de Bola', 'Falta Sofrida', 'Falta Cometida', 'Golo Marcado'];
-    const actionColors = { 'Passe Falhado': 'var(--red)', 'Cruzamento Certo': 'var(--acc)', 'Cruzamento Falhado': 'var(--red)', 'Remate à Baliza': 'var(--acc)', 'Remate Fora': 'var(--yel)', 'Desarme Certo': 'var(--acc)', 'Perda de Bola': 'var(--red)', 'Falta Sofrida': 'var(--yel)', 'Falta Cometida': 'var(--yel)', 'Golo Marcado': '#FFD700' };
-    
-    const counts = {};
-    actionTypes.forEach(a => { counts[a] = logs.filter(l => l.action === a).length; });
-    const maxCount = Math.max(1, ...Object.values(counts));
+// OPPONENT
+function addOppQuick(action) {
+  const min = Math.floor(seconds / 60);
+  const zone = prompt('Zona:', 'Meio Centro') || 'Meio Centro';
+  oppLogs.unshift({id:Date.now(),min,action,zone,half});
+  localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
+  renderOppActions();
+  updateStats();
+}
 
-    container.innerHTML = actionTypes.filter(a => counts[a] > 0).map(a => {
-      const c = counts[a];
-      const pct = maxCount > 0 ? (c / maxCount) * 100 : 0;
-      return `<div class="act-row">
-        <span class="act-name">${a}</span>
-        <div class="act-bar-bg"><div class="act-bar" style="width:${pct}%; background:${actionColors[a] || 'var(--acc)'}"></div></div>
-        <span class="act-count">${c}</span>
-      </div>`;
-    }).join('') || '<span style="color:var(--t3);font-size:11px;">Sem dados ainda.</span>';
-  }
+function renderOppActions() {
+  const html = oppLogs.slice(0,5).map(o => `
+    <div class="opp-item">
+      <span class="opp-name">${o.min}' ${o.action}</span>
+      <span class="opp-zone">${o.zone}</span>
+    </div>
+  `).join('');
+  document.getElementById('opp-actions-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span>';
+}
 
-  // QUICK OPPONENT REGISTRATION
-  function addOppQuick(action) {
-    const min = Math.floor(seconds / 60);
-    const zone = prompt("Zona:", "Meio Centro") || "Meio Centro";
-    const oppLog = { id: Date.now(), min, action, zone, half };
-    oppLogs.unshift(oppLog);
-    localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
-    renderOppActions();
-  }
+// HISTORY
+function saveMatchToHistory() {
+  const entry = {id:Date.now(),date:new Date().toLocaleDateString('pt-PT'),golos:logs.filter(l=>l.action==='Golo Marcado').length,sofridos:oppLogs.filter(o=>o.action==='Golo Sofrido').length};
+  const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
+  history.unshift(entry);
+  if (history.length > 20) history.pop();
+  localStorage.setItem('ls_match_history', JSON.stringify(history));
+  renderMatchHistory();
+  showToast('💾 Jogo guardado!');
+}
 
-  // MATCH HISTORY
-  function saveMatchToHistory() {
-    const golosMarcados = logs.filter(l => l.action === 'Golo Marcado').length;
-    const golosSofridos = oppLogs.filter(o => o.action === 'Golo Sofrido').length;
-    const entry = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString('pt-PT'),
-      golos: golosMarcados,
-      sofridos: golosSofridos,
-      totalActions: logs.length,
-      opponentActions: oppLogs.length
-    };
-    const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
-    history.unshift(entry);
-    if (history.length > 20) history.pop(); // Keep last 20 matches
-    localStorage.setItem('ls_match_history', JSON.stringify(history));
-    renderMatchHistory();
-    showToast(`Jogo guardado: ${golosMarcados} - ${golosSofridos}`, true);
-  }
+function renderMatchHistory() {
+  const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
+  const html = history.slice(0,5).map(m => `
+    <div class="hist-item">
+      <span class="hist-date">${m.date}</span>
+      <span class="hist-score">${m.golos} - ${m.sofridos}</span>
+    </div>
+  `).join('');
+  document.getElementById('match-history-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span>';
+}
 
-  function renderMatchHistory() {
-    const container = document.getElementById('match-history-list');
-    if (!container) return;
-    const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
-    if (history.length === 0) {
-      container.innerHTML = '<span style="color:var(--t3); font-size:12px;">Nenhum jogo guardado ainda.</span>';
-      return;
-    }
-    container.innerHTML = history.slice(0, 5).map(m => `
-      <div class="match-history-item">
-        <div>
-          <div class="mhi-date">${m.date}</div>
-          <div class="mhi-detail">${m.totalActions} ações • ${m.opponentActions} advers.</div>
-        </div>
-        <div class="mhi-score">${m.golos} - ${m.sofridos}</div>
-      </div>
-    `).join('');
-  }
+// ZONE DETAIL
+function showZoneDetail(zone) {
+  const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
+  if (perdas.length === 0) { showToast(zone + ': sem perdas'); return; }
+  alert(zone + ' — ' + perdas.length + ' perdas:\n' + perdas.map(p => p.min + "' " + p.player + ': ' + p.action).join('\n'));
+}
 
-  // OFFLINE DETECTION
-  function checkOnlineStatus() {
-    const el = document.getElementById('offline-status');
-    if (!el) return;
-    if (!navigator.onLine) {
-      el.style.display = 'block';
-      document.body.classList.add('offline');
-    } else {
-      el.style.display = 'none';
-      document.body.classList.remove('offline');
-    }
+// EXCEL EXPORT
+function exportDirectExcel() {
+  if (typeof XLSX === 'undefined') { showToast('A carregar... tenta novamente.'); return; }
+  if (logs.length === 0) { showToast('Sem dados para exportar.'); return; }
+  const dateStr = new Date().toLocaleDateString('pt-PT');
+  const dataRows = [['Data','Minuto','Jogador','Numero','Acao','Zona','Parte']];
+  logs.forEach(log => { dataRows.push([dateStr,log.min,log.player,log.num,log.action,log.zone,log.half||1]); });
+  if (oppLogs.length > 0) {
+    dataRows.push(['--- ADVERSARIO ---']);
+    oppLogs.forEach(o => { dataRows.push(['',o.min,'','',o.action,o.zone,o.half||'']); });
   }
-  window.addEventListener('online', checkOnlineStatus);
-  window.addEventListener('offline', checkOnlineStatus);
+  const resumoRows = [
+    ['RESUMO SÃO MANÇOS',dateStr],
+    ['Golos Marcados',logs.filter(l=>l.action==='Golo Marcado').length],
+    ['Golos Sofridos',oppLogs.filter(o=>o.action==='Golo Sofrido').length],
+    ['Cruzamentos Certos',logs.filter(l=>l.action==='Cruzamento Certo').length],
+    ['Cruzamentos Falhados',logs.filter(l=>l.action==='Cruzamento Falhado').length],
+    ['Remates à Baliza',logs.filter(l=>l.action==='Remate à Baliza').length],
+    ['Remates Fora',logs.filter(l=>l.action==='Remate Fora').length],
+    ['',''],['Jogador','Total Ações']
+  ];
+  const pCounts = {};
+  logs.forEach(l => { pCounts[l.player] = (pCounts[l.player]||0)+1; });
+  Object.entries(pCounts).sort((a,b)=>b[1]-a[1]).forEach(([n,c]) => { resumoRows.push([n,c]); });
 
-  // Call renderHeatmap & charts when stats update
-  const origUpdateStats = updateStats;
-  updateStats = function() {
-    origUpdateStats.apply(this, arguments);
-    renderHeatmap();
-    renderActionChart();
-  };
-  window.onload = function() {
-    origOnload.apply(this, arguments);
-    checkOnlineStatus();
-    renderMatchHistory();
-    renderHeatmap();
-    renderActionChart();
-  };
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet(dataRows);
+  const ws2 = XLSX.utils.aoa_to_sheet(resumoRows);
+  ws1['!cols'] = [{wch:12},{wch:8},{wch:15},{wch:8},{wch:18},{wch:15},{wch:6}];
+  ws2['!cols'] = [{wch:20},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Base de Dados');
+  XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
+  XLSX.writeFile(wb, `SaoMancos_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast('📊 Excel descarregado!');
+}
 
-  // TEAM EDITOR
-  function renderTeamEditor() {
-    const editor = document.getElementById('team-editor');
-    editor.innerHTML = '';
-    players.forEach((p, index) => {
-      const row = document.createElement('div');
-      row.className = 'input-row';
-      row.innerHTML = `
-        <input type="number" style="width:70px" value="${p.num}" id="te-num-${index}">
-        <input type="text" style="flex:1" value="${p.name}" id="te-name-${index}">
-        <button class="btn-danger" style="padding:10px" onclick="removePlayerField(${index})">✕</button>
-      `;
-      editor.appendChild(row);
-    });
-  }
-  function addPlayerField() {
-    players.push({ num: 99, name: "Novo Jogador" });
-    renderTeamEditor();
-  }
-  function removePlayerField(index) {
-    players.splice(index, 1);
-    renderTeamEditor();
-  }
-  function saveTeam() {
-    const newPlayers = [];
-    for(let i=0; i<players.length; i++) {
-      if(!document.getElementById(`te-num-${i}`)) continue;
-      newPlayers.push({
-        num: document.getElementById(`te-num-${i}`).value,
-        name: document.getElementById(`te-name-${i}`).value
-      });
-    }
-    players = newPlayers;
-    localStorage.setItem('ls_team', JSON.stringify(players));
-    renderPlayers();
-    alert("Equipa guardada com sucesso!");
-  }
+// TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
 
-  // GUARDAR NO PC (via servidor local)
-  async function saveToPC() {
-    if (logs.length === 0) { showToast('Não há dados para guardar.', false); return; }
-    const csv = buildCSV();
-    const filename = `SaoMancos_${new Date().toISOString().slice(0,10)}.csv`;
-    try {
-      const resp = await fetch('http://localhost:5556/guardar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, content: csv })
-      });
-      const data = await resp.json();
-      if (data.ok) {
-        showToast('✔ Guardado em: São manços \ ' + filename, true);
-      } else {
-        showToast('❌ Erro: ' + data.error, false);
-      }
-    } catch(e) {
-      showToast('❌ Não foi possível ligar ao servidor. Usa Exportar CSV.', false);
-    }
-  }
+// ONLINE STATUS
+function checkOnlineStatus() {
+  window.addEventListener('online', () => { document.getElementById('offline-status').style.display = 'none'; });
+  window.addEventListener('offline', () => { document.getElementById('offline-status').style.display = 'block'; });
+}
 
-  function buildCSV() {
-    let csv = 'Data;Minuto;Jogador;Numero;Acao;Zona\r\n';
-    const dateStr = new Date().toLocaleDateString('pt-PT');
-    [...logs].reverse().forEach(row => {
-      csv += `${dateStr};${row.min};${row.player};${row.num};${row.action};${row.zone}\r\n`;
-    });
-    // Include opponent logs
-    if (oppLogs.length > 0) {
-      csv += '\r\n--- ACCOES ADVERSARIO ---\r\n';
-      csv += 'Minuto;Acao;Zona\r\n';
-      oppLogs.forEach(o => { csv += `${o.min};${o.action};${o.zone}\r\n`; });
-    }
-    return csv;
-  }
-
-  // EXPORT TO EXCEL COMPATIBLE FORMAT
-  async function exportToExcel() {
-    if (logs.length === 0) { showToast('Sem dados para exportar.', false); return; }
-    
-    // Try to sync with local server first
-    try {
-      const resp = await fetch('http://localhost:5557/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logs, opp_logs })
-      });
-      if (resp.ok) {
-        showToast('✅ Sincronizado com Excel! Dashboard atualizado.', true);
-        return;
-      }
-    } catch(e) {
-      // Server not running - fallback to CSV download
-    }
-    
-    // Fallback: download CSV compatible with Excel
-    const csv = buildCSV();
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `SaoMancos_Export_${new Date().toISOString().slice(0,10)}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-    showToast('📥 Exportado! (copia para Base de Dados do Excel)', true);
-  }
-
-  function showZoneDetail(zone) {
-    const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
-    if (perdas.length === 0) { showToast(`${zone}: sem perdas`, true); return; }
-    const detalhes = perdas.map(p => `${p.min}' ${p.player}: ${p.action}`).join('\n');
-    alert(`${zone} — ${perdas.length} perdas:\n\n${detalhes}`);
-  }
-
-  function showToast(msg, ok) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = ok ? 'ok' : 'err';
-    t.style.display = 'block';
-    setTimeout(() => { t.style.display = 'none'; }, 4000);
-  }
-
-  // EXPORT CSV (download browser)
-  function exportCSV() {
-    if (logs.length === 0) { alert('Não há dados.'); return; }
-    const csv = buildCSV();
-    const uri = encodeURI('data:text/csv;charset=utf-8,' + csv);
-    const link = document.createElement('a');
-    link.setAttribute('href', uri);
-    link.setAttribute('download', `SaoMancos_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-  }
-
-  // RESET ALL
-  function hardReset() {
-    if(confirm("ATENÇÃO: Isto apaga todos os dados do jogo atual. A equipa não é apagada. Continuar?")) {
-      logs = [];
-      seconds = 0; isRunning = false; half = 1;
-      clearInterval(timerInterval);
-      document.getElementById('timer-display').innerText = "00:00 (1ªP)";
-      document.getElementById('btn-timer-toggle').innerText = "Iniciar Jogo";
-      document.getElementById('btn-end-half').style.display = 'none';
-      localStorage.removeItem('ls_logs');
-      localStorage.removeItem('ls_time');
-      localStorage.removeItem('ls_half');
-      renderLogs();
-      switchTab('jogo');
-    }
-  }
-
-  // QUICK ACTION BAR
-  let quickBarTimeout = null;
-  function showQuickBar() {
-    const bar = document.getElementById('quick-bar');
-    bar.style.display = 'flex';
-    clearTimeout(quickBarTimeout);
-    quickBarTimeout = setTimeout(closeQuickBar, 8000);
-  }
-  function closeQuickBar() {
-    document.getElementById('quick-bar').style.display = 'none';
-    clearTimeout(quickBarTimeout);
-  }
-  function qba(action, score) {
-    if (!selectedPlayer) {
-      // Use last used player or first player
-      if (logs.length > 0 && logs[0].player) {
-        selectedPlayer = players.find(p => p.name === logs[0].player) || players[0];
-      } else {
-        selectedPlayer = players[0];
-      }
-      if (!selectedPlayer) return;
-    }
-    askZone(action, score);
-    clearTimeout(quickBarTimeout);
-    quickBarTimeout = setTimeout(closeQuickBar, 8000);
-  }
-
-  // Load half from localStorage
-  half = parseInt(localStorage.getItem('ls_half')) || 1;
-  document.getElementById('timer-display').innerText = formatTime(seconds) + (half === 2 ? " (2ªP)" : " (1ªP)");
-  if (half === 2) document.getElementById('btn-timer-toggle').innerText = "Iniciar 2ª Parte";
-  window.onload = window.initApp;
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
+// Demo data for testing
+if (logs.length === 0) {
+  logs = [
+    {id:1,min:5,half:1,player:'Médio',num:8,action:'Passe Falhado',score:-1,zone:'Meio Centro'},
+    {id:2,min:12,half:1,player:'Extremo D.',num:7,action:'Cruzamento Certo',score:1,zone:'Ataque Dir.'},
+    {id:3,min:23,half:1,player:'Ponta Lança',num:9,action:'Remate à Baliza',score:1,zone:'Ataque Centro'},
+    {id:4,min:31,half:1,player:'Trinco',num:6,action:'Desarme Certo',score:1,zone:'Defesa Centro'},
+    {id:5,min:45,half:1,player:'Ponta Lança',num:9,action:'Golo Marcado',score:1,zone:'Ataque Centro'}
+  ];
+  oppLogs = [{id:1,min:38,action:'Golo Sofrido',zone:'Ataque Centro',half:1}];
+  updateStats();
+  renderOppActions();
+  renderMatchHistory();
+}
 </script>
 </body>
 </html>
