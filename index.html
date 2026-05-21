@@ -21,18 +21,12 @@
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
       </svg>
     </div>
-    <span class="logo-name">Tactical Lab</span>
-  </div>
+    <div class="logo-name">São Manços — Análise ao Vivo</div>
   <div class="vsep"></div>
 
-  <!-- TAB NAV -->
-  <nav class="tab-nav" role="navigation" aria-label="Vistas">
-    <button class="tab-btn active" id="tab-stats" aria-label="Estatísticas" aria-pressed="true">📊 Estatísticas</button>
-    <a class="tab-btn" href="tactical.html" aria-label="Táctico">⚽ Táctico</a>
-  </nav>
-
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-    <span id="offline-status" style="display:none;font-size:11px;color:#ff4a4a;">Offline</span>
+    <a href="tactical.html" style="font-size:12px;color:var(--acc);text-decoration:none;font-weight:600;">⚽ Táctico</a>
+    <span id="offline-status" style="display:none;font-size:11px;color:var(--red);">Offline</span>
   </div>
 </header>
 
@@ -153,12 +147,16 @@
     <div class="opp-panel">
       <div class="opp-title">⚔ Adversário</div>
       <div class="opp-actions">
-        <button class="opp-btn" onclick="addOppQuick('Canto')">⚽ Canto</button>
-        <button class="opp-btn" onclick="addOppQuick('Remate')">🎯 Remate</button>
-        <button class="opp-btn" onclick="addOppQuick('Golo Sofrido')">💜 Golo Sofrido</button>
-        <button class="opp-btn" onclick="addOppQuick('Falta')">📋 Falta</button>
-        <button class="opp-btn" onclick="addOppQuick('Pênalti')">⛳ Pênalti</button>
+        <button class="opp-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Golo Sofrido</button>
+        <button class="opp-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate Baliza</button>
+        <button class="opp-btn" onclick="addOppQuick('Remate Fora')">❌ Remate Fora</button>
+        <button class="opp-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
+        <button class="opp-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
+        <button class="opp-btn" onclick="addOppQuick('Cartão Amarelo')">🟨 Cartão Amarelo</button>
+        <button class="opp-btn" onclick="addOppQuick('Cartão Vermelho')">🟥 Cartão Vermelho</button>
         <button class="opp-btn" onclick="addOppQuick('Fora de Jogo')">🚩 Fora de Jogo</button>
+        <button class="opp-btn" onclick="addOppQuick('Pênalti')">⛳ Pênalti</button>
+        <button class="opp-btn" onclick="addOppQuick('Lesão')">🏥 Lesão</button>
       </div>
       <div style="margin-top:8px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px;">Últimas ações:</div>
       <div id="opp-actions-list"></div>
