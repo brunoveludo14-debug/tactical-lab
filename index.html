@@ -3,202 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>São Manços - Estatísticas</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif}
-body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
-.title{text-align:center;font-weight:700;font-size:18px;margin-bottom:12px;color:#3ddc84}
-
-/* Header */
-.dash-header{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:8px}
-.dash-btn{background:rgba(61,220,132,.15);border:1px solid rgba(61,220,132,.3);color:#3ddc84;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
-
-/* Result bar */
-.result-bar{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#16241b;border-radius:12px;margin-bottom:10px;border:1px solid rgba(61,220,132,.15)}
-.result-big{text-align:center}
-.result-num{font-size:36px;font-weight:700;color:#FFD700;line-height:1}
-.result-num.purple{color:#c850f5}
-.result-label{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.05em;margin-top:2px}
-.result-div{font-size:24px;color:rgba(255,255,255,.3)}
-.half-filters{display:flex;gap:4px;margin-left:auto}
-.hf-btn{background:#1f3025;border:1px solid rgba(61,220,132,.2);color:rgba(255,255,255,.5);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
-.hf-btn.active{background:#3ddc84;color:#0c1610;border-color:#3ddc84}
-
-/* Cards */
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.dash-card{background:#16241b;border:1px solid rgba(61,220,132,.12);border-radius:10px;padding:10px}
-.dash-card-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:8px}
-
-/* Eficácia */
-.eff-row{display:flex;gap:10px}
-.eff-item{flex:1}
-.eff-label{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:3px}
-.eff-big{font-size:22px;font-weight:700;color:#3ddc84}
-.eff-bar-bg{height:5px;background:#1f3025;border-radius:3px;overflow:hidden;margin:4px 0}
-.eff-bar{height:100%;background:#3ddc84;border-radius:3px;width:0%;transition:width .4s}
-.eff-sub{font-size:10px;color:rgba(255,255,255,.4)}
-
-/* Action list */
-.action-list{display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;font-size:11px}
-.act-row{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.act-name{flex:1;color:rgba(255,255,255,.6)}
-.act-bar-bg{flex:1;height:4px;background:#1f3025;border-radius:2px;overflow:hidden}
-.act-bar{height:100%;background:#3ddc84;border-radius:2px}
-.act-count{font-size:10px;color:rgba(255,255,255,.4);min-width:18px;text-align:right}
-
-/* Heatmap */
-.heatmap-mini{display:flex;flex-direction:column;gap:3px}
-.hm-row{display:flex;gap:3px}
-.hm-cell{flex:1;aspect-ratio:1;background:rgba(255,255,255,.06);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,.3);font-weight:600;cursor:pointer;transition:background .3s}
-
-/* Player list */
-.player-list{display:flex;flex-direction:column;gap:3px}
-.pl-item{display:flex;align-items:center;gap:6px;padding:4px 6px;background:#1f3025;border-radius:6px;font-size:11px}
-.pl-rank{font-size:10px;color:rgba(255,255,255,.4);font-weight:700;width:16px}
-.pl-name{flex:1;font-weight:600;color:rgba(255,255,255,.8)}
-.pl-count{font-size:10px;color:rgba(255,255,255,.4)}
-
-/* Opponent */
-.opp-quick-btn{background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);color:#ff6b6b;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
-.opp-list{display:flex;flex-direction:column;gap:3px;max-height:60px;overflow-y:auto}
-.opp-item{display:flex;justify-content:space-between;font-size:11px;padding:4px 6px;background:#1f3025;border-radius:5px}
-.opp-name{color:#ff6b6b}
-.opp-zone{color:rgba(255,255,255,.4)}
-
-/* History */
-.history-list{display:flex;flex-direction:column;gap:4px}
-.hist-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#1f3025;border-radius:6px;font-size:12px}
-.hist-date{color:rgba(255,255,255,.5)}
-.hist-score{font-size:16px;font-weight:700;color:#3ddc84}
-
-/* Toast */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:#3ddc84;color:#0c1610;border-radius:8px;font-weight:600;font-size:13px;z-index:999;display:none}
-#toast.err{background:#ff4a4a;color:#fff}
-
-@media(max-width:500px){
-.result-bar{flex-wrap:wrap;justify-content:center;gap:10px}
-.half-filters{width:100%;justify-content:center;margin-top:4px}
-.dash-grid{grid-template-columns:1fr}
-.result-num{font-size:28px}
-}
-</style>
+<title>Tactical Lab — Análise em Tempo Real</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com"    crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="app">
 
-<div class="title">🏆 São Manços — Estatísticas</div>
-
-<div class="dash-header">
-  <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6);">📊 Análise em Tempo Real</span>
-  <div style="display:flex;gap:6px;">
-    <button class="dash-btn" onclick="exportDirectExcel()">📊 Excel .xlsx</button>
-    <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.1);">💾 Guardar</button>
+<!-- ══ TOPBAR ══════════════════════════════════════════════ -->
+<header id="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <span class="logo-name">Tactical Lab</span>
   </div>
-</div>
+  <div class="vsep"></div>
 
-<!-- Result bar -->
-<div class="result-bar">
-  <div class="result-big">
-    <span class="result-num" id="stat-golos-marcados">0</span>
-    <div class="result-label">MARC.</div>
-  </div>
-  <div class="result-div">—</div>
-  <div class="result-big">
-    <span class="result-num purple" id="stat-golos-sofridos">0</span>
-    <div class="result-label">SOFR.</div>
-  </div>
-  <div style="flex:1"></div>
-  <div class="half-filters">
-    <button class="hf-btn active" id="filter-half-all" onclick="setStatHalfFilter('all',this)">Todo</button>
-    <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1ªP</button>
-    <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2ªP</button>
-  </div>
-</div>
+  <!-- TAB NAV -->
+  <nav class="tab-nav" role="navigation" aria-label="Vistas">
+    <button class="tab-btn active" id="tab-stats" aria-label="Estatísticas" aria-pressed="true">📊 Estatísticas</button>
+    <button class="tab-btn"        id="tab-tactic" aria-label="Táctico"    aria-pressed="false">⚽ Táctico</button>
+  </nav>
 
-<!-- Grid 2x2 -->
-<div class="dash-grid">
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+    <span id="offline-status" style="display:none;font-size:11px;color:#ff4a4a;">Offline</span>
+  </div>
+</header>
 
-  <!-- Eficácia -->
-  <div class="dash-card">
-    <div class="dash-card-title">📈 Eficácia</div>
-    <div class="eff-row">
-      <div class="eff-item">
-        <div class="eff-label">Cruzamentos</div>
-        <div class="eff-big" id="stat-cruz-pct">0%</div>
-        <div class="eff-bar-bg"><div class="eff-bar" id="stat-cruz-bar" style="width:0%"></div></div>
-        <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
+<!-- ══ MAIN CONTENT ════════════════════════════════════════ -->
+<main class="main-content">
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- VIEW: ESTATÍSTICAS                          -->
+  <!-- ─────────────────────────────────────────── -->
+  <div id="view-stats" class="view active">
+
+    <!-- HEADER ROW: Timer + Parte + Ações -->
+    <div class="card stats-header">
+      <div class="header-left">
+        <div>
+          <div class="timer-display" id="timer-display">00:00</div>
+          <div class="timer-controls">
+            <button class="timer-btn" id="btn-timer-play"  title="Play/Pause">▶</button>
+            <button class="timer-btn" id="btn-timer-reset" title="Reset">⟲</button>
+          </div>
+        </div>
+        <div class="parte-toggle">
+          <button class="parte-btn active" id="btn-1p" onclick="toggleHalf(1)">1ªP</button>
+          <button class="parte-btn"        id="btn-2p" onclick="toggleHalf(2)">2ªP</button>
+        </div>
       </div>
-      <div class="eff-item">
-        <div class="eff-label">Remates</div>
-        <div class="eff-big" id="stat-remates-pct">0%</div>
-        <div class="eff-bar-bg"><div class="eff-bar" id="stat-remates-bar" style="width:0%"></div></div>
-        <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza · <span id="stat-remates-errado">0</span> fora</div>
+      <div class="header-right">
+        <button class="btn btn-primary" id="btn-export" onclick="exportDirectExcel()">📥 Excel</button>
+        <button class="btn btn-gold"    onclick="saveMatchToHistory()">💾 Guardar</button>
       </div>
     </div>
-  </div>
 
-  <!-- Ações por tipo -->
-  <div class="dash-card">
-    <div class="dash-card-title">📊 Ações</div>
-    <div id="action-chart" class="action-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
-  </div>
-
-  <!-- Mapa de calor -->
-  <div class="dash-card">
-    <div class="dash-card-title">🗺️ Zonas</div>
-    <div class="heatmap-mini">
-      <div class="hm-row">
-        <div class="hm-cell" id="hm-0" onclick="showZoneDetail('Ataque Esq.')">0</div>
-        <div class="hm-cell" id="hm-1" onclick="showZoneDetail('Ataque Centro')">0</div>
-        <div class="hm-cell" id="hm-2" onclick="showZoneDetail('Ataque Dir.')">0</div>
+    <!-- SCORE BAR -->
+    <div class="score-bar">
+      <div class="score-team home">
+        <span>MARC.</span>
+        <span class="score-num" id="stat-golos-marcados">0</span>
       </div>
-      <div class="hm-row">
-        <div class="hm-cell" id="hm-3" onclick="showZoneDetail('Meio Esq.')">0</div>
-        <div class="hm-cell" id="hm-4" onclick="showZoneDetail('Meio Centro')">0</div>
-        <div class="hm-cell" id="hm-5" onclick="showZoneDetail('Meio Dir.')">0</div>
-      </div>
-      <div class="hm-row">
-        <div class="hm-cell" id="hm-6" onclick="showZoneDetail('Defesa Esq.')">0</div>
-        <div class="hm-cell" id="hm-7" onclick="showZoneDetail('Defesa Centro')">0</div>
-        <div class="hm-cell" id="hm-8" onclick="showZoneDetail('Defesa Dir.')">0</div>
+      <span class="score-divider">—</span>
+      <div class="score-team away">
+        <span class="score-num" id="stat-golos-sofridos">0</span>
+        <span>SOFR.</span>
       </div>
     </div>
+
+    <!-- DASHBOARD GRID (2x2) -->
+    <div class="dash-grid">
+
+      <!-- CARD: Eficácia -->
+      <div class="stat-card">
+        <div class="card-title">Eficácia</div>
+        <!-- Cruzamentos -->
+        <div class="stat-bar-row">
+          <span class="stat-bar-label">Cruz.</span>
+          <div class="stat-bar"><div class="stat-bar-fill home" id="stat-cruz-bar" style="width:0%"></div></div>
+          <span class="stat-bar-val" id="stat-cruz-pct">0%</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px;">
+          <span style="font-size:10px;color:#3ddc84;" id="stat-cruz-certo">✓0</span>
+          <span style="font-size:10px;color:#ff4a4a;" id="stat-cruz-errado">✗0</span>
+        </div>
+        <!-- Remates -->
+        <div class="stat-bar-row" style="margin-top:8px;">
+          <span class="stat-bar-label">Remate</span>
+          <div class="stat-bar"><div class="stat-bar-fill home" id="stat-remates-bar" style="width:0%"></div></div>
+          <span class="stat-bar-val" id="stat-remates-pct">0%</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px;">
+          <span style="font-size:10px;color:#3ddc84;" id="stat-remates-certo">✓0</span>
+          <span style="font-size:10px;color:#ff4a4a;" id="stat-remates-errado">✗0</span>
+        </div>
+      </div>
+
+      <!-- CARD: Mapa de Calor -->
+      <div class="stat-card">
+        <div class="card-title">Mapa de Calor — Perdas</div>
+        <div class="heatmap-grid">
+          <div class="heatmap-cell hi-0" id="hm-0" title="Ataque Esq." onclick="showZoneDetail('Ataque Esq.')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-1" title="Ataque Centro" onclick="showZoneDetail('Ataque Centro')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-2" title="Ataque Dir." onclick="showZoneDetail('Ataque Dir.')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-3" title="Meio Esq." onclick="showZoneDetail('Meio Esq.')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-4" title="Meio Centro" onclick="showZoneDetail('Meio Centro')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-5" title="Meio Dir." onclick="showZoneDetail('Meio Dir.')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-6" title="Defesa Esq." onclick="showZoneDetail('Defesa Esq.')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-7" title="Defesa Centro" onclick="showZoneDetail('Defesa Centro')">·</div>
+          <div class="heatmap-cell hi-0" id="hm-8" title="Defesa Dir." onclick="showZoneDetail('Defesa Dir.')">·</div>
+        </div>
+      </div>
+
+      <!-- CARD: Ações por Tipo -->
+      <div class="stat-card">
+        <div class="card-title">Ações</div>
+        <div id="action-chart" style="display:flex;flex-direction:column;gap:5px;"></div>
+      </div>
+
+      <!-- CARD: Top Jogadores -->
+      <div class="stat-card">
+        <div class="card-title">Top Jogadores</div>
+        <div class="top-players" id="top-players-list"></div>
+      </div>
+
+    </div><!-- /dash-grid -->
+
+    <!-- PLAYER GRID -->
+    <div class="card">
+      <div class="action-section-title">Selecionar Jogador</div>
+      <div class="player-grid" id="player-grid"></div>
+      <button class="equipa-btn" onclick="registerEquipaAction()" style="margin-top:8px;">🏀 Registar ação coletiva (Equipa)</button>
+    </div>
+
+    <!-- ACTION GRID (dinâmico — muda para GR se necessário) -->
+    <div class="card" id="action-section">
+      <div class="action-section-title" id="action-section-title">Registar Ação</div>
+      <div class="action-grid" id="action-grid"></div>
+    </div>
+
+    <!-- OPPONENT -->
+    <div class="opp-panel">
+      <div class="opp-title">⚔ Adversário</div>
+      <div class="opp-actions">
+        <button class="opp-btn" onclick="addOppQuick('Canto')">⚽ Canto</button>
+        <button class="opp-btn" onclick="addOppQuick('Remate')">🎯 Remate</button>
+        <button class="opp-btn" onclick="addOppQuick('Golo Sofrido')">💜 Golo Sofrido</button>
+        <button class="opp-btn" onclick="addOppQuick('Falta')">📋 Falta</button>
+        <button class="opp-btn" onclick="addOppQuick('Pênalti')">⛳ Pênalti</button>
+        <button class="opp-btn" onclick="addOppQuick('Fora de Jogo')">🚩 Fora de Jogo</button>
+      </div>
+      <div style="margin-top:8px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px;">Últimas ações:</div>
+      <div id="opp-actions-list"></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card">
+      <div class="card-title">Histórico de Jogos</div>
+      <div class="history-list" id="match-history-list"></div>
+    </div>
+
+  </div><!-- /view-stats -->
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- VIEW: TÁCTICO                              -->
+  <!-- ─────────────────────────────────────────── -->
+  <div id="view-tactic" class="view">
+
+    <div class="tactical-view">
+
+      <div class="card tactical-header">
+        <div style="font-size:13px;font-weight:700;">Mapa Táctico — Registo por Zona</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-icon" onclick="clearTacticalMap()" title="Limpar mapa">🗑</button>
+          <button class="btn btn-primary" onclick="exportTacticalExcel()">📥 Exportar</button>
+        </div>
+      </div>
+
+      <!-- PITCH MAP SVG -->
+      <div class="pitch-container">
+        <svg id="pitch-map" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet">
+
+          <!-- Campo base -->
+          <rect x="2" y="2" width="64" height="101" fill="#0a1a0d" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
+          <line x1="2" y1="52.5" x2="66" y2="52.5" stroke="rgba(255,255,255,.88)" stroke-width=".65"/>
+          <circle cx="34" cy="52.5" r="9.15" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
+          <circle cx="34" cy="52.5" r=".55" fill="white" opacity=".9"/>
+
+          <!-- Área superior -->
+          <rect x="30.34" y="0"   width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)"  stroke-width=".55"/>
+          <rect x="24.84" y="2"   width="18.32" height="5.5"  fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="2"   width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="13" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,18.5 A9.15,9.15 0 0,0 43.7,18.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,4.5 A2.5,2.5 0 0,1 4.5,2"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,4.5 A2.5,2.5 0 0,0 63.5,2" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+          <!-- Área inferior -->
+          <rect x="30.34" y="102.56" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)"  stroke-width=".55"/>
+          <rect x="24.84" y="97.5"  width="18.32" height="5.5"  fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="86.5"  width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="92"   r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,86.5 A9.15,9.15 0 0,1 43.7,86.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,100.5 A2.5,2.5 0 0,0 4.5,103"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,100.5 A2.5,2.5 0 0,1 63.5,103" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+          <!-- ── ZONAS CLICÁVEIS ── -->
+          <!-- ATAQUE (y: 2–36) -->
+          <rect class="tactical-zone" id="zone-atk-l"   data-zone="Ataque Esq."   x="2" y="2" width="21" height="34" fill="rgba(255,74,74,0)" stroke="rgba(255,74,74,0.25)" stroke-width=".3" rx="2"/>
+          <rect class="tactical-zone" id="zone-atk-c"   data-zone="Ataque Centro" x="23.5" y="2" width="21" height="34" fill="rgba(255,74,74,0)" stroke="rgba(255,74,74,0.25)" stroke-width=".3"/>
+          <rect class="tactical-zone" id="zone-atk-r"   data-zone="Ataque Dir."   x="45" y="2" width="21" height="34" fill="rgba(255,74,74,0)" stroke="rgba(255,74,74,0.25)" stroke-width=".3" rx="2"/>
+
+          <!-- MEIO (y: 36–68) -->
+          <rect class="tactical-zone" id="zone-mid-l"   data-zone="Meio Esq."    x="2" y="36" width="21" height="32" fill="rgba(61,220,132,0)" stroke="rgba(61,220,132,0.2)" stroke-width=".3" rx="2"/>
+          <rect class="tactical-zone" id="zone-mid-c"   data-zone="Meio Centro"  x="23.5" y="36" width="21" height="32" fill="rgba(61,220,132,0)" stroke="rgba(61,220,132,0.2)" stroke-width=".3"/>
+          <rect class="tactical-zone" id="zone-mid-r"   data-zone="Meio Dir."    x="45" y="36" width="21" height="32" fill="rgba(61,220,132,0)" stroke="rgba(61,220,132,0.2)" stroke-width=".3" rx="2"/>
+
+          <!-- DEFESA (y: 68–102) -->
+          <rect class="tactical-zone" id="zone-def-l"   data-zone="Defesa Esq."   x="2" y="68" width="21" height="34" fill="rgba(91,156,246,0)" stroke="rgba(91,156,246,0.25)" stroke-width=".3" rx="2"/>
+          <rect class="tactical-zone" id="zone-def-c"   data-zone="Defesa Centro" x="23.5" y="68" width="21" height="34" fill="rgba(91,156,246,0)" stroke="rgba(91,156,246,0.25)" stroke-width=".3"/>
+          <rect class="tactical-zone" id="zone-def-r"   data-zone="Defesa Dir."   x="45" y="68" width="21" height="34" fill="rgba(91,156,246,0)" stroke="rgba(91,156,246,0.25)" stroke-width=".3" rx="2"/>
+
+          <!-- Zone labels -->
+          <text x="12.5" y="16"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">ATQ ESQ</text>
+          <text x="34"   y="16"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">ATQ CENT</text>
+          <text x="55.5" y="16"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">ATQ DIR</text>
+          <text x="12.5" y="50"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">MEIO ESQ</text>
+          <text x="34"   y="50"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">MEIO CENT</text>
+          <text x="55.5" y="50"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">MEIO DIR</text>
+          <text x="12.5" y="84"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">DEF ESQ</text>
+          <text x="34"   y="84"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">DEF CENT</text>
+          <text x="55.5" y="84"  fill="rgba(255,255,255,.4)" font-size="5" font-family="Inter" text-anchor="middle">DEF DIR</text>
+
+        </svg>
+      </div>
+
+      <!-- ZONE REGISTER BAR -->
+      <div class="zone-register-bar">
+        <span class="zone-register-label">Tipo:</span>
+        <button class="zone-tag selected" id="tag-action" onclick="setTacticalAction('acao')">Ação</button>
+        <button class="zone-tag" id="tag-transition" onclick="setTacticalAction('transicao')">Transição</button>
+        <button class="zone-tag" id="tag-press" onclick="setTacticalAction('pressao')">Pressão</button>
+        <span id="tactical-action-label" style="font-size:11px;color:var(--t3);margin-left:auto;">Ação na zona clicada</span>
+      </div>
+
+      <!-- TACTICAL HISTORY -->
+      <div class="card">
+        <div class="card-title">Registo Táctico</div>
+        <div class="history-list" id="tactical-history-list"></div>
+      </div>
+
+    </div><!-- /tactical-view -->
+  </div><!-- /view-tactic -->
+
+</main><!-- /main-content -->
+
+<!-- ══ TOAST ══════════════════════════════════════════════ -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ══ ZONE MODAL ══════════════════════════════════════════ -->
+<div id="zone-modal" class="zone-modal" role="dialog" aria-modal="true">
+  <div class="zone-modal-box">
+    <div class="zone-modal-title" id="zone-modal-title">Onde foi a ação?</div>
+    <div class="zone-modal-info">Seleciona a zona do campo</div>
+    <div class="heatmap-grid" style="margin-bottom:12px;">
+      <button class="heatmap-cell hi-0" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Ataque Dir.')">Ataque Dir.</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Meio Esq.')">Meio Esq.</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Meio Centro')">Meio Centro</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Meio Dir.')">Meio Dir.</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Defesa Esq.')">Defesa Esq.</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Defesa Centro')">Defesa Centro</button>
+      <button class="heatmap-cell hi-0" onclick="recordAction('Defesa Dir.')">Defesa Dir.</button>
+    </div>
+    <button class="btn" onclick="closeZoneModal()" style="width:100%;border-color:var(--red);color:var(--red);">Cancelar</button>
   </div>
-
-  <!-- Top jogadores -->
-  <div class="dash-card">
-    <div class="dash-card-title">👥 Mais Envolve.</div>
-    <div id="top-players-list" class="player-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
-  </div>
-
 </div>
 
-<!-- Adversário -->
-<div class="dash-card" style="margin-top:6px;">
-  <div class="dash-card-title" style="color:#ff6b6b;">🟥 Adversário</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-    <button class="opp-quick-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
-  </div>
-  <div id="opp-actions-list" class="opp-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span></div>
-</div>
+<!-- ══ EXCEL EXPORT LIB ════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<!-- Histórico -->
-<div class="dash-card" style="margin-top:6px;">
-  <div class="dash-card-title">📁 Histórico</div>
-  <div id="match-history-list" class="history-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span></div>
-</div>
-
-<!-- Offline -->
-<div id="offline-status" style="display:none;text-align:center;padding:8px;color:#ff4a4a;font-size:11px;margin-top:8px;background:rgba(255,74,74,.08);border-radius:8px;">📴 Sem internet — dados guardados localmente</div>
-</div>
-
-<div id="toast"></div>
-
+<!-- ══ MAIN SCRIPT ══════════════════════════════════════════ -->
 <script>
-// DEFAULT TEAM
+// ── DEFAULT TEAM ─────────────────────────────────────────
 const defaultPlayers = [
   {num:1,name:"GR"},{num:2,name:"Defesa D."},{num:3,name:"Defesa E."},
   {num:4,name:"Central 1"},{num:5,name:"Central 2"},{num:6,name:"Trinco"},
@@ -208,30 +303,33 @@ const defaultPlayers = [
   {num:15,name:"Suplente 15"},{num:16,name:"Suplente 16"},{num:17,name:"Suplente 17"},{num:18,name:"Suplente 18"}
 ];
 
-// STATE
-let players = JSON.parse(localStorage.getItem('ls_team')) || defaultPlayers;
-let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
-let oppLogs = JSON.parse(localStorage.getItem('ls_opp_logs')) || [];
-let seconds = parseInt(localStorage.getItem('ls_time')) || 0;
-let selectedPlayer = null;
-let pendingAction = null;
-let pendingScore = 0;
-let timerInterval = null;
-let isRunning = false;
-let half = parseInt(localStorage.getItem('ls_half')) || 1;
+// ── STATE ─────────────────────────────────────────────────
+let players      = JSON.parse(localStorage.getItem('ls_team'))      || defaultPlayers;
+let logs         = JSON.parse(localStorage.getItem('ls_logs'))      || [];
+let oppLogs      = JSON.parse(localStorage.getItem('ls_opp_logs'))  || [];
+let tacticalLogs = JSON.parse(localStorage.getItem('ls_tactical_logs')) || [];
+let seconds      = parseInt(localStorage.getItem('ls_time'))        || 0;
+let selectedPlayer   = null;
+let pendingAction    = null;
+let pendingScore     = 0;
+let timerInterval    = null;
+let isRunning        = false;
+let half             = parseInt(localStorage.getItem('ls_half'))    || 1;
 let autoSaveInterval = null;
-let statHalfFilter = 'all';
+let statHalfFilter   = 'all';
+let tacticalAction   = 'acao';   // 'acao' | 'transicao' | 'pressao'
 
-// AUTO-SAVE
+// ── AUTO-SAVE ────────────────────────────────────────────
 function startAutoSave() {
   autoSaveInterval = setInterval(() => {
     localStorage.setItem('ls_logs', JSON.stringify(logs));
     localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
+    localStorage.setItem('ls_tactical_logs', JSON.stringify(tacticalLogs));
   }, 15000);
 }
 startAutoSave();
 
-// INIT
+// ── INIT ─────────────────────────────────────────────────
 window.onload = () => {
   renderPlayerGrid();
   renderHeatmap();
@@ -239,75 +337,152 @@ window.onload = () => {
   renderTopPlayers();
   renderOppActions();
   renderMatchHistory();
+  renderTacticalHistory();
+  initTacticalMap();
   checkOnlineStatus();
+  updateTimerDisplay();
+  updateHalfButtons();
 };
 
-// PLAYERS GRID
+// ── TAB SWITCHING ─────────────────────────────────────────
+document.getElementById('tab-stats').addEventListener('click', () => switchTab('stats'));
+document.getElementById('tab-tactic').addEventListener('click', () => switchTab('tactic'));
+
+function switchTab(tab) {
+  document.getElementById('view-stats').classList.toggle('active', tab === 'stats');
+  document.getElementById('view-tactic').classList.toggle('active', tab === 'tactic');
+  document.getElementById('tab-stats').classList.toggle('active', tab === 'stats');
+  document.getElementById('tab-tactic').classList.toggle('active', tab === 'tactic');
+}
+
+// ── TIMER ─────────────────────────────────────────────────
+document.getElementById('btn-timer-play').addEventListener('click', toggleTimer);
+document.getElementById('btn-timer-reset').addEventListener('click', resetTimer);
+
+function toggleTimer() {
+  if (isRunning) {
+    clearInterval(timerInterval);
+    isRunning = false;
+    document.getElementById('btn-timer-play').textContent = '▶';
+    document.getElementById('btn-timer-play').classList.remove('running');
+  } else {
+    timerInterval = setInterval(() => {
+      seconds++;
+      localStorage.setItem('ls_time', seconds);
+      updateTimerDisplay();
+    }, 1000);
+    isRunning = true;
+    document.getElementById('btn-timer-play').textContent = '⏸';
+    document.getElementById('btn-timer-play').classList.add('running');
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  seconds = 0;
+  isRunning = false;
+  localStorage.setItem('ls_time', 0);
+  updateTimerDisplay();
+  document.getElementById('btn-timer-play').textContent = '▶';
+  document.getElementById('btn-timer-play').classList.remove('running');
+}
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  document.getElementById('timer-display').textContent = m + ':' + s;
+}
+
+// ── HALF TOGGLE ───────────────────────────────────────────
+function toggleHalf(h) {
+  half = h;
+  localStorage.setItem('ls_half', half);
+  updateHalfButtons();
+}
+
+function updateHalfButtons() {
+  document.getElementById('btn-1p').classList.toggle('active', half === 1);
+  document.getElementById('btn-2p').classList.toggle('active', half === 2);
+}
+
+// ── PLAYER GRID ───────────────────────────────────────────
 function renderPlayerGrid() {
-  let html = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Jogador:</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
+  const grid = document.getElementById('player-grid');
+  let html = '';
   players.forEach(p => {
-    html += `<button onclick="selectPlayer(${p.num})" id="btn-p${p.num}" style="background:#16241b;border:1px solid rgba(61,220,132,.2);color:#fff;padding:10px 6px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">#${p.num}<br><span style="font-size:10px;opacity:.7">${p.name}</span></button>`;
+    const isGK = p.num === 1;
+    html += `<button class="player-btn${isGK ? ' goalkeeper' : ''}" id="btn-p${p.num}" onclick="selectPlayer(${p.num})">
+      <span class="player-btn-num">#${p.num}</span>
+      <span class="player-btn-name">${p.name}</span>
+    </button>`;
   });
-  html += '</div></div>';
-  document.body.insertAdjacentHTML('beforeend', html);
+  grid.innerHTML = html;
 }
 
 function selectPlayer(num) {
   selectedPlayer = players.find(p => p.num === num);
-  document.querySelectorAll('[id^="btn-p"]').forEach(b => b.style.background='#16241b');
-  document.getElementById('btn-p' + num).style.background='#3ddc84';
-  document.getElementById('btn-p' + num).style.color='#0c1610';
+  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-p' + num).classList.add('selected');
+  renderActionGrid(); // refresh action grid for GR
 }
 
-// ACTION BUTTONS
-let actionsHTML = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Registar ação:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
-const actions = [
-  {name:'Passe Falhado',score:-1,color:'#ff4a4a'},
-  {name:'Cruzamento Certo',score:1,color:'#3ddc84'},
-  {name:'Cruzamento Falhado',score:-1,color:'#ff4a4a'},
-  {name:'Remate à Baliza',score:1,color:'#3ddc84'},
-  {name:'Remate Fora',score:-1,color:'#ff4a4a'},
-  {name:'Desarme Certo',score:1,color:'#3ddc84'},
-  {name:'Perda de Bola',score:-1,color:'#ff4a4a'},
-  {name:'Falta Sofrida',score:0,color:'#ffb84a'},
-  {name:'Falta Cometida',score:0,color:'#ffb84a'},
-  {name:'Golo Marcado',score:1,color:'#FFD700'},
-  {name:'Golo Sofrido',score:-1,color:'#c850f5'}
+// ── ACTION GRID ───────────────────────────────────────────
+const regularActions = [
+  {name:'Passe Falhado',     score:-1, color:'var(--red)'},
+  {name:'Cruzamento Certo',   score:1,  color:'var(--acc)'},
+  {name:'Cruzamento Falhado', score:-1, color:'var(--red)'},
+  {name:'Remate à Baliza',   score:1,  color:'var(--acc)'},
+  {name:'Remate Fora',        score:-1, color:'var(--red)'},
+  {name:'Desarme Certo',      score:1,  color:'var(--acc)'},
+  {name:'Perda de Bola',      score:-1, color:'var(--red)'},
+  {name:'Falta Sofrida',      score:0,  color:'var(--yel)'},
+  {name:'Falta Cometida',     score:0,  color:'var(--yel)'},
+  {name:'Golo Marcado',       score:1,  color:'var(--gold)'},
+  {name:'Golo Sofrido',       score:-1, color:'var(--opp)'}
 ];
-actions.forEach(a => {
-  actionsHTML += `<button onclick="askZone('${a.name}',${a.score})" style="background:#16241b;border:1px solid ${a.color};color:${a.color};padding:12px 8px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">${a.name}</button>`;
-});
-actionsHTML += '</div></div>';
-document.body.insertAdjacentHTML('beforeend', actionsHTML);
 
-// ZONE MODAL
-document.body.insertAdjacentHTML('beforeend', `
-<div id="zone-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;flex-direction:column;justify-content:center;align-items:center;padding:20px;">
-  <div style="background:#16241b;border:1px solid rgba(61,220,132,.3);border-radius:12px;padding:20px;max-width:320px;width:100%;">
-    <div id="zone-title" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center;">Onde foi a ação?</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
-      <button class="zone-btn" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
-      <button class="zone-btn" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
-      <button class="zone-btn" onclick="recordAction('Ataque Dir.')">Ataque Dir.</button>
-      <button class="zone-btn" onclick="recordAction('Meio Esq.')">Meio Esq.</button>
-      <button class="zone-btn" onclick="recordAction('Meio Centro')">Meio Centro</button>
-      <button class="zone-btn" onclick="recordAction('Meio Dir.')">Meio Dir.</button>
-      <button class="zone-btn" onclick="recordAction('Defesa Esq.')">Defesa Esq.</button>
-      <button class="zone-btn" onclick="recordAction('Defesa Centro')">Defesa Centro</button>
-      <button class="zone-btn" onclick="recordAction('Defesa Dir.')">Defesa Dir.</button>
-    </div>
-    <button onclick="closeZoneModal()" style="width:100%;background:transparent;border:1px solid #ff4a4a;color:#ff4a4a;padding:8px;border-radius:6px;cursor:pointer;">Cancelar</button>
-  </div>
-</div>
-<style>.zone-btn{background:#1f3025;border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px;border-radius:6px;cursor:pointer;font-size:11px}</style>`);
+const grActions = [
+  {name:'Saque',             score:0,  color:'var(--blu)'},
+  {name:'Defesa Difícil',    score:1,  color:'var(--acc)'},
+  {name:'Defesa Fácil',      score:1,  color:'var(--acc)'},
+  {name:'Soco',              score:0,  color:'var(--yel)'},
+  {name:'Passe Longo',       score:0,  color:'var(--acc)'},
+  {name:'Passe Curto',       score:1,  color:'var(--acc)'},
+  {name:'Erro de Passe',     score:-1, color:'var(--red)'},
+  {name:'Corte',             score:1,  color:'var(--acc)'},
+  {name:'Golo Sofrido',      score:-1, color:'var(--opp)'},
+  {name:'Penálti Defendido', score:1,  color:'var(--gold)'}
+];
 
+function renderActionGrid() {
+  const grid = document.getElementById('action-grid');
+  const isGK = selectedPlayer && selectedPlayer.num === 1;
+  const actions = isGK ? grActions : regularActions;
+  document.getElementById('action-section-title').textContent = isGK ? 'Ações do Guarda-Redes' : 'Registar Ação';
+  let html = '';
+  actions.forEach(a => {
+    const style = `background:var(--bg3);border-color:${a.color};color:${a.color};`;
+    html += `<button class="action-btn" style="${style}" onclick="askZone('${a.name}',${a.score})">${a.name}</button>`;
+  });
+  grid.innerHTML = html;
+}
+
+// Fallback — render default action grid if no player selected yet
+renderActionGrid();
+
+// ── ZONE MODAL ────────────────────────────────────────────
 function askZone(action, score) {
   if (!selectedPlayer) { showToast('Seleciona um jogador primeiro!'); return; }
   pendingAction = action; pendingScore = score;
-  document.getElementById('zone-title').textContent = action;
-  document.getElementById('zone-modal').style.display = 'flex';
+  document.getElementById('zone-modal-title').textContent = action;
+  document.getElementById('zone-modal').classList.add('show');
 }
-function closeZoneModal() { document.getElementById('zone-modal').style.display = 'none'; pendingAction = null; }
+
+function closeZoneModal() {
+  document.getElementById('zone-modal').classList.remove('show');
+  pendingAction = null;
+}
+
 function recordAction(zone) {
   if (!selectedPlayer) return;
   const min = Math.floor(seconds / 60);
@@ -316,12 +491,20 @@ function recordAction(zone) {
   localStorage.setItem('ls_logs', JSON.stringify(logs));
   closeZoneModal();
   selectedPlayer = null;
-  document.querySelectorAll('[id^="btn-p"]').forEach(b => {b.style.background='#16241b';b.style.color='#fff';});
+  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
   updateStats();
-  showToast('✅ ação registada');
+  showToast('✅ ' + pendingAction + ' — ' + zone);
 }
 
-// STATS ENGINE
+function registerEquipaAction() {
+  if (!pendingAction) {
+    showToast('Seleciona primeiro uma ação na grelha');
+    return;
+  }
+  askZone(pendingAction, pendingScore);
+}
+
+// ── STATS ENGINE ───────────────────────────────────────────
 function setStatHalfFilter(val, btn) {
   statHalfFilter = val;
   document.querySelectorAll('.hf-btn').forEach(b => b.classList.remove('active'));
@@ -330,8 +513,8 @@ function setStatHalfFilter(val, btn) {
 }
 
 function updateStats() {
-  let filtered = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
-  let filteredOpp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
+  const filtered   = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
+  const filteredOpp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
 
   document.getElementById('stat-golos-marcados').textContent = filtered.filter(l => l.action === 'Golo Marcado').length;
   document.getElementById('stat-golos-sofridos').textContent = filteredOpp.filter(o => o.action === 'Golo Sofrido').length;
@@ -341,71 +524,83 @@ function updateStats() {
   const cruzPct = cruzC + cruzF > 0 ? Math.round((cruzC / (cruzC + cruzF)) * 100) : 0;
   document.getElementById('stat-cruz-pct').textContent = cruzPct + '%';
   document.getElementById('stat-cruz-bar').style.width = cruzPct + '%';
-  document.getElementById('stat-cruz-certo').textContent = cruzC;
-  document.getElementById('stat-cruz-errado').textContent = cruzF;
+  document.getElementById('stat-cruz-certo').textContent = '✓' + cruzC;
+  document.getElementById('stat-cruz-errado').textContent = '✗' + cruzF;
 
   const remC = filtered.filter(l => l.action === 'Remate à Baliza').length;
   const remF = filtered.filter(l => l.action === 'Remate Fora').length;
   const remPct = remC + remF > 0 ? Math.round((remC / (remC + remF)) * 100) : 0;
   document.getElementById('stat-remates-pct').textContent = remPct + '%';
   document.getElementById('stat-remates-bar').style.width = remPct + '%';
-  document.getElementById('stat-remates-certo').textContent = remC;
-  document.getElementById('stat-remates-errado').textContent = remF;
+  document.getElementById('stat-remates-certo').textContent = '✓' + remC;
+  document.getElementById('stat-remates-errado').textContent = '✗' + remF;
 
   renderHeatmap();
   renderActionChart();
   renderTopPlayers();
 }
 
+// ── HEATMAP ───────────────────────────────────────────────
 function renderHeatmap() {
-  const zonas = ['Ataque Esq.','Ataque Centro','Ataque Dir.','Meio Esq.','Meio Centro','Meio Dir.','Defesa Esq.','Defesa Centro','Defesa Dir.'];
+  const zonas  = ['Ataque Esq.','Ataque Centro','Ataque Dir.','Meio Esq.','Meio Centro','Meio Dir.','Defesa Esq.','Defesa Centro','Defesa Dir.'];
   const perdas = logs.filter(l => ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
   const zCounts = {};
   perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
   const maxC = Math.max(1, ...Object.values(zCounts));
   zonas.forEach((z, i) => {
-    const c = zCounts[z] || 0;
     const el = document.getElementById('hm-' + i);
-    if (el) {
-      el.textContent = c || '·';
-      el.style.background = c > 0 ? `rgba(255,74,74,${0.2 + (c/maxC)*0.8})` : 'rgba(255,255,255,.06)';
-      el.style.color = c > 0 ? '#fff' : 'rgba(255,255,255,.3)';
+    if (!el) return;
+    const c = zCounts[z] || 0;
+    el.textContent = c || '·';
+    if (c === 0) {
+      el.className = 'heatmap-cell hi-0';
+    } else {
+      const intensity = Math.ceil((c / maxC) * 5);
+      el.className = 'heatmap-cell hi-' + Math.min(5, intensity);
+      el.style.color = '#fff';
     }
   });
 }
 
+// ── ACTION CHART ───────────────────────────────────────────
 function renderActionChart() {
-  const types = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate à Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
+  const types  = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate à Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
   const counts = {};
   types.forEach(t => { counts[t] = logs.filter(l => l.action === t).length; });
   const max = Math.max(1, ...Object.values(counts));
-  const filtered = logs;
   const html = types.filter(t => counts[t] > 0).map(t => {
-    const pct = (counts[t] / max) * 100;
-    const color = t.includes('Certo') || t === 'Remate à Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? '#3ddc84' : (t === 'Falta Sofrida' ? '#ffb84a' : '#ff4a4a');
-    return `<div class="act-row"><span class="act-name">${t}</span><div class="act-bar-bg"><div class="act-bar" style="width:${pct}%;background:${color}"></div></div><span class="act-count">${counts[t]}</span></div>`;
+    const pct   = (counts[t] / max) * 100;
+    const color = t.includes('Certo') || t === 'Remate à Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? 'var(--acc)' : (t === 'Falta Sofrida' ? 'var(--yel)' : 'var(--red)');
+    return `<div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+      <span style="color:var(--t2);width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t}</span>
+      <div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${color};border-radius:3px;"></div></div>
+      <span style="color:${color};width:20px;text-align:right;font-weight:600;">${counts[t]}</span>
+    </div>`;
   }).join('');
-  document.getElementById('action-chart').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
+  document.getElementById('action-chart').innerHTML = html || '<div class="empty-state" style="padding:12px;">Sem dados ainda</div>';
 }
 
+// ── TOP PLAYERS ────────────────────────────────────────────
 function renderTopPlayers() {
   const counts = {};
   logs.forEach(l => { counts[l.player] = (counts[l.player] || 0) + 1; });
   const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
   const html = top.map(([name, count], i) => `
-    <div class="pl-item">
-      <span class="pl-rank">${i+1}</span>
-      <span class="pl-name">${name}</span>
-      <span class="pl-count">${count}</span>
+    <div class="player-stat-row animate-in">
+      <span class="player-rank">${i+1}</span>
+      <div class="player-info">
+        <div class="player-name">${name}</div>
+      </div>
+      <span class="player-actions-count">${count}</span>
     </div>
   `).join('');
-  document.getElementById('top-players-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
+  document.getElementById('top-players-list').innerHTML = html || '<div class="empty-state" style="padding:12px;">Sem dados ainda</div>';
 }
 
-// OPPONENT
+// ── OPPONENT ───────────────────────────────────────────────
 function addOppQuick(action) {
-  const min = Math.floor(seconds / 60);
-  const zone = prompt('Zona:', 'Meio Centro') || 'Meio Centro';
+  const zone = prompt('Zona do campo:', 'Meio Centro') || 'Meio Centro';
+  const min  = Math.floor(seconds / 60);
   oppLogs.unshift({id:Date.now(),min,action,zone,half});
   localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
   renderOppActions();
@@ -414,17 +609,23 @@ function addOppQuick(action) {
 
 function renderOppActions() {
   const html = oppLogs.slice(0,5).map(o => `
-    <div class="opp-item">
-      <span class="opp-name">${o.min}' ${o.action}</span>
-      <span class="opp-zone">${o.zone}</span>
+    <div class="history-item">
+      <span class="history-time">${o.min}'</span>
+      <span class="history-player">${o.action}</span>
+      <span class="history-zone">${o.zone}</span>
     </div>
   `).join('');
-  document.getElementById('opp-actions-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span>';
+  document.getElementById('opp-actions-list').innerHTML = html || '<div style="font-size:11px;color:var(--t3);padding:4px;">Nenhuma ação</div>';
 }
 
-// HISTORY
+// ── HISTORY ───────────────────────────────────────────────
 function saveMatchToHistory() {
-  const entry = {id:Date.now(),date:new Date().toLocaleDateString('pt-PT'),golos:logs.filter(l=>l.action==='Golo Marcado').length,sofridos:oppLogs.filter(o=>o.action==='Golo Sofrido').length};
+  const entry = {
+    id:Date.now(),
+    date: new Date().toLocaleDateString('pt-PT'),
+    golos: logs.filter(l=>l.action==='Golo Marcado').length,
+    sofridos: oppLogs.filter(o=>o.action==='Golo Sofrido').length
+  };
   const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
   history.unshift(entry);
   if (history.length > 20) history.pop();
@@ -436,22 +637,70 @@ function saveMatchToHistory() {
 function renderMatchHistory() {
   const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
   const html = history.slice(0,5).map(m => `
-    <div class="hist-item">
-      <span class="hist-date">${m.date}</span>
-      <span class="hist-score">${m.golos} - ${m.sofridos}</span>
+    <div class="history-item">
+      <span class="history-time">${m.date}</span>
+      <span class="history-action">${m.golos} — ${m.sofridos}</span>
     </div>
   `).join('');
-  document.getElementById('match-history-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span>';
+  document.getElementById('match-history-list').innerHTML = html || '<div style="font-size:11px;color:var(--t3);padding:4px;">Nenhum jogo guardado</div>';
 }
 
-// ZONE DETAIL
+// ── ZONE DETAIL ───────────────────────────────────────────
 function showZoneDetail(zone) {
   const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
   if (perdas.length === 0) { showToast(zone + ': sem perdas'); return; }
-  alert(zone + ' — ' + perdas.length + ' perdas:\n' + perdas.map(p => p.min + "' " + p.player + ': ' + p.action).join('\n'));
+  const text = zone + ' — ' + perdas.length + ' perdas:\n' + perdas.map(p => p.min + "' " + p.player + ': ' + p.action).join('\n');
+  alert(text);
 }
 
-// EXCEL EXPORT
+// ── TACTICAL MAP ──────────────────────────────────────────
+function initTacticalMap() {
+  document.querySelectorAll('.tactical-zone').forEach(zone => {
+    zone.addEventListener('click', () => {
+      const zoneName = zone.dataset.zone;
+      const min = Math.floor(seconds / 60);
+      const log = {id:Date.now(),min,half,zone:zoneName,type:tacticalAction,player:'Equipa'};
+      tacticalLogs.unshift(log);
+      localStorage.setItem('ls_tactical_logs', JSON.stringify(tacticalLogs));
+
+      // Visual feedback
+      zone.style.fill = 'rgba(61,220,132,0.35)';
+      setTimeout(() => { zone.style.fill = ''; }, 600);
+
+      renderTacticalHistory();
+      showToast('📍 ' + zoneName + ' — ' + tacticalAction);
+    });
+  });
+}
+
+function setTacticalAction(type) {
+  tacticalAction = type;
+  document.querySelectorAll('.zone-tag').forEach(t => t.classList.remove('selected'));
+  document.getElementById('tag-' + type === 'transicao' ? 'transition' : type === 'pressao' ? 'press' : 'action').classList.add('selected');
+  const labels = {acao:'Ação na zona clicada', transicao:'Transição na zona clicada', pressao:'Pressão na zona clicada'};
+  document.getElementById('tactical-action-label').textContent = labels[type];
+}
+
+function renderTacticalHistory() {
+  const html = tacticalLogs.slice(0,10).map(t => `
+    <div class="history-item">
+      <span class="history-time">${t.min}'</span>
+      <span class="badge badge-${t.type === 'transicao' ? 'away' : t.type === 'pressao' ? 'red' : 'acc'}">${t.type}</span>
+      <span class="history-player">${t.zone}</span>
+    </div>
+  `).join('');
+  document.getElementById('tactical-history-list').innerHTML = html || '<div style="font-size:11px;color:var(--t3);padding:4px;">Sem registos</div>';
+}
+
+function clearTacticalMap() {
+  tacticalLogs = [];
+  localStorage.setItem('ls_tactical_logs', JSON.stringify(tacticalLogs));
+  document.querySelectorAll('.tactical-zone').forEach(z => { z.style.fill = ''; });
+  renderTacticalHistory();
+  showToast('🗑 Mapa limpo');
+}
+
+// ── EXCEL EXPORT ──────────────────────────────────────────
 function exportDirectExcel() {
   if (typeof XLSX === 'undefined') { showToast('A carregar... tenta novamente.'); return; }
   if (logs.length === 0) { showToast('Sem dados para exportar.'); return; }
@@ -459,7 +708,7 @@ function exportDirectExcel() {
   const dataRows = [['Data','Minuto','Jogador','Numero','Acao','Zona','Parte']];
   logs.forEach(log => { dataRows.push([dateStr,log.min,log.player,log.num,log.action,log.zone,log.half||1]); });
   if (oppLogs.length > 0) {
-    dataRows.push(['--- ADVERSARIO ---']);
+    dataRows.push(['--- ADVERSÁRIO ---']);
     oppLogs.forEach(o => { dataRows.push(['',o.min,'','',o.action,o.zone,o.half||'']); });
   }
   const resumoRows = [
@@ -487,30 +736,49 @@ function exportDirectExcel() {
   showToast('📊 Excel descarregado!');
 }
 
-// TOAST
+function exportTacticalExcel() {
+  if (typeof XLSX === 'undefined') { showToast('A carregar...'); return; }
+  if (tacticalLogs.length === 0) { showToast('Sem registos tácticos.'); return; }
+  const dateStr = new Date().toLocaleDateString('pt-PT');
+  const rows = [['Data','Minuto','Parte','Zona','Tipo']];
+  tacticalLogs.forEach(t => { rows.push([dateStr,t.min,t.half,t.zone,t.type]); });
+  const wb = XLSX.utils.book_new();
+  const ws  = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:12},{wch:8},{wch:6},{wch:15},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Registo Táctico');
+  XLSX.writeFile(wb, `SaoMancos_Tactico_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast('📊 Mapa táctico exportado!');
+}
+
+// ── TOAST ─────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3000);
+  t.classList.add('show');
+  setTimeout(() => { t.classList.remove('show'); }, 3000);
 }
 
-// ONLINE STATUS
+// ── ONLINE STATUS ──────────────────────────────────────────
 function checkOnlineStatus() {
-  window.addEventListener('online', () => { document.getElementById('offline-status').style.display = 'none'; });
-  window.addEventListener('offline', () => { document.getElementById('offline-status').style.display = 'block'; });
+  window.addEventListener('online',  () => { document.getElementById('offline-status').style.display = 'none'; });
+  window.addEventListener('offline', () => { document.getElementById('offline-status').style.display = 'inline'; });
 }
 
-// Demo data for testing
+// ── DEMO DATA ──────────────────────────────────────────────
 if (logs.length === 0) {
   logs = [
-    {id:1,min:5,half:1,player:'Médio',num:8,action:'Passe Falhado',score:-1,zone:'Meio Centro'},
-    {id:2,min:12,half:1,player:'Extremo D.',num:7,action:'Cruzamento Certo',score:1,zone:'Ataque Dir.'},
-    {id:3,min:23,half:1,player:'Ponta Lança',num:9,action:'Remate à Baliza',score:1,zone:'Ataque Centro'},
-    {id:4,min:31,half:1,player:'Trinco',num:6,action:'Desarme Certo',score:1,zone:'Defesa Centro'},
-    {id:5,min:45,half:1,player:'Ponta Lança',num:9,action:'Golo Marcado',score:1,zone:'Ataque Centro'}
+    {id:1,min:5,  half:1,player:'Médio',      num:8,action:'Passe Falhado',     score:-1,zone:'Meio Centro'},
+    {id:2,min:12, half:1,player:'Extremo D.', num:7,action:'Cruzamento Certo',   score:1, zone:'Ataque Dir.'},
+    {id:3,min:23, half:1,player:'Ponta Lança',num:9,action:'Remate à Baliza',   score:1, zone:'Ataque Centro'},
+    {id:4,min:31, half:1,player:'Trinco',     num:6,action:'Desarme Certo',     score:1, zone:'Defesa Centro'},
+    {id:5,min:45, half:1,player:'Ponta Lança',num:9,action:'Golo Marcado',      score:1, zone:'Ataque Centro'},
+    {id:6,min:28, half:1,player:'Extremo E.', num:11,action:'Perda de Bola',    score:-1,zone:'Meio Esq.'},
+    {id:7,min:15, half:1,player:'GR',         num:1,action:'Saque',             score:0, zone:'Defesa Centro'}
   ];
-  oppLogs = [{id:1,min:38,action:'Golo Sofrido',zone:'Ataque Centro',half:1}];
+  oppLogs = [
+    {id:1,min:38,action:'Golo Sofrido',zone:'Ataque Centro',half:1},
+    {id:2,min:22,action:'Canto',       zone:'Ataque Dir.',  half:1}
+  ];
   updateStats();
   renderOppActions();
   renderMatchHistory();
