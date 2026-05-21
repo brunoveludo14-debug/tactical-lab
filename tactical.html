@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Tactical Lab</title>
+
+<!-- PWA -->
+<meta name="application-name" content="Tactical Lab">
+<meta name="description"      content="Quadro tático de futebol — formações, animações e notas">
+<meta name="theme-color"      content="#0c1610">
+<meta name="mobile-web-app-capable"             content="yes">
+<meta name="apple-mobile-web-app-capable"       content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title"         content="Tactical Lab">
+<meta name="msapplication-TileColor"            content="#0c1610">
+<meta name="msapplication-tap-highlight"        content="no">
+
+<link rel="manifest"          href="manifest.json">
+<link rel="icon"              type="image/png" sizes="32x32"  href="icons/favicon-32.png">
+<link rel="apple-touch-icon"  sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon"  sizes="512x512" href="icons/icon-512.png">
+
+<!-- Non-blocking font load -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com"    crossorigin>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+</noscript>
+
+<link rel="stylesheet" href="styles.css?v=32">
+</head>
+<body>
+<div id="app" role="application" aria-label="Tactical Lab">
+
+<!-- ── TOPBAR ─────────────────────────────────────────────────────── -->
+<header id="topbar" role="banner">
+  <div class="logo" aria-hidden="true">
+    <div class="logo-icon">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <span class="logo-name" id="club-name-display">Tactical Lab</span>
+  </div>
+  <div class="vsep" aria-hidden="true"></div>
+
+  <nav role="navigation" aria-label="Vistas">
+    <button class="top-btn active" data-v="tactic" aria-pressed="true"  aria-label="Vista Táticas">Táticas</button>
+    <button class="top-btn"        data-v="box"    aria-pressed="false" aria-label="Vista Cenários de Jogo">Cenários de Jogo</button>
+    <button class="top-btn"        data-v="pbox"   aria-pressed="false" aria-label="Vista Bolas Paradas">Bolas Paradas</button>
+    <button class="top-btn"        data-v="notes"  aria-pressed="false" aria-label="Vista Notas">Notas</button>
+  </nav>
+  <div class="vsep" aria-hidden="true"></div>
+  <button id="btn-library" class="top-btn" aria-label="Biblioteca de jogadas" title="Biblioteca de Jogadas"
+    style="display:flex;align-items:center;gap:5px;color:var(--yel);">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Biblioteca
+  </button>
+  <button id="btn-share-tactic" class="top-btn" aria-label="Partilhar tática" title="Partilhar tática por link"
+    style="display:flex;align-items:center;gap:5px;color:var(--acc);">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Partilhar
+  </button>
+  <button id="btn-club" aria-label="Personalizar clube" title="Personalizar clube"
+    style="width:32px;height:32px;border-radius:9px;border:1px solid var(--b2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+  </button>
+
+  <div class="tr">
+    <button id="btn-orient"
+            aria-label="Alternar orientação"
+            title="Alternar orientação vertical/horizontal"
+            style="width:28px;height:28px;border-radius:7px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;">
+      <svg id="orient-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="5" y="2" width="14" height="20" rx="2"/>
+        <line x1="12" y1="18" x2="12" y2="18.5" stroke-width="2.5"/>
+      </svg>
+    </button>
+    <span id="offline-dot" aria-hidden="true"></span>
+    <span class="ldot"  aria-hidden="true"></span>
+    <span class="ltxt"  aria-live="polite">Live</span>
+    <span id="autosave-indicator" aria-live="polite" title="Último autosave">—</span>
+  </div>
+</header>
+
+<!-- ── LANDSCAPE WRAPPERS (CSS display:contents in portrait) ──────── -->
+<div id="main-landscape">
+
+<!-- ── TOOLBAR ────────────────────────────────────────────────────── -->
+<div id="toolbar" role="toolbar" aria-label="Ferramentas">
+
+  <!-- Formation -->
+  <div class="tg" style="padding-left:0;">
+    <div class="fwrap" id="fwrap">
+      <span class="fwrap-lbl">Formação</span>
+      <div class="fwrap-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+        <button class="fwrap-custom-btn" id="btn-custom-fmt" title="Formações personalizadas" aria-label="Formações personalizadas">★</button>
+        <div id="custom-fmts-list" role="menu" aria-label="Formações personalizadas"></div>
+        <select id="fsel" aria-label="Formação da equipa">
+          <optgroup label="4 Defesas">
+            <option>4-3-3 ATK</option><option>4-3-3 DEF</option><option>4-4-2</option>
+            <option>4-4-2 Diamante</option><option>4-2-3-1</option><option>4-1-4-1</option>
+            <option>4-5-1</option><option>4-2-2-2</option>
+          </optgroup>
+          <optgroup label="3 Defesas">
+            <option>3-5-2</option><option>3-4-3</option><option>3-4-1-2</option><option>3-6-1</option>
+          </optgroup>
+          <optgroup label="5 Defesas">
+            <option>5-3-2</option><option>5-4-1</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <span class="tg-label">Formação</span>
+  </div>
+
+  <!-- Opponent formation -->
+  <div class="tg" id="fwrap-opp-tg">
+    <div class="fwrap-opp" id="fwrap-opp">
+      <span class="fwrap-opp-lbl">Adversário</span>
+      <div class="fwrap-opp-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+        <select id="fsel-opp" aria-label="Formação adversária">
+          <option value="">— sem adv. —</option>
+          <optgroup label="4 Defesas">
+            <option>4-3-3 ATK</option><option>4-3-3 DEF</option><option>4-4-2</option>
+            <option>4-4-2 Diamante</option><option>4-2-3-1</option><option>4-1-4-1</option>
+            <option>4-5-1</option><option>4-2-2-2</option>
+          </optgroup>
+          <optgroup label="3 Defesas">
+            <option>3-5-2</option><option>3-4-3</option><option>3-4-1-2</option><option>3-6-1</option>
+          </optgroup>
+          <optgroup label="5 Defesas">
+            <option>5-3-2</option><option>5-4-1</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <span class="tg-label" style="color:var(--opp)">Adversário</span>
+  </div>
+
+  <div class="toolbar-tabs">
+    <button class="tb-tab active" data-tb="edit">Tática / Editar</button>
+    <button class="tb-tab" data-tb="anim">Anim / Exportar</button>
+  </div>
+
+  <div class="tb-panel active" id="tb-edit">
+    <!-- Move tool -->
+    <div class="tg">
+      <button class="tb active" id="t-sel" aria-label="Modo mover jogadores" title="Selecionar e mover jogadores">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3l14 9-7 1-3 7z"/></svg>
+        <span>Mover</span>
+      </button>
+      <span class="tg-label">Ferramenta</span>
+    </div>
+
+    <!-- Arrow directions -->
+    <div class="tg">
+      <button class="tb" id="t-ar" data-arrow-dir="right" aria-label="Seta direita" title="Seta para a direita →">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        <span>Dir.</span>
+      </button>
+      <button class="tb" id="t-al" data-arrow-dir="left" aria-label="Seta esquerda" title="Seta para a esquerda ←">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 18 5 12 11 6"/></svg>
+        <span>Esq.</span>
+      </button>
+      <button class="tb" id="t-au" data-arrow-dir="up" aria-label="Seta cima" title="Seta para cima ↑">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>
+        <span>Cima</span>
+      </button>
+      <button class="tb" id="t-ad" data-arrow-dir="down" aria-label="Seta baixo" title="Seta para baixo ↓">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="18 13 12 19 6 13"/></svg>
+        <span>Baixo</span>
+      </button>
+      <span class="tg-label">Setas</span>
+    </div>
+
+    <!-- Ferramentas Táticas -->
+    <div class="tg">
+      <button class="tb" id="t-poly" aria-label="Desenhar polígono" title="Desenhar zona poligonal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/></svg>
+        <span>Polígono</span>
+      </button>
+      <button class="tb" id="t-zone" aria-label="Desenhar zona" title="Desenhar zona circular">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+        <span>Zona</span>
+      </button>
+      <button class="tb" id="t-linked" aria-label="Criar Linha Defensiva" title="Liga jogadores com uma linha ancorada" data-mode="linked-line">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        <span>Linha</span>
+      </button>
+      <button class="tb" id="t-ruler" aria-label="Régua de Distância" title="Mede a distância em metros livres" data-mode="ruler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><path d="M5 10v4M10 10v4M14 10v4M19 10v4"/></svg>
+        <span>Régua</span>
+      </button>
+      <button class="tb" id="t-curve" aria-label="Seta com Curva" title="Seta com curva Bézier" data-mode="curve">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 19q7-14 14 0"/><polyline points="15 14 19 19 23 14"/></svg>
+        <span>Curva</span>
+      </button>
+      <button class="tb" id="t-spotlight" aria-label="Foco/Spotlight" title="Máscara de foco no relvado" data-mode="spotlight">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="10" stroke-dasharray="2 4"/></svg>
+        <span>Foco</span>
+      </button>
+      <span class="tg-label">Formas & Tática</span>
+    </div>
+
+    <!-- Edit -->
+    <div class="tg" style="border-bottom:none;">
+      <button class="tb" id="btn-undo" aria-label="Desfazer (Ctrl+Z)" title="Desfazer (Ctrl+Z)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+        <span>Desfazer<span class="undo-badge" id="undo-badge"></span></span>
+      </button>
+      <button class="tb" id="btn-redo" aria-label="Refazer (Ctrl+Y)" title="Refazer (Ctrl+Y)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
+        <span>Refazer<span class="undo-badge" id="redo-badge"></span></span>
+      </button>
+      <button class="tb" id="btn-clear" aria-label="Limpar formas" title="Limpar todas as formas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        <span>Limpar</span>
+      </button>
+      <button class="tb" id="btn-mirror" aria-label="Espelhar campo" title="Espelhar campo (ver pelo mesmo lado)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M3 9l4-4 4 4M17 15l4 4-4 4"/></svg>
+        <span>Espelho</span>
+      </button>
+      <button class="tb" id="btn-toggle-plantel" aria-label="Mostrar/Esconder Plantel" title="Mostrar ou esconder o painel do Plantel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Plantel</span>
+      </button>
+      <span class="tg-label">Edição</span>
+    </div>
+  </div> <!-- /tb-panel edit -->
+
+  <div class="tb-panel" id="tb-anim">
+    <!-- Animation -->
+    <div class="tg">
+      <button class="tb" id="btn-capture" aria-label="Gravar fotograma" title="Gravar posição atual como fotograma" style="color:var(--yel)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+        <span>Gravar <span class="kf-badge" id="kf-count">0</span></span>
+      </button>
+      <button class="tb" id="btn-play" aria-label="Reproduzir animação" title="Reproduzir animação">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Animar</span>
+      </button>
+      <button class="tb" id="btn-trails" aria-label="Mostrar trilhas" title="Mostrar trajetórias">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12 Q8 4 12 12 Q16 20 21 12"/></svg>
+        <span>Trilhas</span>
+      </button>
+      <button class="tb" id="btn-clear-kf" aria-label="Limpar fotogramas" title="Limpar fotogramas gravados">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+        <span>Reset</span>
+      </button>
+      <div class="kf-speed-wrap" style="border-left:none;padding-left:0;margin-top:4px;">
+        <span class="kf-speed-lbl">Vel.</span>
+        <input type="range" id="kf-speed" min="200" max="2000" step="100" value="800" aria-label="Velocidade de animação">
+      </div>
+      <span class="tg-label">Movimentação</span>
+    </div>
+
+    <!-- Vídeo e Imagem -->
+    <div class="tg">
+      <button class="tb" id="btn-export-mp4" aria-label="Exportar MP4" title="Exportar animação como Vídeo MP4" style="color:var(--yel)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+        <span>MP4</span>
+      </button>
+      <button class="tb" id="btn-export-gif" aria-label="Exportar GIF" title="Exportar animação como imagem GIF" style="color:var(--yel)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h3v3H9z" fill="currentColor" stroke="none"/><path d="M15 9v3M15 12h-2"/></svg>
+        <span>GIF</span>
+      </button>
+      <button class="tb" id="btn-export-png"  aria-label="Exportar PNG" title="Exportar o relvado como imagem PNG"  style="color:var(--blu)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>PNG</span>
+      </button>
+      <span class="tg-label">Vídeo & Imagem</span>
+    </div>
+
+    <!-- Session -->
+    <div class="tg">
+      <button class="tb" id="btn-save" aria-label="Guardar sessão" title="Guardar a sessão de trabalho atual" style="color:var(--acc)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Guardar</span>
+      </button>
+      <button class="tb" id="btn-load" aria-label="Carregar sessão" title="Carregar uma sessão já guardada">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Carregar</span>
+      </button>
+      <button class="tb" id="btn-export-json" aria-label="Exportar JSON" title="Descarregar backup da sessão como JSON">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>JSON</span>
+      </button>
+      <button class="tb" id="btn-import-json" aria-label="Importar JSON" title="Importar backup de JSON">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="21"/></svg>
+        <span>Importar</span>
+      </button>
+      <span class="tg-label">Sessão</span>
+    </div>
+
+    <!-- Apresentação -->
+    <div class="tg" style="border-bottom:none;">
+      <button class="tb" id="btn-present" aria-label="Modo Apresentação" title="Ativar o Modo de Apresentação de Táticas" style="color:var(--yel);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span style="font-weight:700">Apresentar</span>
+      </button>
+    </div>
+  </div> <!-- /tb-panel anim -->
+
+</div><!-- /toolbar -->
+
+<!-- ── MODE INDICATOR BAR ─────────────────────────────────────────── -->
+<div id="content-landscape">
+<div id="mode-bar" role="status" aria-live="polite">
+  <span class="mb-dot" aria-hidden="true"></span>
+  <span class="mb-txt" id="mode-bar-txt">Modo ativo</span>
+  <button class="mb-esc" id="btn-mode-cancel" aria-label="Cancelar modo (ESC)">ESC — Cancelar</button>
+</div>
+
+<!-- ── KEYFRAME TIMELINE ──────────────────────────────────── -->
+<div id="kf-timeline" role="list" aria-label="Linha temporal de fotogramas">
+  <span class="kf-tl-label">Frames</span>
+  <!-- frames are inserted dynamically -->
+</div>
+
+<!-- ── TÁTICAS VIEW ───────────────────────────────────────────────── -->
+<div id="view-tactic" class="view active" role="region" aria-label="Campo tático">
+  <div id="tactic-panel" class="collapsed" role="complementary" aria-label="Painel Tático">
+    <div class="tp-head">
+      <span class="tp-title">Plantel</span>
+      <button id="btn-tp-collapse" aria-label="Recolher painel" title="Recolher">✕</button>
+    </div>
+    <div class="tp-body" id="tp-body"></div>
+  </div>
+  <div id="pitch-wrap">
+    <button id="btn-field-fs" aria-label="Ecrã inteiro" title="Ecrã inteiro (Campo)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+    <div id="pitch" role="img" aria-label="Campo de futebol tático">
+      <svg id="p-lines" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet">
+        <!-- Outer field border -->
+        <rect x="2" y="2" width="64" height="101" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
+        <!-- Halfway line -->
+        <line x1="2" y1="52.5" x2="66" y2="52.5" stroke="rgba(255,255,255,.88)" stroke-width=".65"/>
+        <!-- Centre circle (r=9.15m) -->
+        <circle cx="34" cy="52.5" r="9.15" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
+        <!-- Centre spot -->
+        <circle cx="34" cy="52.5" r=".55" fill="white" opacity=".9"/>
+
+        <!-- ── TOP HALF ── -->
+        <!-- Goal (7.32m wide x 2.44m deep, centred) -->
+        <rect x="30.34" y="0" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+        <!-- Goal area / Small box (18.32m x 5.5m) -->
+        <rect x="24.84" y="2" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+        <!-- Penalty area / Large box (40.32m x 16.5m) -->
+        <rect x="13.84" y="2" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+        <!-- Penalty spot (11m from goal line) -->
+        <circle cx="34" cy="13" r=".55" fill="white" opacity=".9"/>
+        <!-- Penalty arc (r=9.15m from penalty spot, outside box) -->
+        <path d="M24.3,18.5 A9.15,9.15 0 0,0 43.7,18.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+        <!-- Corner arcs top -->
+        <path d="M2,4.5 A2.5,2.5 0 0,1 4.5,2"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+        <path d="M66,4.5 A2.5,2.5 0 0,0 63.5,2" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+        <!-- ── BOTTOM HALF ── -->
+        <!-- Goal -->
+        <rect x="30.34" y="102.56" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+        <!-- Small box -->
+        <rect x="24.84" y="97.5" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+        <!-- Large box -->
+        <rect x="13.84" y="86.5" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+        <!-- Penalty spot -->
+        <circle cx="34" cy="92" r=".55" fill="white" opacity=".9"/>
+        <!-- Penalty arc -->
+        <path d="M24.3,86.5 A9.15,9.15 0 0,1 43.7,86.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+        <!-- Corner arcs bottom -->
+        <path d="M2,100.5 A2.5,2.5 0 0,0 4.5,103"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+        <path d="M66,100.5 A2.5,2.5 0 0,1 63.5,103" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+        <!-- Corner flag dots -->
+        <circle cx="2"  cy="2"   r=".45" fill="white" opacity=".55"/>
+        <circle cx="66" cy="2"   r=".45" fill="white" opacity=".55"/>
+        <circle cx="2"  cy="103" r=".45" fill="white" opacity=".55"/>
+        <circle cx="66" cy="103" r=".45" fill="white" opacity=".55"/>
+      </svg>
+      <svg id="p-shapes" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <svg id="p-draw"   viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <canvas id="swipe-canvas" aria-hidden="true"></canvas>
+      <canvas id="trail-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;" aria-hidden="true"></canvas>
+      <div class="dhint hide" id="dhint" aria-hidden="true">
+        <span class="hdot"></span>
+        <span id="dhint-txt"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CENÁRIOS DE JOGO VIEW ───────────────────────────────────────────── -->
+<div id="view-box" class="view" role="region" aria-label="Cenários de Jogo">
+  <div id="box-wrap">
+    <div id="box-pc">
+      <div id="box-pitch" role="img" aria-label="Cenários de Jogo">
+        <!-- box ball is spawned dynamically -->
+        <svg id="b-lines" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet">
+          <!-- Outer field border -->
+          <rect x="2" y="2" width="64" height="101" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
+          <!-- Halfway line -->
+          <line x1="2" y1="52.5" x2="66" y2="52.5" stroke="rgba(255,255,255,.88)" stroke-width=".65"/>
+          <!-- Centre circle (r=9.15m) -->
+          <circle cx="34" cy="52.5" r="9.15" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
+          <!-- Centre spot -->
+          <circle cx="34" cy="52.5" r=".55" fill="white" opacity=".9"/>
+
+          <!-- ── TOP HALF ── -->
+          <rect x="30.34" y="0" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="2" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="2" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="13" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,18.5 A9.15,9.15 0 0,0 43.7,18.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,4.5 A2.5,2.5 0 0,1 4.5,2"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,4.5 A2.5,2.5 0 0,0 63.5,2" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+          <!-- ── BOTTOM HALF ── -->
+          <rect x="30.34" y="102.56" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="97.5" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="86.5" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="92" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,86.5 A9.15,9.15 0 0,1 43.7,86.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,100.5 A2.5,2.5 0 0,0 4.5,103"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,100.5 A2.5,2.5 0 0,1 63.5,103" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+        </svg>
+
+        <svg id="b-shapes" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <svg id="b-draw"   viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <div id="b-hint" class="hide" aria-hidden="true">
+          <span class="hdot"></span>
+          <span id="b-hint-txt" class="hint-txt"></span>
+        </div>
+      </div>
+    </div>
+    <div class="box-rp" role="complementary" aria-label="Painel Cenários">
+      <div class="brp-h">
+        <div class="brp-title">Cenários de Jogo</div>
+        <div class="brp-sub">Dinâmicas e Movimentos</div>
+      </div>
+      <div class="brp-b">
+        <div style="margin-bottom:10px;">
+          <button class="pbtn p" id="btn-save-box" style="width:100%;margin-bottom:6px;">Guardar Cenário</button>
+          <button class="pbtn s" id="btn-load-box" style="width:100%;">Carregar Cenário</button>
+        </div>
+        <div class="div"></div>
+        <div>
+          <div class="sec">Criar Equipa</div>
+          <div class="add-btns">
+            <button class="add-btn" id="btn-add-att" style="color:var(--acc)" aria-label="Adicionar atacante">+Atq</button>
+            <button class="add-btn" id="btn-add-def" style="color:var(--red)"  aria-label="Adicionar defesa">+Def</button>
+            <button class="add-btn" id="btn-add-gk"  style="color:var(--blu)"  aria-label="Adicionar guarda-redes">+GR</button>
+          </div>
+          <button class="pbtn s" id="btn-clear-box-pl" style="width:100%;margin-top:5px;font-size:11px;" aria-label="Remover todos os jogadores">Remover Todos</button>
+        </div>
+        <div class="div"></div>
+        <div>
+          <div class="sec">Situações de Jogo</div>
+          <button class="bpo" data-bp-zone="pos-off" aria-label="Posicionamento Ofensivo">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div><div class="bpo-t">Posicionamento Ofensivo</div></div>
+          </button>
+          <button class="bpo" data-bp-zone="pos-def" aria-label="Posicionamento Defensivo">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="bpo-t">Posicionamento Defensivo</div></div>
+          </button>
+          <button class="bpo" data-bp-zone="press" aria-label="Linha de Pressão">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+            <div><div class="bpo-t">Linha de Pressão</div></div>
+          </button>
+          <button class="bpo" data-bp-zone="trans" aria-label="Transição">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="20" y1="4" x2="3" y2="21"/></svg></div>
+            <div><div class="bpo-t">Transição Ofensiva/Defensiva</div></div>
+          </button>
+          <button class="bpo" data-bp-zone="saida-gk" aria-label="Saída de Bola GR">
+            <div class="bpo-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+            <div><div class="bpo-t">Saída de Bola GR</div></div>
+          </button>
+        </div>
+        <div class="div"></div>
+        <div>
+          <div class="sec">Selecionado</div>
+          <div class="pcard hide" id="bc">
+            <div class="pav f" id="bca" aria-hidden="true"></div>
+            <div><div class="pnm" id="bcn"></div><div class="pps" id="bcp"></div></div>
+            <button class="pcard-del" id="btn-del-box-pl" aria-label="Remover jogador">✕</button>
+          </div>
+        </div>
+        <div class="div"></div>
+        <div class="pbtns">
+          <button class="pbtn s" id="btn-clear-box-shapes">Limpar</button>
+          <button class="pbtn p" id="btn-save-box" style="display:none">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MEIO CAMPO VIEW ────────────────────────────────────────────── -->
+<div id="view-pbox" class="view" role="region" aria-label="Bolas Paradas">
+  <div id="pbox-outer">
+    <div id="pbox-wrap">
+      <div id="pbox-pitch" role="img" aria-label="Campo Bolas Paradas">
+        <svg id="pb-lines" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet">
+          <!-- Outer field border -->
+          <rect x="2" y="2" width="64" height="101" fill="none" stroke="rgba(255,255,255,.88)" stroke-width=".65" rx=".2"/>
+          <!-- Halfway line -->
+          <line x1="2" y1="52.5" x2="66" y2="52.5" stroke="rgba(255,255,255,.88)" stroke-width=".65"/>
+          <!-- Centre circle (r=9.15m) -->
+          <circle cx="34" cy="52.5" r="9.15" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".6"/>
+          <!-- Centre spot -->
+          <circle cx="34" cy="52.5" r=".55" fill="white" opacity=".9"/>
+
+          <!-- ── TOP HALF ── -->
+          <rect x="30.34" y="0" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="2" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="2" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="13" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,18.5 A9.15,9.15 0 0,0 43.7,18.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,4.5 A2.5,2.5 0 0,1 4.5,2"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,4.5 A2.5,2.5 0 0,0 63.5,2" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+
+          <!-- ── BOTTOM HALF ── -->
+          <rect x="30.34" y="102.56" width="7.32" height="2.44" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.9)" stroke-width=".55"/>
+          <rect x="24.84" y="97.5" width="18.32" height="5.5" fill="none" stroke="rgba(255,255,255,.82)" stroke-width=".55"/>
+          <rect x="13.84" y="86.5" width="40.32" height="16.5" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.88)" stroke-width=".6"/>
+          <circle cx="34" cy="92" r=".55" fill="white" opacity=".9"/>
+          <path d="M24.3,86.5 A9.15,9.15 0 0,1 43.7,86.5" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".55"/>
+          <path d="M2,100.5 A2.5,2.5 0 0,0 4.5,103"  fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+          <path d="M66,100.5 A2.5,2.5 0 0,1 63.5,103" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".55"/>
+        </svg>
+
+        <svg id="pb-shapes" viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <svg id="pb-draw"   viewBox="0 0 68 105" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <div id="pb-hint" class="hide" aria-hidden="true">
+          <span class="hdot"></span>
+          <span id="pb-hint-txt" class="hint-txt"></span>
+        </div>
+      </div>
+    </div>
+    <div class="box-rp" role="complementary" aria-label="Painel Cenários">
+      <div class="brp-h">
+        <div class="brp-title">Cenários</div>
+        <div class="brp-sub">Criar &amp; inventar jogadas</div>
+      </div>
+      <div class="brp-b">
+        <div style="margin-bottom:10px;">
+          <button class="pbtn p" id="btn-save-scenario" style="width:100%;margin-bottom:6px;">Guardar Cenário</button>
+          <button class="pbtn s" id="btn-load-scenario" style="width:100%;">Carregar Cenário</button>
+        </div>
+        <div class="div"></div>
+        <div>
+          <div class="sec">Criar Equipa</div>
+          <div class="add-btns">
+            <button class="add-btn" id="btn-pbox-att" style="color:var(--acc)" aria-label="Adicionar atacante">+Atq</button>
+            <button class="add-btn" id="btn-pbox-def" style="color:var(--red)"  aria-label="Adicionar defesa">+Def</button>
+            <button class="add-btn" id="btn-pbox-gk"  style="color:var(--blu)"  aria-label="Adicionar guarda-redes">+GR</button>
+          </div>
+        </div>
+        <div class="div"></div>
+        <div>
+          <div class="sec">Adversário</div>
+          <div class="add-btns">
+            <button class="add-btn" id="btn-pbox-opp-att" style="color:var(--opp)"    aria-label="Adicionar atacante adversário">+Atq</button>
+            <button class="add-btn" id="btn-pbox-opp-def" style="color:rgba(255,107,74,.7)" aria-label="Adicionar defesa adversária">+Def</button>
+            <button class="add-btn" id="btn-pbox-opp-gk"  style="color:var(--opp-gk)" aria-label="Adicionar GR adversário">+GR</button>
+          </div>
+        </div>
+        <div class="div"></div>
+        <div>
+          <div class="sec">Selecionado</div>
+          <div class="pcard hide" id="pbc">
+            <div class="pav f" id="pbca" aria-hidden="true"></div>
+            <div><div class="pnm" id="pbcn"></div><div class="pps" id="pbcp"></div></div>
+            <button class="pcard-del" id="btn-del-pbox-pl" aria-label="Remover jogador">✕</button>
+          </div>
+        </div>
+        <div class="div"></div>
+        <div class="pbtns">
+          <button class="pbtn s" id="btn-clear-pbox-shapes">Limpar</button>
+          <button class="pbtn s" id="btn-clear-pbox-pl">Remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NOTAS VIEW ────────────────────────────────────────────────── -->
+<div id="view-notes" class="view" role="region" aria-label="Notas">
+  <div class="notes-wrap">
+    <div class="notes-list" role="complementary" aria-label="Lista de notas">
+      <div class="nl-head">
+        <span class="nl-title">Notas</span>
+        <button class="nl-add" id="btn-new-note" aria-label="Criar nova nota" title="Nova nota">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="nl-items" id="nl-items" role="list">
+        <div class="nl-empty">Sem notas.<br>Clica <strong>+</strong> para criar.</div>
+      </div>
+    </div>
+    <div class="notes-editor" role="main">
+      <div class="ne-head" id="ne-head" style="display:none;">
+        <input id="note-title" type="text" placeholder="Título da nota…" aria-label="Título da nota">
+        <button class="ne-tag tc"    id="tag-tc" aria-label="Tag: Táticas" aria-pressed="false">Táticas</button>
+        <button class="ne-tag bp"    id="tag-bp" aria-label="Tag: Bolas Paradas" aria-pressed="false">B. Paradas</button>
+        <button class="ne-tag ge on" id="tag-ge" aria-label="Tag: Geral" aria-pressed="true">Geral</button>
+        <button class="ne-del" id="btn-del-note" aria-label="Eliminar nota" title="Eliminar nota">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </button>
+      </div>
+      <textarea id="note-body" style="display:none;" aria-label="Conteúdo da nota"
+        placeholder="Escreve aqui as tuas táticas e instruções…
+
+Exemplos:
+— Canto direito: 9 corre ao 1.º poste, 10 ao 2.º
+— Livre: barreira a 9.15m, remate por cima
+— Pressão alta desde o meio-campo
+— Saída a jogar pelo corredor direito"></textarea>
+      <div class="ne-empty" id="ne-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <p>Seleciona ou cria<br>uma nova nota.</p>
+      </div>
+      <div class="ne-foot" id="ne-foot" style="display:none;">
+        <span class="ne-stat" id="ne-stat">0 palavras</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content-landscape -->
+</div><!-- /main-landscape -->
+</div><!-- /app -->
+
+<!-- ── SHAPE LABEL LAYER ──────────────────────────────────────────── -->
+<div id="slyr" aria-hidden="true"></div>
+
+<!-- ── SHAPE ACTION BAR ─────────────────────────────────────────── -->
+<div id="shape-action-bar" role="toolbar" aria-label="Ações da forma selecionada">
+  <span class="sab-label" id="sab-label">Forma</span>
+  <button class="sab-btn del" id="sab-del" aria-label="Eliminar forma">✕ Eliminar</button>
+  <button class="sab-btn cancel" id="sab-cancel" aria-label="Desselecionar">Cancelar</button>
+</div>
+
+<!-- ── GIF PROGRESS ──────────────────────────────────────────────── -->
+<div id="gif-progress" role="status" aria-live="polite">
+  <span class="gif-prog-txt" id="gif-prog-txt">A gerar GIF…</span>
+  <div class="gif-prog-bar-wrap"><div class="gif-prog-bar" id="gif-prog-bar"></div></div>
+</div>
+
+<!-- ── SAVE/LOAD MODAL ───────────────────────────────────────────── -->
+<div id="modal-ov" role="dialog" aria-modal="true" aria-labelledby="modal-title-txt">
+  <div id="modal">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-title-txt">Guardar Sessão</span>
+      <button class="modal-close" id="modal-close" aria-label="Fechar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="save-area" style="display:flex;">
+        <div id="save-name-wrap">
+          <input id="save-name" type="text" placeholder="Nome da sessão…" aria-label="Nome da sessão">
+          <button id="btn-save-ok">Guardar</button>
+        </div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);">Sessões Guardadas</div>
+      <div id="saves-list" role="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PWA INSTALL BANNER ─────────────────────────────────────────── -->
+<div id="install-banner" role="dialog" aria-label="Instalar aplicação">
+  <div class="ib-icon" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  </div>
+  <div class="ib-txt">
+    <div class="ib-title">Instalar Tactical Lab</div>
+    <div class="ib-sub">Adicionar ao ecrã inicial — funciona offline</div>
+  </div>
+  <button class="ib-btn" id="install-btn">Instalar</button>
+  <button class="ib-close" id="install-dismiss" aria-label="Dispensar">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ── UPDATE TOAST ───────────────────────────────────────────────── -->
+<div id="update-toast" role="status" aria-live="polite">
+  <span class="ut-txt">Nova versão disponível</span>
+  <button class="ut-btn" id="update-btn">Atualizar</button>
+</div>
+
+<!-- ── ONBOARDING HINT ────────────────────────────────────────────── -->
+<div id="onboarding-hint" role="dialog" aria-label="Como usar o Tactical Lab">
+  <div class="ob-title">⚡ Como começar</div>
+  <ul class="ob-steps">
+    <li>Arrasta os jogadores para as posições desejadas</li>
+    <li>Duplo clique num jogador → arrasta para criar seta de movimento</li>
+    <li>Usa os botões da toolbar para polígonos e zonas</li>
+    <li>Grava fotogramas para criar animações</li>
+    <li>Ctrl+Z para desfazer qualquer ação</li>
+  </ul>
+  <button id="btn-onboarding-dismiss">Entendido</button>
+</div>
+
+<!-- ── MAIN SCRIPT (ES module) ───────────────────────────────────── -->
+<script type="module" src="app.js?v=32"></script>
+
+<!-- ── CUSTOM CONFIRM MODAL ─────────────────────────────────────── -->
+<div id="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="cfm-title-el">
+  <div id="confirm-modal">
+    <div class="cfm-head">
+      <div class="cfm-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="cfm-title" id="cfm-title-el">Confirmar</div>
+      <div class="cfm-msg" id="cfm-msg-el">Tens a certeza?</div>
+    </div>
+    <div class="cfm-actions">
+      <button class="cfm-btn cancel" id="cfm-cancel">Cancelar</button>
+      <button class="cfm-btn confirm" id="cfm-confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BIBLIOTECA MODAL ──────────────────────────────────────────────── -->
+<div id="lib-overlay" role="dialog" aria-modal="true" aria-labelledby="lib-title">
+  <div id="lib-modal">
+    <div class="lib-head">
+      <span class="lib-title" id="lib-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Biblioteca de Jogadas
+      </span>
+      <div style="display:flex;gap:6px;">
+        <button class="lib-util-btn" id="lib-import-btn" title="Importar biblioteca">&#8595; Importar</button>
+        <button class="lib-util-btn" id="lib-export-btn" title="Exportar biblioteca">&#8593; Exportar</button>
+        <button class="modal-close" id="lib-close" aria-label="Fechar biblioteca">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="lib-save-area">
+      <div class="lib-save-title">Guardar jogada atual</div>
+      <div class="lib-save-row">
+        <input id="lib-save-name" type="text" class="lib-save-input" placeholder="Nome da jogada..." aria-label="Nome da jogada" maxlength="60">
+        <button class="lib-save-submit" id="lib-save-btn" aria-label="Guardar na biblioteca">Guardar</button>
+      </div>
+      <input id="lib-save-desc" type="text" class="lib-save-input" placeholder="Descricao opcional..." aria-label="Descricao" maxlength="120" style="margin-bottom:6px;">
+      <div class="lib-save-tags">
+        <button class="lib-save-tag" data-tag="ataque">Ataque</button>
+        <button class="lib-save-tag" data-tag="defesa">Defesa</button>
+        <button class="lib-save-tag" data-tag="bola-parada">Bola Parada</button>
+        <button class="lib-save-tag" data-tag="transicao">Transicao</button>
+        <button class="lib-save-tag" data-tag="construcao">Construcao</button>
+      </div>
+    </div>
+    <div class="lib-search-wrap">
+      <input type="search" class="lib-search-input" id="lib-search" placeholder="Pesquisar jogadas…" aria-label="Pesquisar na biblioteca">
+    </div>
+    <div class="lib-filters" role="group" aria-label="Filtrar jogadas">
+      <button class="lib-filter-btn active" id="lib-filter-all"        data-filter="all">Todas</button>
+      <button class="lib-filter-btn"        id="lib-filter-ataque"     data-filter="ataque">Ataque</button>
+      <button class="lib-filter-btn"        id="lib-filter-defesa"     data-filter="defesa">Defesa</button>
+      <button class="lib-filter-btn"        id="lib-filter-bola-parada" data-filter="bola-parada">Bola Parada</button>
+      <button class="lib-filter-btn"        id="lib-filter-template"   data-filter="template">Templates</button>
+    </div>
+    <div id="lib-grid" class="lib-grid" role="list"></div>
+  </div>
+</div>
+
+<!-- ── CLUBE MODAL ────────────────────────────────────────────────────── -->
+<div id="club-modal-ov" role="dialog" aria-modal="true" aria-labelledby="club-modal-title">
+  <div id="club-modal">
+    <div class="modal-head">
+      <span class="modal-title" id="club-modal-title">Personalizar Clube</span>
+      <button class="modal-close" id="club-modal-close" aria-label="Fechar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="gap:12px;">
+      <div>
+        <label class="club-label" for="club-name-input">Nome do clube</label>
+        <input id="club-name-input" type="text" class="club-input" placeholder="Ex: Sporting CP" maxlength="40" aria-label="Nome do clube">
+      </div>
+      <div style="display:flex;gap:12px;">
+        <div style="flex:1">
+          <label class="club-label" for="club-color-main">Cor principal</label>
+          <input id="club-color-main" type="color" value="#3ddc84" style="width:100%;height:36px;border-radius:8px;border:1px solid var(--b2);cursor:pointer;background:transparent;" aria-label="Cor principal">
+        </div>
+        <div style="flex:1">
+          <label class="club-label" for="club-color-gk">Cor GR</label>
+          <input id="club-color-gk" type="color" value="#5bbfff" style="width:100%;height:36px;border-radius:8px;border:1px solid var(--b2);cursor:pointer;background:transparent;" aria-label="Cor GR">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <div style="flex:1">
+          <label class="club-label" for="club-color-opp">Cor adversário</label>
+          <input id="club-color-opp" type="color" value="#ff6b4a" style="width:100%;height:36px;border-radius:8px;border:1px solid var(--b2);cursor:pointer;background:transparent;" aria-label="Cor adversário">
+        </div>
+        <div style="flex:1">
+          <label class="club-label" for="club-color-opp-gk">Cor GR adversário</label>
+          <input id="club-color-opp-gk" type="color" value="#ff9f1c" style="width:100%;height:36px;border-radius:8px;border:1px solid var(--b2);cursor:pointer;background:transparent;" aria-label="Cor GR adversário">
+        </div>
+      </div>
+      <div>
+        <label class="club-label">Etiqueta nos jogadores</label>
+        <div style="display:flex;gap:6px;">
+          <button class="club-label-btn active" id="club-label-num"  aria-pressed="true">Numero (9)</button>
+          <button class="club-label-btn"        id="club-label-name" aria-pressed="false">Nome (Ramos)</button>
+        </div>
+      </div>
+      <div>
+        <label class="club-label">Pre-visualizacao</label>
+        <div id="club-color-preview" style="background:var(--s2);border-radius:8px;border:1px solid var(--b1);min-height:56px;"></div>
+      </div>
+      <p style="font-size:11px;color:var(--t3);">Triple-clique num jogador para editar o seu nome/numero individualmente.</p>
+      <button class="ib-btn" id="club-save-btn" style="width:100%">Guardar configuracao</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── APRESENTAÇÃO MODAL ───────────────────────────────────────────── -->
+<div id="presentation-overlay" role="dialog" aria-modal="true" aria-label="Modo de Apresentação">
+  <div id="pres-field"></div>
+  <aside id="pres-sidebar">
+    <div class="ps-header">
+      <span class="ps-title">Modo Apresentação</span>
+      <span id="pres-frame-info">Frame 1/1</span>
+    </div>
+    
+    <div class="ps-controls">
+      <button class="pres-btn secondary" id="btn-pres-prev" title="Fotograma anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="pres-btn primary" id="btn-pres-play" style="flex:1;justify-content:center;">Animar</button>
+      <button class="pres-btn secondary" id="btn-pres-next" title="Fotograma seguinte">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div style="margin-top:auto;">
+      <button class="pres-btn danger" id="btn-pres-exit" style="width:100%;justify-content:center;">Fechar Apresentação</button>
+    </div>
+  </aside>
+</div>
+
+<!-- ── TOAST UNDO/REDO ────────────────────────────────────────────── -->
+<div id="undo-toast" role="status" aria-live="polite"></div>
+
+<!-- ── SHARE MODAL ────────────────────────────────────────────────── -->
+<div id="share-overlay" role="dialog" aria-modal="true" aria-labelledby="share-title">
+  <div id="share-modal">
+    <div class="modal-head">
+      <span class="modal-title" id="share-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Partilhar Tática
+      </span>
+      <button class="modal-close" id="share-modal-close" aria-label="Fechar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="gap:12px;">
+      <p style="font-size:12px;color:var(--t2);margin:0;">Partilha a tática atual com qualquer pessoa. Ao abrir o link, a tática é carregada automaticamente.</p>
+      <div id="share-url-wrap">
+        <input id="share-url-input" type="text" readonly aria-label="Link de partilha">
+        <button id="share-copy-btn" title="Copiar link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+      </div>
+      <div id="share-qr-wrap">
+        <canvas id="share-qr-canvas" width="180" height="180" aria-label="QR Code"></canvas>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:4px;">QR Code</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
