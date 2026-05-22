@@ -1,0 +1,818 @@
+/* ============================================================
+   Tactical Lab — Stats Redesign Design System
+   ============================================================ */
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  /* Colours */
+  --bg0: #070c08;
+  --bg1: #0c1610;
+  --bg2: #142018;
+  --bg3: #1c2a20;
+  --bg4: #243630;
+
+  --accent: #3ddc84;
+  --acc: #3ddc84;
+  --acc-dim: rgba(61,220,132,.15);
+
+  --gold: #FFD700;
+  --gold-dim: rgba(255,215,0,.12);
+
+  --red: #ff4a4a;
+  --red-dim: rgba(255,74,74,.15);
+
+  --blu: #5b9cf6;
+  --blu-dim: rgba(91,156,246,.15);
+
+  --yel: #ffcc00;
+
+  --opp: #c060e0;
+  --opp-gk: rgba(220,120,255,.85);
+
+  --text: #e8f5e9;
+  --t1: #d0e8d4;
+  --t2: #9ab89e;
+  --t3: #5a7a60;
+
+  --b1: rgba(255,255,255,.09);
+  --b2: rgba(255,255,255,.14);
+  --b3: rgba(255,255,255,.2);
+
+  --radius: 8px;
+  --radius-sm: 5px;
+  --radius-lg: 12px;
+
+  --shadow: 0 2px 16px rgba(0,0,0,.45);
+  --shadow-sm: 0 1px 6px rgba(0,0,0,.35);
+
+  --font: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg1);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
+
+/* ── App Shell ──────────────────────────────────────────── */
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ── Header ─────────────────────────────────────────────── */
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 46px;
+  background: var(--bg0);
+  border-bottom: 1px solid var(--b1);
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.logo { display: flex; align-items: center; gap: 7px; color: var(--acc); font-weight: 700; font-size: 13px; white-space: nowrap; }
+.logo-icon { display: flex; align-items: center; }
+
+.vsep { width: 1px; height: 22px; background: var(--b1); flex-shrink: 0; }
+
+/* ── Tab Nav (Stats / Táctico) ────────────────────────── */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  padding: 5px 14px;
+  border: 1px solid var(--b1);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all .18s;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  background: var(--acc-dim);
+  border-color: var(--acc);
+  color: var(--acc);
+}
+
+.tab-btn:hover:not(.active) { background: var(--b1); color: var(--t1); }
+
+/* ── Main Content ───────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── View Panels ────────────────────────────────────────── */
+.view { display: none; flex-direction: column; gap: 10px; }
+.view.active { display: flex; }
+
+/* ── Card Base ──────────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+
+/* ── Header Row (timer + actions) ───────────────────────── */
+.stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.header-left { display: flex; align-items: center; gap: 8px; }
+.header-right { display: flex; align-items: center; gap: 6px; }
+
+/* ── Timer ──────────────────────────────────────────────── */
+.timer-display {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .05em;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.timer-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--b2);
+  border-radius: 6px;
+  background: var(--bg3);
+  color: var(--t2);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+
+.timer-btn:hover { background: var(--b2); color: var(--text); }
+.timer-btn.running { color: var(--acc); border-color: var(--acc); }
+
+/* ── Parte Toggle ───────────────────────────────────────── */
+.parte-toggle {
+  display: flex;
+  border: 1px solid var(--b2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.parte-btn {
+  padding: 4px 10px;
+  background: var(--bg3);
+  color: var(--t3);
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  transition: all .15s;
+}
+
+.parte-btn.active {
+  background: var(--acc-dim);
+  color: var(--acc);
+}
+
+/* ── Score Bar ──────────────────────────────────────────── */
+.score-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+}
+
+.score-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.score-team.home { color: var(--gold); }
+.score-team.away { color: var(--opp); }
+
+.score-num {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.score-divider {
+  font-size: 22px;
+  color: var(--t3);
+}
+
+/* ── Dashboard Grid (2x2) ─────────────────────────────────── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Stat Card ──────────────────────────────────────────── */
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--t3);
+}
+
+/* ── Stat Bar ───────────────────────────────────────────── */
+.stat-bar-wrap { margin-top: 6px; }
+.stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.stat-bar-label { font-size: 10px; color: var(--t2); width: 40px; }
+.stat-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg4);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s;
+}
+.stat-bar-fill.home { background: var(--gold); }
+.stat-bar-fill.away { background: var(--opp); }
+.stat-bar-val { font-size: 10px; color: var(--t2); width: 28px; text-align: right; }
+
+/* ── Heatmap Grid ────────────────────────────────────────── */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--bg0);
+  cursor: pointer;
+  transition: transform .1s, filter .1s;
+  min-height: 40px;
+}
+
+.heatmap-cell:hover { filter: brightness(1.15); transform: scale(1.05); }
+.heatmap-cell.zero { background: var(--bg4); color: var(--t3); }
+
+/* Heatmap intensity colours */
+.hi-0 { background: var(--bg3); }
+.hi-1 { background: #2a5c3a; }
+.hi-2 { background: #3d8a4e; }
+.hi-3 { background: var(--acc); }
+.hi-4 { background: var(--gold); }
+.hi-5 { background: var(--red); }
+
+/* ── Top Players ─────────────────────────────────────────── */
+.top-players {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.player-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg3);
+  border-radius: 6px;
+}
+
+.player-rank {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t3);
+  width: 16px;
+  text-align: center;
+}
+
+.player-info { flex: 1; }
+.player-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.player-num { font-size: 10px; color: var(--t3); }
+
+.player-actions-count {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--acc);
+}
+
+/* ── Player Grid ─────────────────────────────────────────── */
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  .player-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.player-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 6px;
+  background: var(--bg3);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all .15s;
+  min-height: 60px;
+}
+
+.player-btn:hover { background: var(--bg4); border-color: var(--b2); }
+.player-btn.selected { background: var(--acc-dim); border-color: var(--acc); }
+.player-btn.goalkeeper { border-color: var(--blu); }
+
+.player-btn-num {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+
+.player-btn-name {
+  font-size: 9px;
+  color: var(--t2);
+  margin-top: 2px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.player-btn-actions {
+  font-size: 9px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+/* ── Action Grid ─────────────────────────────────────────── */
+.action-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--t3);
+  margin-bottom: 6px;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  .action-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.action-btn {
+  padding: 10px 8px;
+  background: var(--bg3);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  transition: all .15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn:hover { background: var(--bg4); border-color: var(--b2); }
+.action-btn:active { transform: scale(.95); }
+.action-btn.recorded { background: var(--acc-dim); border-color: var(--acc); color: var(--acc); }
+
+/* ── Equipa Button ───────────────────────────────────────── */
+.equipa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: var(--gold-dim);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  width: 100%;
+  transition: all .15s;
+}
+
+.equipa-btn:hover { background: rgba(255,215,0,.22); }
+.equipa-btn:active { transform: scale(.97); }
+
+/* ── Opponent Panel ──────────────────────────────────────── */
+.opp-panel {
+  background: var(--bg2);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.opp-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--opp);
+  margin-bottom: 8px;
+}
+
+.opp-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.opp-btn {
+  padding: 10px 8px;
+  background: rgba(192,96,224,.1);
+  border: 1px solid rgba(192,96,224,.3);
+  border-radius: var(--radius);
+  color: var(--opp);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  transition: all .15s;
+}
+
+.opp-btn:hover { background: rgba(192,96,224,.2); }
+.opp-btn:active { transform: scale(.95); }
+
+/* ── History Panel ──────────────────────────────────────── */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg3);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.history-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--t3);
+  min-width: 36px;
+}
+
+.history-player { color: var(--t2); font-weight: 500; }
+.history-action { color: var(--text); }
+.history-zone { font-size: 10px; color: var(--t3); }
+
+/* ── Section Divider ────────────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--b1);
+}
+
+.section-divider span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--t3);
+  font-weight: 600;
+}
+
+/* ── Badge ──────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.badge-home { background: var(--gold-dim); color: var(--gold); }
+.badge-away { background: rgba(192,96,224,.15); color: var(--opp); }
+.badge-acc  { background: var(--acc-dim); color: var(--acc); }
+.badge-red  { background: var(--red-dim); color: var(--red); }
+
+/* ── Toast ───────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--bg3);
+  border: 1px solid var(--acc);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transition: transform .3s, opacity .3s;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ── Zone Modal ──────────────────────────────────────────── */
+.zone-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+.zone-modal.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.zone-modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--b2);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  max-width: 300px;
+  width: 90%;
+  text-align: center;
+}
+
+.zone-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.zone-modal-info {
+  font-size: 12px;
+  color: var(--t2);
+  margin-bottom: 16px;
+}
+
+/* ── Táctico View — Pitch Map ─────────────────────────────── */
+.tactical-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.tactical-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pitch-container {
+  flex: 1;
+  position: relative;
+  max-height: 500px;
+  background: var(--bg2);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+#pitch-map {
+  width: 100%;
+  height: 100%;
+}
+
+.zone-register-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--b1);
+  border-radius: var(--radius);
+}
+
+.zone-register-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--t3);
+  font-weight: 600;
+}
+
+.zone-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--b2);
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.zone-tag.selected { background: var(--acc-dim); border-color: var(--acc); color: var(--acc); }
+
+/* ── Clickable Zones ─────────────────────────────────────── */
+.tactical-zone {
+  cursor: pointer;
+  transition: fill .15s, opacity .15s;
+}
+
+.tactical-zone:hover { opacity: .85; }
+.tactical-zone.selected { fill: var(--acc) !important; opacity: 1; }
+.tactical-zone.has-action { fill: var(--red) !important; }
+
+/* ── Export Buttons ──────────────────────────────────────── */
+.btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--b2);
+  background: var(--bg3);
+  color: var(--t1);
+  transition: all .15s;
+}
+
+.btn:hover { background: var(--bg4); color: var(--text); }
+.btn:active { transform: scale(.97); }
+
+.btn-primary { background: var(--acc-dim); border-color: var(--acc); color: var(--acc); }
+.btn-primary:hover { background: rgba(61,220,132,.22); }
+
+.btn-gold { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--b2);
+  background: var(--bg3);
+  color: var(--t2);
+  transition: all .15s;
+}
+
+.btn-icon:hover { background: var(--bg4); color: var(--text); }
+
+/* ── Row layouts ─────────────────────────────────────────── */
+.row { display: flex; align-items: center; gap: 8px; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.gap-4 { gap: 4px; }
+.gap-6 { gap: 6px; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+
+/* ── Empty state ─────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--t3);
+  font-size: 13px;
+  text-align: center;
+  gap: 8px;
+}
+
+/* ── Flex utilities ──────────────────────────────────────── */
+.flex-1 { flex: 1; }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in { animation: fadeIn .2s ease-out; }
+
+/* ── Mobile adjustments ─────────────────────────────────── */
+@media (max-width: 400px) {
+  #topbar { padding: 0 8px; gap: 6px; }
+  .logo-name { display: none; }
+  .tab-btn { padding: 4px 10px; font-size: 11px; }
+  .score-num { font-size: 22px; }
+  .timer-display { font-size: 17px; }
+}
