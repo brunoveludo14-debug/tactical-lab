@@ -300,7 +300,24 @@ header::-webkit-scrollbar{display:none}
 /* ── Empty ── */
 .empty{color:rgba(255,255,255,.25);font-size:12px;text-align:center;padding:12px}
 
-/* ── Stats (Análise tab) ── */
+/* ── Heatmap / Pitch ── */
+.pitch-heatmap-wrap{
+  position:relative;border-radius:8px;overflow:hidden;
+  background:#0d2010;
+  border:1px solid rgba(255,255,255,.1);
+}
+.pitch-svg{width:100%;height:auto;display:block}
+.pitch-svg line,.pitch-svg rect,.pitch-svg circle{stroke:rgba(255,255,255,.55);stroke-width:.7;fill:none}
+.pitch-svg .field-fill{fill:#1a3020}
+.zone-overlay{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr}
+.hm-zone{
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+  cursor:pointer;transition:background .2s,transform .1s;
+  position:relative;
+}
+.hm-zone:hover{transform:scale(1.04);z-index:2}
+.hm-zone .zone-num{position:absolute;bottom:2px;right:4px;font-size:8px;font-weight:600;opacity:.7}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stat-card{
   background:#16241b;border:1px solid rgba(61,220,132,.1);
@@ -380,7 +397,7 @@ header::-webkit-scrollbar{display:none}
 }
 
 @media(min-width:1024px){
-  .players-grid{grid-template-columns:repeat(6,1fr))}
+  .players-grid{grid-template-columns:repeat(6,1fr)}
 }
 
 @media(max-width:400px){
@@ -526,22 +543,40 @@ header::-webkit-scrollbar{display:none}
         <div class="stat-bar-bg" style="margin-top:6px;"><div class="stat-bar-fill" id="stat-remates-bar" style="width:0%"></div></div>
       </div>
       <div class="stat-card">
-        <div class="card-title">🗺️ Zonas Críticas (Perdas)</div>
-        <div>
-          <div class="hm-row" style="margin-bottom:3px;">
-            <div class="hm-cell" id="hm-0"></div>
-            <div class="hm-cell" id="hm-1"></div>
-            <div class="hm-cell" id="hm-2"></div>
-          </div>
-          <div class="hm-row" style="margin-bottom:3px;">
-            <div class="hm-cell" id="hm-3"></div>
-            <div class="hm-cell" id="hm-4"></div>
-            <div class="hm-cell" id="hm-5"></div>
-          </div>
-          <div class="hm-row">
-            <div class="hm-cell" id="hm-6"></div>
-            <div class="hm-cell" id="hm-7"></div>
-            <div class="hm-cell" id="hm-8"></div>
+        <div class="card-title">🗺️ Zonas Críticas (Perdas de Bola)</div>
+        <div class="pitch-heatmap-wrap" id="pitch-heatmap-wrap">
+          <svg class="pitch-svg" viewBox="0 0 68 44" xmlns="http://www.w3.org/2000/svg">
+            <!-- Field background -->
+            <rect x=".5" y=".5" width="67" height="43" class="field-fill" rx="1"/>
+            <!-- Outer lines -->
+            <rect x="2" y="2" width="64" height="40"/>
+            <!-- Halfway line -->
+            <line x1="2" y1="22" x2="66" y2="22"/>
+            <!-- Centre circle -->
+            <circle cx="34" cy="22" r="5" stroke-dasharray="none"/>
+            <circle cx="34" cy="22" r=".4" fill="rgba(255,255,255,.6)" stroke="none"/>
+            <!-- Top box -->
+            <rect x="19.84" y="2" width="28.32" height="7"/>
+            <!-- Top small box -->
+            <rect x="28.34" y="2" width="11.32" height="3"/>
+            <!-- Bottom box -->
+            <rect x="19.84" y="35" width="28.32" height="7"/>
+            <!-- Bottom small box -->
+            <rect x="28.34" y="39" width="11.32" height="3"/>
+            <!-- Penalty spots -->
+            <circle cx="34" cy="9" r=".4" fill="rgba(255,255,255,.6)" stroke="none"/>
+            <circle cx="34" cy="35" r=".4" fill="rgba(255,255,255,.6)" stroke="none"/>
+          </svg>
+          <div class="zone-overlay">
+            <div class="hm-zone" id="hm-0" data-zone="Ataque Esq."><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-1" data-zone="Ataque Centro"><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-2" data-zone="Ataque Dir."><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-3" data-zone="Meio Esq."><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-4" data-zone="Meio Centro"><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-5" data-zone="Meio Dir."><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-6" data-zone="Defesa Esq."><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-7" data-zone="Defesa Centro"><span class="zone-num"></span></div>
+            <div class="hm-zone" id="hm-8" data-zone="Defesa Dir."><span class="zone-num"></span></div>
           </div>
         </div>
       </div>
@@ -672,6 +707,15 @@ window.onload = () => {
   renderOppActions();
   renderTimeline();
   renderMatchHistory();
+  // Init heatmap zone clicks
+  document.querySelectorAll('.hm-zone').forEach(el => {
+    el.addEventListener('click', () => {
+      const zone = el.dataset.zone;
+      const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
+      if (perdas.length === 0) { showToast(zone + ': sem perdas'); return; }
+      showToast(zone + ': ' + perdas.length + ' perda(s)');
+    });
+  });
 };
 
 // ── TAB SWITCH ─────────────────────────────────────────────────────────────
@@ -849,7 +893,7 @@ function updateStats() {
   document.getElementById('stat-remates-fora').textContent = remF;
   document.getElementById('stat-remates-bar').style.width = remPct + '%';
 
-  // Heatmap
+  // Heatmap (pitch overlay)
   const perdas = flog.filter(l => ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
   const zCounts = {};
   perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
@@ -858,13 +902,14 @@ function updateStats() {
     const el = document.getElementById('hm-' + i);
     if (!el) return;
     const c = zCounts[z] || 0;
-    el.textContent = c > 0 ? c : '·';
+    const numEl = el.querySelector('.zone-num');
+    if (numEl) numEl.textContent = c > 0 ? c : '';
     if (c > 0) {
-      el.classList.add('has');
-      el.style.background = `rgba(255,74,74,${0.2 + (c / maxC) * 0.8})`;
+      el.style.background = `rgba(255,74,74,${0.15 + (c / maxC) * 0.7})`;
+      el.style.color = '#fff';
     } else {
-      el.classList.remove('has');
-      el.style.background = 'rgba(255,255,255,.05)';
+      el.style.background = 'rgba(255,255,255,.03)';
+      el.style.color = 'rgba(255,255,255,.25)';
     }
     el.onclick = () => showToast(z + ': ' + (c || 'sem perdas'));
   });
