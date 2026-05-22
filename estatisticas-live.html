@@ -3,289 +3,600 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>São Manços - Estatísticas</title>
+<title>São Manços — Estatísticas</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif}
-body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
-.title{text-align:center;font-weight:700;font-size:18px;margin-bottom:12px;color:#3ddc84}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:#0c1610;color:#fff;
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:14px;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  touch-action:manipulation;
+}
 
-/* Header */
-.dash-header{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:8px}
-.dash-btn{background:rgba(61,220,132,.15);border:1px solid rgba(61,220,132,.3);color:#3ddc84;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
 
-/* Result bar */
-.result-bar{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#16241b;border-radius:12px;margin-bottom:10px;border:1px solid rgba(61,220,132,.15)}
-.result-big{text-align:center}
-.result-num{font-size:36px;font-weight:700;color:#FFD700;line-height:1}
-.result-num.purple{color:#c850f5}
-.result-label{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.05em;margin-top:2px}
-.result-div{font-size:24px;color:rgba(255,255,255,.3)}
-.half-filters{display:flex;gap:4px;margin-left:auto}
-.hf-btn{background:#1f3025;border:1px solid rgba(61,220,132,.2);color:rgba(255,255,255,.5);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
-.hf-btn.active{background:#3ddc84;color:#0c1610;border-color:#3ddc84}
+/* ── App Shell ── */
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
 
-/* Cards */
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.dash-card{background:#16241b;border:1px solid rgba(61,220,132,.12);border-radius:10px;padding:10px}
-.dash-card-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:8px}
+/* ── Header ── */
+header{
+  display:flex;align-items:center;gap:8px;
+  padding:0 10px;height:48px;
+  background:#070c08;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  flex-shrink:0;overflow-x:auto;
+}
+header::-webkit-scrollbar{display:none}
 
-/* Eficácia */
-.eff-row{display:flex;gap:10px}
-.eff-item{flex:1}
-.eff-label{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:3px}
-.eff-big{font-size:22px;font-weight:700;color:#3ddc84}
-.eff-bar-bg{height:5px;background:#1f3025;border-radius:3px;overflow:hidden;margin:4px 0}
-.eff-bar{height:100%;background:#3ddc84;border-radius:3px;width:0%;transition:width .4s}
-.eff-sub{font-size:10px;color:rgba(255,255,255,.4)}
+.header-title{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:#3ddc84;white-space:nowrap;flex-shrink:0}
+.header-title svg{color:#3ddc84;flex-shrink:0}
 
-/* Action list */
-.action-list{display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;font-size:11px}
-.act-row{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.act-name{flex:1;color:rgba(255,255,255,.6)}
-.act-bar-bg{flex:1;height:4px;background:#1f3025;border-radius:2px;overflow:hidden}
-.act-bar{height:100%;background:#3ddc84;border-radius:2px}
-.act-count{font-size:10px;color:rgba(255,255,255,.4);min-width:18px;text-align:right}
+.header-tabs{display:flex;gap:4px;flex-shrink:0}
+.tab-btn{
+  padding:5px 14px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;
+  background:transparent;color:rgba(255,255,255,.5);
+  font-size:12px;font-weight:500;white-space:nowrap;
+  cursor:pointer;transition:all .15s;
+}
+.tab-btn.active{background:rgba(61,220,132,.15);border-color:#3ddc84;color:#3ddc84}
+.tab-btn:hover:not(.active){background:rgba(255,255,255,.06)}
 
-/* Heatmap */
-.heatmap-mini{display:flex;flex-direction:column;gap:3px}
+.header-actions{display:flex;gap:5px;margin-left:auto;flex-shrink:0}
+.icon-btn{
+  width:34px;height:34px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  background:rgba(255,255,255,.04);
+  color:rgba(255,255,255,.6);
+  font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;
+  flex-shrink:0;
+}
+.icon-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.icon-btn:active{transform:scale(.95)}
+
+/* ── Main ── */
+.main{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px;display:flex;flex-direction:column;gap:10px}
+
+/* ── Views ── */
+.view{display:none;flex-direction:column;gap:10px;min-height:100%}
+.view.active{display:flex}
+
+/* ── Timer Panel ── */
+.timer-panel{
+  background:#16241b;
+  border:1px solid rgba(61,220,132,.15);
+  border-radius:12px;padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+}
+
+.timer-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.timer-display{
+  font-family:'JetBrains Mono',monospace;
+  font-size:28px;font-weight:800;color:#fff;
+  letter-spacing:.05em;
+}
+.timer-controls{display:flex;gap:5px}
+.timer-btn{
+  width:34px;height:34px;border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;background:#1c2a20;color:rgba(255,255,255,.5);
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;
+}
+.timer-btn.play{background:#3ddc84;color:#0c1610;border-color:#3ddc84;font-size:14px}
+.timer-btn.running{color:#3ddc84;border-color:#3ddc84}
+.timer-btn:hover{background:#243630;color:#fff}
+.timer-btn.play:hover{background:#4de896}
+
+.half-toggle{display:flex;border:1px solid rgba(255,255,255,.1);border-radius:8px;overflow:hidden}
+.half-btn{
+  flex:1;padding:7px;
+  background:#1c2a20;color:rgba(255,255,255,.4);
+  font-size:12px;font-weight:600;border:none;
+  cursor:pointer;transition:all .15s;text-align:center;
+}
+.half-btn.active{background:#3ddc84;color:#0c1610}
+.half-btn:hover:not(.active){background:#243630}
+
+/* ── Scoreboard ── */
+.scoreboard{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:10px;background:#1c2a20;border-radius:10px;
+}
+.score-team{text-align:center}
+.score-val{font-size:32px;font-weight:800;line-height:1}
+.score-val.marcados{color:#FFD700}
+.score-val.sofridos{color:#c850f5}
+.score-label{font-size:10px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.05em;margin-top:2px}
+.score-div{font-size:22px;color:rgba(255,255,255,.2)}
+
+/* ── Cards ── */
+.card{
+  background:#16241b;
+  border:1px solid rgba(61,220,132,.1);
+  border-radius:10px;padding:12px;
+}
+.card-title{
+  font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;color:rgba(255,255,255,.5);
+  margin-bottom:8px;
+}
+
+/* ── Player Grid ── */
+.section-title{
+  font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;color:rgba(255,255,255,.4);
+  margin-bottom:6px;
+}
+.players-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(70px,1fr));
+  gap:6px;
+}
+.player-btn{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;
+  padding:10px 4px;
+  background:#1c2a20;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;cursor:pointer;transition:all .15s;
+  min-height:62px;
+}
+.player-btn:hover{background:#243630;border-color:rgba(255,255,255,.15)}
+.player-btn.selected{background:rgba(61,220,132,.15);border-color:#3ddc84}
+.player-btn.gr{background:rgba(91,156,246,.08);border-color:rgba(91,156,246,.2)}
+.player-btn.gr.selected{background:rgba(91,156,246,.2);border-color:#5b9cf6}
+.player-num{font-size:16px;font-weight:800;color:#fff;line-height:1}
+.player-btn.selected .player-num{color:#3ddc84}
+.player-btn.gr .player-num{color:#5b9cf6}
+.player-name{font-size:9px;color:rgba(255,255,255,.5);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.player-btn.selected .player-name{color:#3ddc84}
+.player-badge{
+  font-size:8px;padding:1px 4px;border-radius:4px;
+  background:rgba(61,220,132,.2);color:#3ddc84;
+  font-weight:600;margin-top:1px;
+}
+.player-badge.out{background:rgba(255,74,74,.15);color:#ff6b6b}
+
+/* ── Actions ── */
+.actions-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+}
+.action-btn{
+  padding:10px 6px;
+  background:#1c2a20;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;color:#fff;
+  font-size:11px;font-weight:600;text-align:center;
+  cursor:pointer;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  min-height:52px;justify-content:center;
+}
+.action-btn:hover{background:#243630;border-color:rgba(255,255,255,.15)}
+.action-btn:active{transform:scale(.95)}
+.action-btn.positive{border-color:rgba(61,220,132,.4);color:#3ddc84}
+.action-btn.positive:hover{background:rgba(61,220,132,.1)}
+.action-btn.negative{border-color:rgba(255,74,74,.3);color:#ff6b6b}
+.action-btn.negative:hover{background:rgba(255,74,74,.08)}
+.action-btn.neutral{border-color:rgba(255,184,74,.3);color:#ffb84a}
+.action-btn.neutral:hover{background:rgba(255,184,74,.08)}
+.action-btn.gold{border-color:rgba(255,215,0,.4);color:#FFD700}
+.action-btn.gold:hover{background:rgba(255,215,0,.1)}
+
+/* ── Timeline ── */
+.timeline-list{display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto}
+.timeline-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;background:#1c2a20;border-radius:8px;font-size:12px;
+}
+.tl-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.4);min-width:30px}
+.tl-num{font-weight:700;color:rgba(255,255,255,.6);min-width:22px;text-align:center}
+.tl-name{flex:1;font-weight:500;color:rgba(255,255,255,.8)}
+.tl-action{color:rgba(255,255,255,.5);font-size:11px;flex:1}
+.tl-zone{font-size:10px;color:rgba(255,255,255,.3)}
+.tl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tl-dot.pos{background:#3ddc84}
+.tl-dot.neg{background:#ff4a4a}
+.tl-dot.neu{background:#ffb84a}
+.tl-dot.gol{background:#FFD700}
+
+/* ── Zone Modal ── */
+#zone-modal,#sub-modal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:1000;
+  flex-direction:column;justify-content:center;align-items:center;padding:20px;
+}
+.modal-box{
+  background:#16241b;
+  border:1px solid rgba(61,220,132,.3);
+  border-radius:14px;padding:20px;
+  max-width:340px;width:100%;text-align:center;
+}
+.modal-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:10px}
+.modal-subtitle{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px}
+.zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.zone-btn{
+  background:#1c2a20;border:1px solid rgba(255,255,255,.12);
+  color:#fff;padding:10px;border-radius:6px;
+  cursor:pointer;font-size:11px;font-weight:500;
+  transition:all .15s;
+}
+.zone-btn:hover{background:#243630;border-color:#3ddc84}
+.cancel-btn{
+  width:100%;background:transparent;
+  border:1px solid rgba(255,74,74,.4);color:#ff6b6b;
+  padding:9px;border-radius:6px;cursor:pointer;
+  font-size:12px;font-weight:600;transition:all .15s;
+}
+.cancel-btn:hover{background:rgba(255,74,74,.1)}
+
+/* ── Undo ── */
+.undo-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.undo-btn{
+  background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.3);
+  color:#3ddc84;padding:5px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
+}
+.undo-btn:hover{background:rgba(61,220,132,.2)}
+
+/* ── Opponent ── */
+.opp-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.opp-btn{
+  padding:6px 10px;
+  background:rgba(192,96,224,.1);border:1px solid rgba(192,96,224,.25);
+  color:#c850f5;border-radius:6px;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.opp-btn:hover{background:rgba(192,96,224,.2)}
+.opp-list{display:flex;flex-direction:column;gap:4px;max-height:80px;overflow-y:auto}
+.opp-item{display:flex;justify-content:space-between;font-size:11px;padding:5px 8px;background:#1c2a20;border-radius:6px}
+.opp-name{color:#c850f5}
+.opp-zone{color:rgba(255,255,255,.35)}
+
+/* ── Filter toggle ── */
+.filter-row{display:flex;gap:4px;margin-bottom:4px}
+.filter-btn{
+  padding:4px 10px;background:#1c2a20;border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.4);border-radius:6px;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.filter-btn.active{background:#3ddc84;color:#0c1610;border-color:#3ddc84}
+
+/* ── Export / Save ── */
+.action-row{display:flex;gap:8px;flex-wrap:wrap}
+.action-row button{
+  flex:1;padding:10px;
+  border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;min-width:120px;
+}
+.btn-excel{
+  background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.3);color:#3ddc84;
+}
+.btn-excel:hover{background:rgba(61,220,132,.2)}
+.btn-save{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:#FFD700}
+.btn-save:hover{background:rgba(255,215,0,.2)}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  padding:10px 20px;background:#3ddc84;color:#0c1610;
+  border-radius:8px;font-weight:600;font-size:13px;z-index:9999;
+  display:none;transition:opacity .3s;
+}
+
+/* ── Empty ── */
+.empty{color:rgba(255,255,255,.25);font-size:12px;text-align:center;padding:12px}
+
+/* ── Stats (Análise tab) ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-card{
+  background:#16241b;border:1px solid rgba(61,220,132,.1);
+  border-radius:10px;padding:12px;
+}
+.stat-big{font-size:22px;font-weight:800;color:#3ddc84;line-height:1;margin-bottom:4px}
+.stat-bar-bg{height:5px;background:#1c2a20;border-radius:3px;overflow:hidden;margin:4px 0}
+.stat-bar-fill{height:100%;background:#3ddc84;border-radius:3px;transition:width .4s}
+.stat-sub{font-size:10px;color:rgba(255,255,255,.4)}
+.stat-row{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.5)}
+.stat-row span:first-child{color:#3ddc84}
+.stat-row span:last-child{color:#ff6b6b}
+
+.player-stat-row{display:flex;align-items:center;gap:7px;padding:5px 7px;background:#1c2a20;border-radius:6px;margin-bottom:4px}
+.player-rank{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);min-width:14px}
+.player-stat-name{flex:1;font-size:12px;font-weight:500;color:rgba(255,255,255,.8)}
+.player-stat-count{font-size:13px;font-weight:800;color:#3ddc84}
+
 .hm-row{display:flex;gap:3px}
-.hm-cell{flex:1;aspect-ratio:1;background:rgba(255,255,255,.06);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,.3);font-weight:600;cursor:pointer;transition:background .3s}
+.hm-cell{
+  flex:1;aspect-ratio:1;background:rgba(255,255,255,.05);
+  border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:rgba(255,255,255,.25);font-weight:600;
+  cursor:pointer;transition:background .2s;min-height:38px;
+}
+.hm-cell.has{color:#fff}
 
-/* Player list */
-.player-list{display:flex;flex-direction:column;gap:3px}
-.pl-item{display:flex;align-items:center;gap:6px;padding:4px 6px;background:#1f3025;border-radius:6px;font-size:11px}
-.pl-rank{font-size:10px;color:rgba(255,255,255,.4);font-weight:700;width:16px}
-.pl-name{flex:1;font-weight:600;color:rgba(255,255,255,.8)}
-.pl-count{font-size:10px;color:rgba(255,255,255,.4)}
+/* ── Configs (Equipa tab) ── */
+.config-card{
+  background:#16241b;border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:14px;
+}
+.config-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:12px}
+.team-editor{display:flex;flex-direction:column;gap:8px}
+.player-edit{display:flex;align-items:center;gap:6px}
+.player-edit input{
+  background:#1c2a20;border:1px solid rgba(255,255,255,.1);
+  color:#fff;padding:8px;border-radius:6px;font-size:13px;
+  flex:1;
+}
+.player-edit input:focus{outline:none;border-color:#3ddc84}
+.btn-del{
+  width:32px;height:32px;background:rgba(255,74,74,.1);
+  border:1px solid rgba(255,74,74,.25);color:#ff6b6b;border-radius:6px;
+  cursor:pointer;font-size:14px;flex-shrink:0;
+}
+.btn-del:hover{background:rgba(255,74,74,.2)}
+.btn-add{
+  padding:10px;background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.3);
+  color:#3ddc84;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .15s;
+}
+.btn-add:hover{background:rgba(61,220,132,.2)}
+.btn-save-team{
+  padding:10px;background:#3ddc84;color:#0c1610;border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;border:none;width:100%;
+  transition:all .15s;
+}
+.btn-save-team:hover{background:#4de896}
+.btn-danger{
+  padding:10px;background:rgba(255,74,74,.12);border:1px solid rgba(255,74,74,.3);
+  color:#ff4a4a;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .15s;width:100%;
+}
+.btn-danger:hover{background:rgba(255,74,74,.22)}
+.config-note{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:12px;line-height:1.5}
 
-/* Opponent */
-.opp-quick-btn{background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);color:#ff6b6b;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
-.opp-list{display:flex;flex-direction:column;gap:3px;max-height:60px;overflow-y:auto}
-.opp-item{display:flex;justify-content:space-between;font-size:11px;padding:4px 6px;background:#1f3025;border-radius:5px}
-.opp-name{color:#ff6b6b}
-.opp-zone{color:rgba(255,255,255,.4)}
+/* ── Responsive ── */
+@media(min-width:768px){
+  .main{padding:16px;gap:14px}
+  .players-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}
+  .actions-grid{grid-template-columns:repeat(4,1fr)}
+  .stats-grid{grid-template-columns:repeat(4,1fr)}
+  .card{padding:16px}
+  .timer-display{font-size:34px}
+  .score-val{font-size:40px}
+}
 
-/* History */
-.history-list{display:flex;flex-direction:column;gap:4px}
-.hist-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#1f3025;border-radius:6px;font-size:12px}
-.hist-date{color:rgba(255,255,255,.5)}
-.hist-score{font-size:16px;font-weight:700;color:#3ddc84}
+@media(min-width:1024px){
+  .players-grid{grid-template-columns:repeat(6,1fr))}
+}
 
-/* Toast */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:#3ddc84;color:#0c1610;border-radius:8px;font-weight:600;font-size:13px;z-index:999;display:none}
-#toast.err{background:#ff4a4a;color:#fff}
-
-@media(max-width:500px){
-.result-bar{flex-wrap:wrap;justify-content:center;gap:10px}
-.half-filters{width:100%;justify-content:center;margin-top:4px}
-.dash-grid{grid-template-columns:1fr}
-.result-num{font-size:28px}
+@media(max-width:400px){
+  .tab-btn{padding:4px 10px;font-size:11px}
+  .actions-grid{grid-template-columns:repeat(2,1fr)}
+  .score-val{font-size:26px}
+  .timer-display{font-size:22px}
+  .stats-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<div class="title">🏆 São Manços — Estatísticas</div>
+<div id="app">
 
-<div class="dash-header">
-  <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6);">📊 Análise em Tempo Real</span>
-  <div style="display:flex;gap:6px;">
-    <button class="dash-btn" onclick="exportDirectExcel()">📊 Excel .xlsx</button>
-    <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.1);">💾 Guardar</button>
-  </div>
-</div>
+  <!-- HEADER -->
+  <header>
+    <div class="header-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      São Manços
+    </div>
+    <div class="header-tabs">
+      <button class="tab-btn active" onclick="switchTab('jogo')">1. Jogo</button>
+      <button class="tab-btn" onclick="switchTab('stats')">2. Análise</button>
+      <button class="tab-btn" onclick="switchTab('equipa')">3. Configs</button>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="switchTab('stats')" title="Ver Análise">📊</button>
+      <button class="icon-btn" onclick="exportDirectExcel()" title="Exportar Excel">📥</button>
+    </div>
+  </header>
 
-<!-- Result bar -->
-<div class="result-bar">
-  <div class="result-big">
-    <span class="result-num" id="stat-golos-marcados">0</span>
-    <div class="result-label">MARC.</div>
-  </div>
-  <div class="result-div">—</div>
-  <div class="result-big">
-    <span class="result-num purple" id="stat-golos-sofridos">0</span>
-    <div class="result-label">SOFR.</div>
-  </div>
-  <div style="flex:1"></div>
-  <div class="half-filters">
-    <button class="hf-btn active" id="filter-half-all" onclick="setStatHalfFilter('all',this)">Todo</button>
-    <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1ªP</button>
-    <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2ªP</button>
-  </div>
-</div>
+  <div id="toast"></div>
 
-<!-- Grid 2x2 -->
-<div class="dash-grid">
+  <!-- VIEW 1: JOGO -->
+  <div id="view-jogo" class="view active main">
 
-  <!-- Eficácia -->
-  <div class="dash-card">
-    <div class="dash-card-title">📈 Eficácia</div>
-    <div class="eff-row">
-      <div class="eff-item">
-        <div class="eff-label">Cruzamentos</div>
-        <div class="eff-big" id="stat-cruz-pct">0%</div>
-        <div class="eff-bar-bg"><div class="eff-bar" id="stat-cruz-bar" style="width:0%"></div></div>
-        <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
+    <!-- Timer -->
+    <div class="timer-panel">
+      <div class="timer-row">
+        <div class="timer-display" id="timer-display">00:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn" onclick="resetTimer()">⟲</button>
+          <button class="timer-btn play" id="btn-play" onclick="toggleTimer()">▶</button>
+        </div>
       </div>
-      <div class="eff-item">
-        <div class="eff-label">Remates</div>
-        <div class="eff-big" id="stat-remates-pct">0%</div>
-        <div class="eff-bar-bg"><div class="eff-bar" id="stat-remates-bar" style="width:0%"></div></div>
-        <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza · <span id="stat-remates-errado">0</span> fora</div>
+      <div class="half-toggle">
+        <button class="half-btn active" id="btn-half-1" onclick="setHalf(1)">1ª Parte</button>
+        <button class="half-btn" id="btn-half-2" onclick="setHalf(2)">2ª Parte</button>
       </div>
+    </div>
+
+    <!-- Score -->
+    <div class="scoreboard">
+      <div class="score-team">
+        <div class="score-val Marcados" id="stat-golos-marcados">0</div>
+        <div class="score-label">MARC.</div>
+      </div>
+      <div class="score-div">—</div>
+      <div class="score-team">
+        <div class="score-val Sofridos" id="stat-golos-sofridos">0</div>
+        <div class="score-label">SOFR.</div>
+      </div>
+    </div>
+
+    <!-- Titulares -->
+    <div class="card">
+      <div class="section-title">1. Titulares em Campo</div>
+      <div class="players-grid" id="players-grid-titulares"></div>
+      <div class="section-title" style="margin-top:10px;color:rgba(255,255,255,.25);">Suplentes</div>
+      <div class="players-grid" id="players-grid-suplentes"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card">
+      <div class="section-title">2. Registar Ação</div>
+      <div class="actions-grid" id="actions-grid"></div>
+    </div>
+
+    <!-- Adversário -->
+    <div class="card">
+      <div class="section-title" style="color:#c850f5;">🟥 Adversário</div>
+      <div class="opp-row">
+        <button class="opp-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
+        <button class="opp-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
+        <button class="opp-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
+        <button class="opp-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
+      </div>
+      <div id="opp-actions-list" class="opp-list"><div class="empty">Nenhuma ação</div></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="card">
+      <div class="undo-bar">
+        <div class="section-title" style="margin:0;">Timeline</div>
+        <button class="undo-btn" onclick="undoLastAction()">↩ Desfazer</button>
+      </div>
+      <div id="timeline-list" class="timeline-list"><div class="empty">Sem ações registadas</div></div>
+    </div>
+
+  </div>
+
+  <!-- VIEW 2: ANÁLISE -->
+  <div id="view-stats" class="view main">
+    <div class="card">
+      <div class="scoreboard">
+        <div class="score-team">
+          <div class="score-val Marcados" id="stat-golos-marcados-2">0</div>
+          <div class="score-label">MARC.</div>
+        </div>
+        <div class="score-div">—</div>
+        <div class="score-team">
+          <div class="score-val Sofridos" id="stat-golos-sofridos-2">0</div>
+          <div class="score-label">SOFR.</div>
+        </div>
+      </div>
+      <div class="filter-row" style="margin-top:10px;justify-content:center;">
+        <button class="filter-btn active" onclick="setStatHalfFilter('all',this)">Todo</button>
+        <button class="filter-btn" onclick="setStatHalfFilter(1,this)">1ªP</button>
+        <button class="filter-btn" onclick="setStatHalfFilter(2,this)">2ªP</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="card-title">📈 Cruzamentos</div>
+        <div class="stat-big" id="stat-cruz-pct">0%</div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-cruz-bar" style="width:0%"></div></div>
+        <div class="stat-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
+      </div>
+      <div class="stat-card">
+        <div class="card-title">🎯 Remates</div>
+        <div style="display:flex;gap:20px;align-items:baseline;margin-top:4px;">
+          <div>
+            <div class="stat-big" id="stat-remates-certos" style="color:#3ddc84;">0</div>
+            <div class="stat-sub">baliza</div>
+          </div>
+          <div>
+            <div class="stat-big" id="stat-remates-fora" style="color:#ff6b6b;">0</div>
+            <div class="stat-sub">fora</div>
+          </div>
+        </div>
+        <div class="stat-bar-bg" style="margin-top:6px;"><div class="stat-bar-fill" id="stat-remates-bar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="card-title">🗺️ Zonas Críticas (Perdas)</div>
+        <div>
+          <div class="hm-row" style="margin-bottom:3px;">
+            <div class="hm-cell" id="hm-0"></div>
+            <div class="hm-cell" id="hm-1"></div>
+            <div class="hm-cell" id="hm-2"></div>
+          </div>
+          <div class="hm-row" style="margin-bottom:3px;">
+            <div class="hm-cell" id="hm-3"></div>
+            <div class="hm-cell" id="hm-4"></div>
+            <div class="hm-cell" id="hm-5"></div>
+          </div>
+          <div class="hm-row">
+            <div class="hm-cell" id="hm-6"></div>
+            <div class="hm-cell" id="hm-7"></div>
+            <div class="hm-cell" id="hm-8"></div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="card-title">👥 Top 5 Envolve.</div>
+        <div id="top-players-list"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Ações por Tipo</div>
+      <div id="action-chart"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-excel" onclick="exportDirectExcel()">📊 Exportar .xlsx</button>
+      <button class="btn-save" onclick="saveMatchToHistory()">💾 Guardar Jogo</button>
     </div>
   </div>
 
-  <!-- Ações por tipo -->
-  <div class="dash-card">
-    <div class="dash-card-title">📊 Ações</div>
-    <div id="action-chart" class="action-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
-  </div>
+  <!-- VIEW 3: EQUIPA & CONFIG -->
+  <div id="view-equipa" class="view main">
+    <div class="config-card">
+      <div class="config-title">📁 Importar / Exportar Backup</div>
+      <div class="config-note">Exporta todos os dados (logs, cronómetro, equipa) num ficheiro .json que pode ser carregado depois.</div>
+      <div class="action-row" style="margin-bottom:8px;">
+        <button class="btn-excel" style="flex:1;padding:10px;border-radius:8px;background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.3);color:#3ddc84;font-size:13px;font-weight:600;cursor:pointer;" onclick="exportJSON()">📦 Exportar Backup</button>
+        <label class="btn-save" style="flex:1;padding:10px;border-radius:8px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:#FFD700;font-size:13px;font-weight:600;cursor:pointer;text-align:center;">
+          <input type="file" style="display:none" accept=".json" onchange="importJSON(event)">
+          📂 Importar Backup
+        </label>
+      </div>
+    </div>
 
-  <!-- Mapa de calor -->
-  <div class="dash-card">
-    <div class="dash-card-title">🗺️ Zonas</div>
-    <div class="heatmap-mini">
-      <div class="hm-row">
-        <div class="hm-cell" id="hm-0" onclick="showZoneDetail('Ataque Esq.')">0</div>
-        <div class="hm-cell" id="hm-1" onclick="showZoneDetail('Ataque Centro')">0</div>
-        <div class="hm-cell" id="hm-2" onclick="showZoneDetail('Ataque Dir.')">0</div>
-      </div>
-      <div class="hm-row">
-        <div class="hm-cell" id="hm-3" onclick="showZoneDetail('Meio Esq.')">0</div>
-        <div class="hm-cell" id="hm-4" onclick="showZoneDetail('Meio Centro')">0</div>
-        <div class="hm-cell" id="hm-5" onclick="showZoneDetail('Meio Dir.')">0</div>
-      </div>
-      <div class="hm-row">
-        <div class="hm-cell" id="hm-6" onclick="showZoneDetail('Defesa Esq.')">0</div>
-        <div class="hm-cell" id="hm-7" onclick="showZoneDetail('Defesa Centro')">0</div>
-        <div class="hm-cell" id="hm-8" onclick="showZoneDetail('Defesa Dir.')">0</div>
-      </div>
+    <div class="config-card">
+      <div class="config-title">⚙️ Configurar Plantel</div>
+      <div class="config-note">Os primeiros 11 jogadores são considerados Titulares.</div>
+      <div class="team-editor" id="team-editor"></div>
+      <button class="btn-add" style="margin-top:10px;" onclick="addPlayerField()">+ Adicionar Jogador</button>
+      <button class="btn-save-team" style="margin-top:8px;" onclick="saveTeam()">💾 Guardar Plantel</button>
+    </div>
+
+    <div class="config-card" style="border-color:rgba(255,74,74,.2);">
+      <div class="card-title" style="color:#ff4a4a;">Zona de Perigo</div>
+      <button class="btn-danger" onclick="hardReset()">🗑️ Limpar Todos os Dados (Novo Jogo)</button>
     </div>
   </div>
 
-  <!-- Top jogadores -->
-  <div class="dash-card">
-    <div class="dash-card-title">👥 Mais Envolve.</div>
-    <div id="top-players-list" class="player-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
-  </div>
-
 </div>
 
-<!-- Adversário -->
-<div class="dash-card" style="margin-top:6px;">
-  <div class="dash-card-title" style="color:#ff6b6b;">🟥 Adversário</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-    <button class="opp-quick-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
-  </div>
-  <div id="opp-actions-list" class="opp-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span></div>
-</div>
-
-<!-- Histórico -->
-<div class="dash-card" style="margin-top:6px;">
-  <div class="dash-card-title">📁 Histórico</div>
-  <div id="match-history-list" class="history-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span></div>
-</div>
-
-<!-- Offline -->
-<div id="offline-status" style="display:none;text-align:center;padding:8px;color:#ff4a4a;font-size:11px;margin-top:8px;background:rgba(255,74,74,.08);border-radius:8px;">📴 Sem internet — dados guardados localmente</div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-// DEFAULT TEAM
-const defaultPlayers = [
-  {num:1,name:"GR"},{num:2,name:"Defesa D."},{num:3,name:"Defesa E."},
-  {num:4,name:"Central 1"},{num:5,name:"Central 2"},{num:6,name:"Trinco"},
-  {num:8,name:"Médio"},{num:10,name:"Médio Of."},{num:7,name:"Extremo D."},
-  {num:11,name:"Extremo E."},{num:9,name:"Ponta Lança"},
-  {num:12,name:"Suplente 12"},{num:13,name:"Suplente 13"},{num:14,name:"Suplente 14"},
-  {num:15,name:"Suplente 15"},{num:16,name:"Suplente 16"},{num:17,name:"Suplente 17"},{num:18,name:"Suplente 18"}
-];
-
-// STATE
-let players = JSON.parse(localStorage.getItem('ls_team')) || defaultPlayers;
-let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
-let oppLogs = JSON.parse(localStorage.getItem('ls_opp_logs')) || [];
-let seconds = parseInt(localStorage.getItem('ls_time')) || 0;
-let selectedPlayer = null;
-let pendingAction = null;
-let pendingScore = 0;
-let timerInterval = null;
-let isRunning = false;
-let half = parseInt(localStorage.getItem('ls_half')) || 1;
-let autoSaveInterval = null;
-let statHalfFilter = 'all';
-
-// AUTO-SAVE
-function startAutoSave() {
-  autoSaveInterval = setInterval(() => {
-    localStorage.setItem('ls_logs', JSON.stringify(logs));
-    localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
-  }, 15000);
-}
-startAutoSave();
-
-// INIT
-window.onload = () => {
-  renderPlayerGrid();
-  renderHeatmap();
-  renderActionChart();
-  renderTopPlayers();
-  renderOppActions();
-  renderMatchHistory();
-  checkOnlineStatus();
-};
-
-// PLAYERS GRID
-function renderPlayerGrid() {
-  let html = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Jogador:</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
-  players.forEach(p => {
-    html += `<button onclick="selectPlayer(${p.num})" id="btn-p${p.num}" style="background:#16241b;border:1px solid rgba(61,220,132,.2);color:#fff;padding:10px 6px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">#${p.num}<br><span style="font-size:10px;opacity:.7">${p.name}</span></button>`;
-  });
-  html += '</div></div>';
-  document.body.insertAdjacentHTML('beforeend', html);
-}
-
-function selectPlayer(num) {
-  selectedPlayer = players.find(p => p.num === num);
-  document.querySelectorAll('[id^="btn-p"]').forEach(b => b.style.background='#16241b');
-  document.getElementById('btn-p' + num).style.background='#3ddc84';
-  document.getElementById('btn-p' + num).style.color='#0c1610';
-}
-
-// ACTION BUTTONS
-let actionsHTML = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Registar ação:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
-const actions = [
-  {name:'Passe Falhado',score:-1,color:'#ff4a4a'},
-  {name:'Cruzamento Certo',score:1,color:'#3ddc84'},
-  {name:'Cruzamento Falhado',score:-1,color:'#ff4a4a'},
-  {name:'Remate à Baliza',score:1,color:'#3ddc84'},
-  {name:'Remate Fora',score:-1,color:'#ff4a4a'},
-  {name:'Desarme Certo',score:1,color:'#3ddc84'},
-  {name:'Perda de Bola',score:-1,color:'#ff4a4a'},
-  {name:'Falta Sofrida',score:0,color:'#ffb84a'},
-  {name:'Falta Cometida',score:0,color:'#ffb84a'},
-  {name:'Golo Marcado',score:1,color:'#FFD700'},
-  {name:'Golo Sofrido',score:-1,color:'#c850f5'}
-];
-actions.forEach(a => {
-  actionsHTML += `<button onclick="askZone('${a.name}',${a.score})" style="background:#16241b;border:1px solid ${a.color};color:${a.color};padding:12px 8px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">${a.name}</button>`;
-});
-actionsHTML += '</div></div>';
-document.body.insertAdjacentHTML('beforeend', actionsHTML);
-
-// ZONE MODAL
-document.body.insertAdjacentHTML('beforeend', `
-<div id="zone-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;flex-direction:column;justify-content:center;align-items:center;padding:20px;">
-  <div style="background:#16241b;border:1px solid rgba(61,220,132,.3);border-radius:12px;padding:20px;max-width:320px;width:100%;">
-    <div id="zone-title" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center;">Onde foi a ação?</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+<!-- ZONE MODAL -->
+<div id="zone-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="zone-title">Onde foi a ação?</div>
+    <div class="zone-grid">
       <button class="zone-btn" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
       <button class="zone-btn" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
       <button class="zone-btn" onclick="recordAction('Ataque Dir.')">Ataque Dir.</button>
@@ -296,18 +607,195 @@ document.body.insertAdjacentHTML('beforeend', `
       <button class="zone-btn" onclick="recordAction('Defesa Centro')">Defesa Centro</button>
       <button class="zone-btn" onclick="recordAction('Defesa Dir.')">Defesa Dir.</button>
     </div>
-    <button onclick="closeZoneModal()" style="width:100%;background:transparent;border:1px solid #ff4a4a;color:#ff4a4a;padding:8px;border-radius:6px;cursor:pointer;">Cancelar</button>
+    <button class="cancel-btn" onclick="closeZoneModal()">Cancelar</button>
   </div>
 </div>
-<style>.zone-btn{background:#1f3025;border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px;border-radius:6px;cursor:pointer;font-size:11px}</style>`);
 
+<!-- SUB MODAL -->
+<div id="sub-modal">
+  <div class="modal-box">
+    <div class="modal-title">Substituição</div>
+    <div class="modal-subtitle">Quem entra para o lugar de <br><span id="sub-out-name" style="color:#3ddc84;"></span>?</div>
+    <div id="sub-bench-grid" class="players-grid" style="max-height:40vh;overflow-y:auto;margin-bottom:12px;"></div>
+    <button class="cancel-btn" onclick="closeSubModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const ZONAS = ['Ataque Esq.','Ataque Centro','Ataque Dir.','Meio Esq.','Meio Centro','Meio Dir.','Defesa Esq.','Defesa Centro','Defesa Dir.'];
+
+const ACTIONS = [
+  {name:'Passe Falhado',score:-1,type:'negative'},
+  {name:'Cruzamento Certo',score:1,type:'positive'},
+  {name:'Cruzamento Falhado',score:-1,type:'negative'},
+  {name:'Remate à Baliza',score:1,type:'positive'},
+  {name:'Remate Fora',score:-1,type:'negative'},
+  {name:'Desarme Certo',score:1,type:'positive'},
+  {name:'Perda de Bola',score:-1,type:'negative'},
+  {name:'Falta Sofrida',score:0,type:'neutral'},
+  {name:'Falta Cometida',score:0,type:'neutral'},
+  {name:'Golo Marcado',score:1,type:'gold'},
+  {name:'Golo Sofrido',score:-1,type:'gold'}
+];
+
+const DEFAULT_PLAYERS = [
+  {num:1,name:'GR'},{num:2,name:'Defesa D.'},{num:3,name:'Defesa E.'},
+  {num:4,name:'Central 1'},{num:5,name:'Central 2'},{num:6,name:'Trinco'},
+  {num:8,name:'Médio'},{num:10,name:'Médio Of.'},{num:7,name:'Extremo D.'},
+  {num:11,name:'Extremo E.'},{num:9,name:'Ponta Lança'},
+  {num:12,name:'Suplente 12'},{num:13,name:'Suplente 13'},{num:14,name:'Suplente 14'},
+  {num:15,name:'Suplente 15'},{num:16,name:'Suplente 16'},{num:17,name:'Suplente 17'},{num:18,name:'Suplente 18'}
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let players = JSON.parse(localStorage.getItem('ls_team')) || JSON.parse(JSON.stringify(DEFAULT_PLAYERS));
+let logs = JSON.parse(localStorage.getItem('ls_logs')) || [];
+let oppLogs = JSON.parse(localStorage.getItem('ls_opp_logs')) || [];
+let subs = JSON.parse(localStorage.getItem('ls_subs')) || [];
+let seconds = parseInt(localStorage.getItem('ls_time') || '0');
+let selectedPlayer = null;
+let pendingAction = null;
+let pendingScore = 0;
+let timerInterval = null;
+let isRunning = false;
+let half = parseInt(localStorage.getItem('ls_half') || '1');
+let statHalfFilter = 'all';
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+window.onload = () => {
+  renderPlayerGrid();
+  renderActionGrid();
+  renderTeamEditor();
+  updateTimer();
+  updateStats();
+  renderOppActions();
+  renderTimeline();
+  renderMatchHistory();
+};
+
+// ── TAB SWITCH ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'stats') updateStats();
+}
+
+// ── TIMER ──────────────────────────────────────────────────────────────────
+function updateTimer() {
+  const m = String(Math.floor(seconds / 60)).padStart(2,'0');
+  const s = String(seconds % 60).padStart(2,'0');
+  document.getElementById('timer-display').textContent = m + ':' + s;
+  localStorage.setItem('ls_time', seconds);
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('btn-play');
+  if (isRunning) {
+    clearInterval(timerInterval);
+    isRunning = false;
+    btn.textContent = '▶';
+    btn.classList.remove('running');
+  } else {
+    isRunning = true;
+    btn.textContent = '⏸';
+    btn.classList.add('running');
+    timerInterval = setInterval(() => {
+      seconds++;
+      updateTimer();
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  seconds = 0;
+  updateTimer();
+  document.getElementById('btn-play').textContent = '▶';
+  document.getElementById('btn-play').classList.remove('running');
+}
+
+function setHalf(n) {
+  half = n;
+  localStorage.setItem('ls_half', half);
+  document.getElementById('btn-half-1').classList.toggle('active', n === 1);
+  document.getElementById('btn-half-2').classList.toggle('active', n === 2);
+  updateStats();
+}
+
+// ── PLAYER GRID ────────────────────────────────────────────────────────────
+function renderPlayerGrid() {
+  const titulares = players.slice(0, 11);
+  const suplentes = players.slice(11);
+
+  const outNums = new Set(subs.map(s => s.out));
+  const benchNums = new Set(suplentes.map(p => p.num).difference(outNums));
+
+  const htmlT = titulares.map(p => {
+    const isOut = outNums.has(p.num);
+    return `<button class="player-btn${p.num===1?' gr':''}${selectedPlayer&&selectedPlayer.num===p.num?' selected':''}" onclick="selectPlayer(${p.num})">
+      <span class="player-num">#${p.num}</span>
+      <span class="player-name">${p.name}</span>
+      ${isOut?'<span class="player-badge out">Saiu</span>':''}
+    </button>`;
+  }).join('');
+
+  const htmlS = suplentes.map(p => {
+    const isOut = outNums.has(p.num);
+    return `<button class="player-btn${selectedPlayer&&selectedPlayer.num===p.num?' selected':''}${isOut?' selected':''}" onclick="${isOut?'':'selectPlayer('+p.num+')'}" style="${isOut?'opacity:.5':''}">
+      <span class="player-num">#${p.num}</span>
+      <span class="player-name">${p.name}</span>
+      ${isOut?'<span class="player-badge out">Saiu</span>':''}
+    </button>`;
+  }).join('');
+
+  document.getElementById('players-grid-titulares').innerHTML = htmlT;
+  document.getElementById('players-grid-suplentes').innerHTML = htmlS;
+}
+
+function selectPlayer(num) {
+  const p = players.find(pl => pl.num === num);
+  if (!p) return;
+  const outNums = new Set(subs.map(s => s.out));
+  if (outNums.has(num)) {
+    showToast('Jogador já saiu!');
+    return;
+  }
+  selectedPlayer = p;
+  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.player-btn').forEach(b => {
+    if (parseInt(b.querySelector('.player-num').textContent.replace('#','')) === num) {
+      b.classList.add('selected');
+    }
+  });
+  showToast('✅ ' + p.name + ' selecionado');
+}
+
+// ── ACTION GRID ────────────────────────────────────────────────────────────
+function renderActionGrid() {
+  const html = ACTIONS.map(a =>
+    `<button class="action-btn ${a.type}" onclick="askZone('${a.name}',${a.score})">${a.name}</button>`
+  ).join('');
+  document.getElementById('actions-grid').innerHTML = html;
+}
+
+// ── ZONE MODAL ─────────────────────────────────────────────────────────────
 function askZone(action, score) {
   if (!selectedPlayer) { showToast('Seleciona um jogador primeiro!'); return; }
-  pendingAction = action; pendingScore = score;
+  pendingAction = action;
+  pendingScore = score;
   document.getElementById('zone-title').textContent = action;
   document.getElementById('zone-modal').style.display = 'flex';
 }
-function closeZoneModal() { document.getElementById('zone-modal').style.display = 'none'; pendingAction = null; }
+
+function closeZoneModal() {
+  document.getElementById('zone-modal').style.display = 'none';
+  pendingAction = null;
+}
+
 function recordAction(zone) {
   if (!selectedPlayer) return;
   const min = Math.floor(seconds / 60);
@@ -316,165 +804,258 @@ function recordAction(zone) {
   localStorage.setItem('ls_logs', JSON.stringify(logs));
   closeZoneModal();
   selectedPlayer = null;
-  document.querySelectorAll('[id^="btn-p"]').forEach(b => {b.style.background='#16241b';b.style.color='#fff';});
+  document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('selected'));
   updateStats();
-  showToast('✅ ação registada');
+  renderTimeline();
+  showToast('✅ ' + pendingAction + ' — ' + zone);
 }
 
-// STATS ENGINE
+// ── STATS ──────────────────────────────────────────────────────────────────
 function setStatHalfFilter(val, btn) {
   statHalfFilter = val;
-  document.querySelectorAll('.hf-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   updateStats();
 }
 
 function updateStats() {
-  let filtered = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
-  let filteredOpp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
+  const flog = statHalfFilter === 'all' ? logs : logs.filter(l => l.half === statHalfFilter);
+  const fopp = statHalfFilter === 'all' ? oppLogs : oppLogs.filter(o => o.half === statHalfFilter);
 
-  document.getElementById('stat-golos-marcados').textContent = filtered.filter(l => l.action === 'Golo Marcado').length;
-  document.getElementById('stat-golos-sofridos').textContent = filteredOpp.filter(o => o.action === 'Golo Sofrido').length;
+  const golosMarcados = flog.filter(l => l.action === 'Golo Marcado').length;
+  const golosSofridos = fopp.filter(o => o.action === 'Golo Sofrido').length;
 
-  const cruzC = filtered.filter(l => l.action === 'Cruzamento Certo').length;
-  const cruzF = filtered.filter(l => l.action === 'Cruzamento Falhado').length;
+  ['stat-golos-marcados','stat-golos-marcados-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = golosMarcados;
+  });
+  ['stat-golos-sofridos','stat-golos-sofridos-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = golosSofridos;
+  });
+
+  const cruzC = flog.filter(l => l.action === 'Cruzamento Certo').length;
+  const cruzF = flog.filter(l => l.action === 'Cruzamento Falhado').length;
   const cruzPct = cruzC + cruzF > 0 ? Math.round((cruzC / (cruzC + cruzF)) * 100) : 0;
   document.getElementById('stat-cruz-pct').textContent = cruzPct + '%';
   document.getElementById('stat-cruz-bar').style.width = cruzPct + '%';
   document.getElementById('stat-cruz-certo').textContent = cruzC;
   document.getElementById('stat-cruz-errado').textContent = cruzF;
 
-  const remC = filtered.filter(l => l.action === 'Remate à Baliza').length;
-  const remF = filtered.filter(l => l.action === 'Remate Fora').length;
+  const remC = flog.filter(l => l.action === 'Remate à Baliza').length;
+  const remF = flog.filter(l => l.action === 'Remate Fora').length;
   const remPct = remC + remF > 0 ? Math.round((remC / (remC + remF)) * 100) : 0;
-  document.getElementById('stat-remates-pct').textContent = remPct + '%';
+  document.getElementById('stat-remates-certos').textContent = remC;
+  document.getElementById('stat-remates-fora').textContent = remF;
   document.getElementById('stat-remates-bar').style.width = remPct + '%';
-  document.getElementById('stat-remates-certo').textContent = remC;
-  document.getElementById('stat-remates-errado').textContent = remF;
 
-  renderHeatmap();
-  renderActionChart();
-  renderTopPlayers();
-}
-
-function renderHeatmap() {
-  const zonas = ['Ataque Esq.','Ataque Centro','Ataque Dir.','Meio Esq.','Meio Centro','Meio Dir.','Defesa Esq.','Defesa Centro','Defesa Dir.'];
-  const perdas = logs.filter(l => ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
+  // Heatmap
+  const perdas = flog.filter(l => ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
   const zCounts = {};
   perdas.forEach(l => { zCounts[l.zone] = (zCounts[l.zone] || 0) + 1; });
   const maxC = Math.max(1, ...Object.values(zCounts));
-  zonas.forEach((z, i) => {
-    const c = zCounts[z] || 0;
+  ZONAS.forEach((z, i) => {
     const el = document.getElementById('hm-' + i);
-    if (el) {
-      el.textContent = c || '·';
-      el.style.background = c > 0 ? `rgba(255,74,74,${0.2 + (c/maxC)*0.8})` : 'rgba(255,255,255,.06)';
-      el.style.color = c > 0 ? '#fff' : 'rgba(255,255,255,.3)';
+    if (!el) return;
+    const c = zCounts[z] || 0;
+    el.textContent = c > 0 ? c : '·';
+    if (c > 0) {
+      el.classList.add('has');
+      el.style.background = `rgba(255,74,74,${0.2 + (c / maxC) * 0.8})`;
+    } else {
+      el.classList.remove('has');
+      el.style.background = 'rgba(255,255,255,.05)';
     }
+    el.onclick = () => showToast(z + ': ' + (c || 'sem perdas'));
   });
-}
 
-function renderActionChart() {
-  const types = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate à Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
+  // Top players
   const counts = {};
-  types.forEach(t => { counts[t] = logs.filter(l => l.action === t).length; });
-  const max = Math.max(1, ...Object.values(counts));
-  const filtered = logs;
-  const html = types.filter(t => counts[t] > 0).map(t => {
-    const pct = (counts[t] / max) * 100;
-    const color = t.includes('Certo') || t === 'Remate à Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? '#3ddc84' : (t === 'Falta Sofrida' ? '#ffb84a' : '#ff4a4a');
-    return `<div class="act-row"><span class="act-name">${t}</span><div class="act-bar-bg"><div class="act-bar" style="width:${pct}%;background:${color}"></div></div><span class="act-count">${counts[t]}</span></div>`;
-  }).join('');
-  document.getElementById('action-chart').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
-}
-
-function renderTopPlayers() {
-  const counts = {};
-  logs.forEach(l => { counts[l.player] = (counts[l.player] || 0) + 1; });
+  flog.forEach(l => { counts[l.player] = (counts[l.player] || 0) + 1; });
   const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
-  const html = top.map(([name, count], i) => `
-    <div class="pl-item">
-      <span class="pl-rank">${i+1}</span>
-      <span class="pl-name">${name}</span>
-      <span class="pl-count">${count}</span>
-    </div>
-  `).join('');
-  document.getElementById('top-players-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
+  const topHtml = top.map(([name,count], i) =>
+    `<div class="player-stat-row">
+      <span class="player-rank">${i+1}</span>
+      <span class="player-stat-name">${name}</span>
+      <span class="player-stat-count">${count}</span>
+    </div>`
+  ).join('');
+  document.getElementById('top-players-list').innerHTML = topHtml || '<div class="empty">Sem dados</div>';
+
+  // Action chart
+  const types = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate à Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
+  const aCounts = {};
+  types.forEach(t => { aCounts[t] = flog.filter(l => l.action === t).length; });
+  const maxA = Math.max(1, ...Object.values(aCounts));
+  const chartHtml = types.filter(t => aCounts[t] > 0).map(t => {
+    const pct = (aCounts[t] / maxA) * 100;
+    const color = t.includes('Certo') || t === 'Remate à Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? '#3ddc84' : (t === 'Falta Sofrida' ? '#ffb84a' : '#ff6b6b');
+    return `<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
+      <span style="flex:1;color:rgba(255,255,255,.6);">${t}</span>
+      <div style="flex:1;height:4px;background:#1c2a20;border-radius:2px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${color};border-radius:2px;"></div></div>
+      <span style="min-width:20px;text-align:right;color:${color};font-weight:600;">${aCounts[t]}</span>
+    </div>`;
+  }).join('');
+  const el = document.getElementById('action-chart');
+  if (el) el.innerHTML = chartHtml || '<div class="empty">Sem dados</div>';
 }
 
-// OPPONENT
+// ── TIMELINE ──────────────────────────────────────────────────────────────
+function renderTimeline() {
+  const html = logs.slice(0,30).map(l => {
+    const dot = l.action === 'Golo Marcado' ? 'gol' : l.score > 0 ? 'pos' : l.score < 0 ? 'neg' : 'neu';
+    return `<div class="timeline-item">
+      <span class="tl-dot ${dot}"></span>
+      <span class="tl-time">${l.min}'</span>
+      <span class="tl-num">#${l.num}</span>
+      <span class="tl-name">${l.player}</span>
+      <span class="tl-action">${l.action}</span>
+      <span class="tl-zone">${l.zone}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('timeline-list').innerHTML = html || '<div class="empty">Sem ações registadas</div>';
+}
+
+function undoLastAction() {
+  if (logs.length === 0) { showToast('Nada para desfazer'); return; }
+  const undone = logs.shift();
+  localStorage.setItem('ls_logs', JSON.stringify(logs));
+  updateStats();
+  renderTimeline();
+  showToast('↩ Desfeito: ' + undone.action);
+}
+
+// ── OPPONENT ───────────────────────────────────────────────────────────────
 function addOppQuick(action) {
+  const zone = prompt('Zona do campo:', 'Meio Centro') || 'Meio Centro';
   const min = Math.floor(seconds / 60);
-  const zone = prompt('Zona:', 'Meio Centro') || 'Meio Centro';
   oppLogs.unshift({id:Date.now(),min,action,zone,half});
   localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
   renderOppActions();
   updateStats();
+  showToast('🟥 ' + action + ' registado');
 }
 
 function renderOppActions() {
-  const html = oppLogs.slice(0,5).map(o => `
-    <div class="opp-item">
-      <span class="opp-name">${o.min}' ${o.action}</span>
-      <span class="opp-zone">${o.zone}</span>
-    </div>
-  `).join('');
-  document.getElementById('opp-actions-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span>';
+  const html = oppLogs.slice(0,5).map(o =>
+    `<div class="opp-item"><span class="opp-name">${o.min}' ${o.action}</span><span class="opp-zone">${o.zone}</span></div>`
+  ).join('');
+  document.getElementById('opp-actions-list').innerHTML = html || '<div class="empty">Nenhuma ação</div>';
 }
 
-// HISTORY
+// ── TEAM EDITOR ────────────────────────────────────────────────────────────
+function renderTeamEditor() {
+  const html = players.map((p,i) =>
+    `<div class="player-edit">
+      <input type="number" value="${p.num}" min="1" max="99" style="max-width:60px;"
+        onchange="players[${i}].num=parseInt(this.value)||${p.num}">
+      <input type="text" value="${p.name}" placeholder="Nome" style="flex:1;"
+        onchange="players[${i}].name=this.value">
+      <button class="btn-del" onclick="removePlayer(${i})">✕</button>
+    </div>`
+  ).join('');
+  document.getElementById('team-editor').innerHTML = html;
+}
+
+function addPlayerField() {
+  const nextNum = (players.length > 0 ? Math.max(...players.map(p => p.num)) : 0) + 1;
+  players.push({num: nextNum, name: 'Jogador ' + nextNum});
+  renderTeamEditor();
+}
+
+function removePlayer(idx) {
+  players.splice(idx, 1);
+  renderTeamEditor();
+}
+
+function saveTeam() {
+  localStorage.setItem('ls_team', JSON.stringify(players));
+  renderPlayerGrid();
+  showToast('💾 Plantel guardado!');
+}
+
+// ── HISTORY ────────────────────────────────────────────────────────────────
 function saveMatchToHistory() {
-  const entry = {id:Date.now(),date:new Date().toLocaleDateString('pt-PT'),golos:logs.filter(l=>l.action==='Golo Marcado').length,sofridos:oppLogs.filter(o=>o.action==='Golo Sofrido').length};
+  const entry = {
+    id:Date.now(),
+    date: new Date().toLocaleDateString('pt-PT'),
+    golos: logs.filter(l => l.action === 'Golo Marcado').length,
+    sofridos: oppLogs.filter(o => o.action === 'Golo Sofrido').length
+  };
   const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
   history.unshift(entry);
   if (history.length > 20) history.pop();
   localStorage.setItem('ls_match_history', JSON.stringify(history));
-  renderMatchHistory();
   showToast('💾 Jogo guardado!');
 }
 
 function renderMatchHistory() {
   const history = JSON.parse(localStorage.getItem('ls_match_history') || '[]');
-  const html = history.slice(0,5).map(m => `
-    <div class="hist-item">
-      <span class="hist-date">${m.date}</span>
-      <span class="hist-score">${m.golos} - ${m.sofridos}</span>
-    </div>
-  `).join('');
-  document.getElementById('match-history-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span>';
+  const html = history.slice(0,5).map(m =>
+    `<div style="display:flex;justify-content:space-between;padding:5px 8px;background:#1c2a20;border-radius:6px;font-size:12px;">
+      <span style="color:rgba(255,255,255,.4);">${m.date}</span>
+      <span style="font-weight:700;color:#3ddc84;">${m.golos} — ${m.sofridos}</span>
+    </div>`
+  ).join('');
+  const el = document.getElementById('match-history-list');
+  if (el) el.innerHTML = html || '<div class="empty">Nenhum jogo guardado</div>';
 }
 
-// ZONE DETAIL
-function showZoneDetail(zone) {
-  const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
-  if (perdas.length === 0) { showToast(zone + ': sem perdas'); return; }
-  alert(zone + ' — ' + perdas.length + ' perdas:\n' + perdas.map(p => p.min + "' " + p.player + ': ' + p.action).join('\n'));
+// ── IMPORT / EXPORT JSON ────────────────────────────────────────────────────
+function exportJSON() {
+  const data = {players,logs,oppLogs,subs,seconds,half,history:JSON.parse(localStorage.getItem('ls_match_history')||'[]')};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `SaoMancos_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('📦 Backup exportado!');
 }
 
-// EXCEL EXPORT
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.players) { players = d.players; localStorage.setItem('ls_team', JSON.stringify(players)); }
+      if (d.logs) { logs = d.logs; localStorage.setItem('ls_logs', JSON.stringify(logs)); }
+      if (d.oppLogs) { oppLogs = d.oppLogs; localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs)); }
+      if (d.subs) { subs = d.subs; localStorage.setItem('ls_subs', JSON.stringify(subs)); }
+      if (d.seconds != null) { seconds = d.seconds; }
+      if (d.half) { half = d.half; }
+      if (d.history) localStorage.setItem('ls_match_history', JSON.stringify(d.history));
+      renderPlayerGrid(); renderTeamEditor(); updateTimer(); updateStats(); renderOppActions(); renderTimeline();
+      showToast('✅ Backup carregado!');
+    } catch(err) { showToast('Erro ao carregar backup'); }
+  };
+  reader.readAsText(file);
+}
+
+// ── EXCEL EXPORT ───────────────────────────────────────────────────────────
 function exportDirectExcel() {
-  if (typeof XLSX === 'undefined') { showToast('A carregar... tenta novamente.'); return; }
-  if (logs.length === 0) { showToast('Sem dados para exportar.'); return; }
+  if (typeof XLSX === 'undefined') { showToast('A carregar...'); return; }
+  if (logs.length === 0) { showToast('Sem dados para exportar!'); return; }
   const dateStr = new Date().toLocaleDateString('pt-PT');
   const dataRows = [['Data','Minuto','Jogador','Numero','Acao','Zona','Parte']];
-  logs.forEach(log => { dataRows.push([dateStr,log.min,log.player,log.num,log.action,log.zone,log.half||1]); });
+  logs.forEach(log => dataRows.push([dateStr,log.min,log.player,log.num,log.action,log.zone,log.half||1]));
   if (oppLogs.length > 0) {
     dataRows.push(['--- ADVERSARIO ---']);
-    oppLogs.forEach(o => { dataRows.push(['',o.min,'','',o.action,o.zone,o.half||'']); });
+    oppLogs.forEach(o => dataRows.push(['',o.min,'','',o.action,o.zone,o.half||'']));
   }
   const resumoRows = [
-    ['RESUMO SÃO MANÇOS',dateStr],
+    ['RESUMO SÃO MANÇOS',dateStr],['',''],
     ['Golos Marcados',logs.filter(l=>l.action==='Golo Marcado').length],
     ['Golos Sofridos',oppLogs.filter(o=>o.action==='Golo Sofrido').length],
     ['Cruzamentos Certos',logs.filter(l=>l.action==='Cruzamento Certo').length],
     ['Cruzamentos Falhados',logs.filter(l=>l.action==='Cruzamento Falhado').length],
     ['Remates à Baliza',logs.filter(l=>l.action==='Remate à Baliza').length],
     ['Remates Fora',logs.filter(l=>l.action==='Remate Fora').length],
+    ['Perda de Bola',logs.filter(l=>l.action==='Perda de Bola').length],
     ['',''],['Jogador','Total Ações']
   ];
   const pCounts = {};
   logs.forEach(l => { pCounts[l.player] = (pCounts[l.player]||0)+1; });
-  Object.entries(pCounts).sort((a,b)=>b[1]-a[1]).forEach(([n,c]) => { resumoRows.push([n,c]); });
+  Object.entries(pCounts).sort((a,b)=>b[1]-a[1]).forEach(([n,c]) => resumoRows.push([n,c]));
 
   const wb = XLSX.utils.book_new();
   const ws1 = XLSX.utils.aoa_to_sheet(dataRows);
@@ -487,21 +1068,31 @@ function exportDirectExcel() {
   showToast('📊 Excel descarregado!');
 }
 
-// TOAST
+// ── HARD RESET ─────────────────────────────────────────────────────────────
+function hardReset() {
+  if (!confirm('Apagar TODOS os dados? Isto não pode ser revertido!')) return;
+  localStorage.removeItem('ls_logs');
+  localStorage.removeItem('ls_opp_logs');
+  localStorage.removeItem('ls_subs');
+  localStorage.removeItem('ls_time');
+  localStorage.removeItem('ls_half');
+  localStorage.removeItem('ls_match_history');
+  logs = []; oppLogs = []; subs = [];
+  seconds = 0; half = 1;
+  resetTimer(); setHalf(1);
+  renderPlayerGrid(); updateStats(); renderOppActions(); renderTimeline();
+  showToast('🗑️ Dados apagados!');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3000);
+  setTimeout(() => { t.style.display = 'none'; }, 2800);
 }
 
-// ONLINE STATUS
-function checkOnlineStatus() {
-  window.addEventListener('online', () => { document.getElementById('offline-status').style.display = 'none'; });
-  window.addEventListener('offline', () => { document.getElementById('offline-status').style.display = 'block'; });
-}
-
-// Demo data for testing
+// ── DEMO DATA (only if empty) ──────────────────────────────────────────────
 if (logs.length === 0) {
   logs = [
     {id:1,min:5,half:1,player:'Médio',num:8,action:'Passe Falhado',score:-1,zone:'Meio Centro'},
@@ -511,9 +1102,9 @@ if (logs.length === 0) {
     {id:5,min:45,half:1,player:'Ponta Lança',num:9,action:'Golo Marcado',score:1,zone:'Ataque Centro'}
   ];
   oppLogs = [{id:1,min:38,action:'Golo Sofrido',zone:'Ataque Centro',half:1}];
+  localStorage.setItem('ls_logs', JSON.stringify(logs));
+  localStorage.setItem('ls_opp_logs', JSON.stringify(oppLogs));
   updateStats();
-  renderOppActions();
-  renderMatchHistory();
 }
 </script>
 </body>
