@@ -32,14 +32,14 @@
 <!-- ── MAIN ────────────────────────────────────────────── -->
 <main id="main-content">
 
-  <!-- STATS HEADER -->
+  <!-- Stats Header -->
   <div class="stats-header">
     <div class="timer-block">
       <div id="timer-display" class="timer-display">00:00</div>
       <div class="timer-controls">
-        <button id="btn-start" class="btn btn-start" aria-label="Iniciar">▶</button>
-        <button id="btn-pause" class="btn btn-pause" aria-label="Pausar" style="display:none">⏸</button>
-        <button id="btn-reset" class="btn btn-reset" aria-label="Reiniciar">⟲</button>
+        <button id="btn-timer-play"  class="btn btn-start"  aria-label="Iniciar">▶</button>
+        <button id="btn-timer-pause" class="btn btn-pause"  aria-label="Pausar"  style="display:none">⏸</button>
+        <button id="btn-timer-reset"  class="btn btn-reset"   aria-label="Reiniciar">⟲</button>
       </div>
     </div>
     <div class="parte-toggle">
@@ -51,23 +51,20 @@
       <span class="score-sep">—</span>
       <input id="score-away" type="number" min="0" max="99" value="0" class="score-input" aria-label="Equipa visitante">
     </div>
-    <button class="btn btn-outline" onclick="AppState?.exportExcel()">📥 Excel</button>
-    <button class="btn btn-outline" onclick="saveMatch()">💾 Guardar</button>
+    <button class="btn btn-outline" onclick="window.AppState?.exportExcel()">📥 Excel</button>
+    <button class="btn btn-outline" onclick="window.AppState?.saveMatchToHistory()">💾 Guardar</button>
   </div>
 
-  <!-- STATS GRID -->
+  <!-- Stats Grid -->
   <div id="stats-grid">
-
     <div class="card">
       <div class="card-title">📊 Eficácia</div>
       <div id="stats-summary"></div>
     </div>
-
     <div class="card">
       <div class="card-title">🔥 Mapa de Calor</div>
       <div id="heatmap-panel"></div>
     </div>
-
     <div class="card">
       <div class="card-title">⚡ Ações por Tipo</div>
       <div class="stats-filter-row">
@@ -77,30 +74,25 @@
       </div>
       <div id="actions-grid"></div>
     </div>
-
     <div class="card">
       <div class="card-title">🏆 Top Jogadores</div>
       <div id="top-players-list"></div>
     </div>
-
   </div>
 
-  <!-- JOGADORES + ADVERSÁRIO -->
+  <!-- Players + Opponent -->
   <div class="players-opp-row">
-
     <div class="card">
       <div class="card-title">👥 Plantel — São Manços</div>
       <div id="players-panel"></div>
     </div>
-
     <div class="card">
       <div class="card-title">⚔ Adversário</div>
       <div id="opp-panel"></div>
     </div>
-
   </div>
 
-  <!-- HISTÓRICO -->
+  <!-- History -->
   <div class="card">
     <div class="card-title">📋 Registo de Jogo</div>
     <div class="history-controls">
@@ -113,7 +105,7 @@
         <option value="Perda">Perda</option>
         <option value="Falta">Falta</option>
       </select>
-      <button class="btn btn-sm" onclick="AppState?.clearAll()">🗑 Limpar Tudo</button>
+      <button class="btn btn-sm" onclick="window.AppState?.clearAll()">🗑 Limpar Tudo</button>
     </div>
     <div id="history-list" class="history-list"></div>
   </div>
@@ -124,57 +116,6 @@
 <div id="toast" class="toast" role="alert" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="app.js"></script>
-<script>
-// ══ BRIDGE: Liga o index.html ao AppState do app.js ══════════
-
-// Bindings de timer
-document.getElementById('btn-start')?.addEventListener('click', () => {
-  if (!AppState?.isRunning) AppState?.toggleTimer();
-  document.getElementById('btn-start').style.display = 'none';
-  document.getElementById('btn-pause').style.display = '';
-});
-document.getElementById('btn-pause')?.addEventListener('click', () => {
-  if (AppState?.isRunning) AppState?.toggleTimer();
-  document.getElementById('btn-pause').style.display = 'none';
-  document.getElementById('btn-start').style.display = '';
-});
-document.getElementById('btn-reset')?.addEventListener('click', () => {
-  AppState?.resetTimer();
-  document.getElementById('btn-start').style.display = '';
-  document.getElementById('btn-pause').style.display = 'none';
-});
-
-// Toggle parte
-document.getElementById('btn-1p')?.addEventListener('click', () => AppState?.setHalf(1));
-document.getElementById('btn-2p')?.addEventListener('click', () => AppState?.setHalf(2));
-
-// Filtro stats
-document.getElementById('filter-all')?.addEventListener('click', () => AppState?.setStatFilter('all'));
-document.getElementById('filter-1p')?.addEventListener('click', () => AppState?.setStatFilter(1));
-document.getElementById('filter-2p')?.addEventListener('click', () => AppState?.setStatFilter(2));
-
-// Histórico filter
-document.getElementById('history-filter')?.addEventListener('change', () => AppState?.renderMatchHistory());
-
-// Guardar sessão
-function saveMatch() {
-  const match = {
-    date: new Date().toISOString(),
-    scoreHome: document.getElementById('score-home')?.value || 0,
-    scoreAway: document.getElementById('score-away')?.value || 0,
-    half: localStorage.getItem('ls_half') || '1',
-    logs: JSON.parse(localStorage.getItem('ls_logs') || '[]'),
-    oppLogs: JSON.parse(localStorage.getItem('ls_opp_logs') || '[]')
-  };
-  const history = JSON.parse(localStorage.getItem('ls_history') || '[]');
-  history.unshift(match);
-  localStorage.setItem('ls_history', JSON.stringify(history.slice(0, 20)));
-  AppState?.showToast('Sessão guardada!');
-}
-
-// Expor para app.js
-window.saveMatch = saveMatch;
-</script>
+<script src="app.js?v=34"></script>
 </body>
 </html>

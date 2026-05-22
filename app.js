@@ -745,8 +745,9 @@ function createAppState() {
   return proxy;
 }
 
-// Instância global
+// Instância global + expor para window (script tag, não module)
 const AppState = createAppState();
+window.AppState = AppState;
 
 // Auto-init quando DOM pronto
 window.addEventListener('DOMContentLoaded', () => { AppState.init(); });
