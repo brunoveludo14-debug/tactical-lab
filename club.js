@@ -1,5 +1,5 @@
 /**
- * club.js — Club personalisation UI
+ * club.js ??? Club personalisation UI
  *
  * Renders the club settings panel and applies colours via CSS custom properties.
  * Reads/writes to Club object in state.js and persists via saveClubConfig().

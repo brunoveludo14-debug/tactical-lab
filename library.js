@@ -1,5 +1,5 @@
 /**
- * library.js — Biblioteca de Jogadas
+ * library.js ??? Biblioteca de Jogadas
  *
  * Stores play entries in localStorage (IndexedDB would be ideal for thumbnails
  * at scale, but localStorage keeps the zero-backend constraint while the user
@@ -17,7 +17,7 @@ import { buildSession, restoreSession } from './state.js';
 const KEY = 'tl_library';
 const MAX_ENTRIES = 200;
 
-// ─── Storage helpers ──────────────────────────────────────────────────────────
+// ????????? Storage helpers ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 function readAll() {
   try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
@@ -29,7 +29,7 @@ function writeAll(entries) {
   catch (e) { console.warn('[library] write failed:', e); return false; }
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+// ????????? Public API ?????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 export function getLibrary() { return readAll(); }
 
@@ -93,7 +93,7 @@ export function deletePlay(id) {
  */
 export function loadPlay(id) {
   const entry = readAll().find(e => e.id === id);
-  if (!entry) return 'Jogada não encontrada';
+  if (!entry) return 'Jogada n??o encontrada';
   return restoreSession(entry.session);
 }
 
@@ -112,7 +112,7 @@ export function importLibrary(jsonStr) {
   try {
     const data = JSON.parse(jsonStr);
     const incoming = Array.isArray(data.entries) ? data.entries : (Array.isArray(data) ? data : null);
-    if (!incoming) return 'Formato inválido';
+    if (!incoming) return 'Formato inv??lido';
     const existing = readAll();
     const existingIds = new Set(existing.map(e => e.id));
     const merged = [...incoming.filter(e => !existingIds.has(e.id)), ...existing];
@@ -148,7 +148,7 @@ export function parseShareURL() {
   } catch { return null; }
 }
 
-// ─── Built-in templates ───────────────────────────────────────────────────────
+// ????????? Built-in templates ?????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 /**
  * Seed the library with built-in template plays if it's empty.
@@ -189,7 +189,7 @@ function buildTemplates() {
     updatedAt: id,
   });
 
-  // Arrow helpers (viewBox coords, 68×105)
+  // Arrow helpers (viewBox coords, 68??105)
   const arr = (x1,y1,x2,y2,stroke='rgba(240,192,64,.9)') => ({
     id:`ts${id}`, type:'arrow',
     points:[{x:x1,y:y1},{x:x2,y:y2}],
@@ -201,31 +201,31 @@ function buildTemplates() {
   });
 
   return [
-    t('Pressão Alta','Equipa sobe linha e pressiona saída adversária',['defesa','pressão'],'4-3-3 ATK',[
+    t('Press??o Alta','Equipa sobe linha e pressiona sa??da advers??ria',['defesa','press??o'],'4-3-3 ATK',[
       arr(10,36, 10,48),  // extremo esq sobe
       arr(58,36, 58,48),  // extremo dir sobe
-      arr(34,30, 34,42),  // avançado cai
+      arr(34,30, 34,42),  // avan??ado cai
       zone([{x:2,y:42},{x:66,y:42},{x:66,y:60},{x:2,y:60}],'rgba(232,85,85,.6)','rgba(232,85,85,.08)'),
     ]),
 
-    t('Contra-Ataque Rápido','Transição rápida após recuperação no bloco médio',['ataque','transição'],'4-2-3-1',[
-      arr(34,64, 34,42),  // trinco para médio
+    t('Contra-Ataque R??pido','Transi????o r??pida ap??s recupera????o no bloco m??dio',['ataque','transi????o'],'4-2-3-1',[
+      arr(34,64, 34,42),  // trinco para m??dio
       arr(10,46, 26,34),  // ext esq corta interior
       arr(58,46, 42,30),  // ext dir corta interior
-      arr(34,42, 34,22),  // meia para avançado
+      arr(34,42, 34,22),  // meia para avan??ado
     ]),
 
-    t('Saída a Jogar pelo GR','Construção curta desde o GR pressionado',['ataque','construção'],'4-3-3 DEF',[
+    t('Sa??da a Jogar pelo GR','Constru????o curta desde o GR pressionado',['ataque','constru????o'],'4-3-3 DEF',[
       arr(34,94, 14,82),  // GR para lateral esq
       arr(14,82, 24,70),  // lateral para defesa
-      arr(24,70, 34,62),  // defesa para médio
-      arr(34,62, 48,54),  // médio para meia
+      arr(24,70, 34,62),  // defesa para m??dio
+      arr(34,62, 48,54),  // m??dio para meia
     ]),
 
-    t('Canto Curto','Canto curto com triangulação na zona',['bola-parada','ataque'],'4-3-3 ATK',[
+    t('Canto Curto','Canto curto com triangula????o na zona',['bola-parada','ataque'],'4-3-3 ATK',[
       arr(66,5,  54,12),  // cruzamento curto
       arr(54,12, 48,20),  // second ball
-      arr(48,20, 34,15),  // cruzamento para área
+      arr(48,20, 34,15),  // cruzamento para ??rea
       zone([{x:20,y:8},{x:50,y:8},{x:50,y:22},{x:20,y:22}],'rgba(240,192,64,.6)','rgba(240,192,64,.1)'),
     ]),
 
@@ -234,28 +234,28 @@ function buildTemplates() {
       zone([{x:22,y:14},{x:46,y:14},{x:46,y:30},{x:22,y:30}],'rgba(91,191,255,.6)','rgba(91,191,255,.1)'),
     ]),
 
-    t('Bloco Médio 4-4-2','Bloco compacto médio pronto para transição',['defesa','bloco'],'4-4-2',[
+    t('Bloco M??dio 4-4-2','Bloco compacto m??dio pronto para transi????o',['defesa','bloco'],'4-4-2',[
       zone([{x:4,y:54},{x:64,y:54},{x:64,y:78},{x:4,y:78}],'rgba(232,85,85,.5)','rgba(232,85,85,.06)'),
     ]),
 
-    t('Triângulo Interior','Combinação de triângulo na faixa direita interior',['ataque','combinação'],'4-3-3 ATK',[
+    t('Tri??ngulo Interior','Combina????o de tri??ngulo na faixa direita interior',['ataque','combina????o'],'4-3-3 ATK',[
       arr(48,60, 58,48),
       arr(58,48, 44,40),
       arr(44,40, 34,30),
     ]),
 
-    t('Pressing Trap','Isolar lateral adversário com pressing coordenado',['defesa','pressing'],'4-3-3 ATK',[
+    t('Pressing Trap','Isolar lateral advers??rio com pressing coordenado',['defesa','pressing'],'4-3-3 ATK',[
       zone([{x:48,y:60},{x:68,y:60},{x:68,y:85},{x:48,y:85}],'rgba(232,85,85,.55)','rgba(232,85,85,.08)'),
       arr(58,36, 62,52),
       arr(48,60, 56,68),
       arr(44,82, 54,76),
     ]),
 
-    t('Penálti — Movimento de Apoio','Posicionamento para recuperação de 2º lance',['bola-parada'],'4-2-3-1',[
+    t('Pen??lti ??? Movimento de Apoio','Posicionamento para recupera????o de 2?? lance',['bola-parada'],'4-2-3-1',[
       zone([{x:13,y:18},{x:55,y:18},{x:55,y:36},{x:13,y:36}],'rgba(91,191,255,.4)','rgba(91,191,255,.06)'),
     ]),
 
-    t('Saída 3-2 com GR','GR como 3.º defesa na construção com 5 homens atrás',['ataque','construção'],'5-3-2',[
+    t('Sa??da 3-2 com GR','GR como 3.?? defesa na constru????o com 5 homens atr??s',['ataque','constru????o'],'5-3-2',[
       arr(34,94, 20,82),
       arr(20,82, 6,76),
       arr(6,76,  20,62),
@@ -264,16 +264,16 @@ function buildTemplates() {
       arr(48,82, 62,76),
     ]),
 
-    t('Transição Defensiva 4-4-2','Reorganização defensiva após perda no ataque',['defesa','transição'],'4-4-2',[
+    t('Transi????o Defensiva 4-4-2','Reorganiza????o defensiva ap??s perda no ataque',['defesa','transi????o'],'4-4-2',[
       arr(24,34, 26,50),
       arr(44,34, 42,50),
       arr(10,56, 10,68),
       arr(58,56, 58,68),
     ]),
 
-    t('Overload Esquerda','Sobrecarga numérica no corredor esquerdo',['ataque','variante'],'4-3-3 ATK',[
+    t('Overload Esquerda','Sobrecarga num??rica no corredor esquerdo',['ataque','variante'],'4-3-3 ATK',[
       arr(10,78, 6,62),   // lateral sobe
-      arr(20,60, 10,48),  // médio abre
+      arr(20,60, 10,48),  // m??dio abre
       arr(10,36, 16,22),  // extremo entra
       zone([{x:2,y:30},{x:30,y:30},{x:30,y:72},{x:2,y:72}],'rgba(61,220,132,.5)','rgba(61,220,132,.06)'),
     ]),

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>São Manços - Estatísticas</title>
+<title>S??o Man??os - Estat??sticas</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif}
@@ -30,7 +30,7 @@ body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
 .dash-card{background:#16241b;border:1px solid rgba(61,220,132,.12);border-radius:10px;padding:10px}
 .dash-card-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:8px}
 
-/* Eficácia */
+/* Efic??cia */
 .eff-row{display:flex;gap:10px}
 .eff-item{flex:1}
 .eff-label{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:3px}
@@ -86,13 +86,13 @@ body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
 </head>
 <body>
 
-<div class="title">🏆 São Manços — Estatísticas</div>
+<div class="title">???? S??o Man??os ??? Estat??sticas</div>
 
 <div class="dash-header">
-  <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6);">📊 Análise em Tempo Real</span>
+  <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6);">???? An??lise em Tempo Real</span>
   <div style="display:flex;gap:6px;">
-    <button class="dash-btn" onclick="exportDirectExcel()">📊 Excel .xlsx</button>
-    <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.1);">💾 Guardar</button>
+    <button class="dash-btn" onclick="exportDirectExcel()">???? Excel .xlsx</button>
+    <button class="dash-btn" onclick="saveMatchToHistory()" style="background:rgba(61,220,132,.1);">???? Guardar</button>
   </div>
 </div>
 
@@ -102,7 +102,7 @@ body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
     <span class="result-num" id="stat-golos-marcados">0</span>
     <div class="result-label">MARC.</div>
   </div>
-  <div class="result-div">—</div>
+  <div class="result-div">???</div>
   <div class="result-big">
     <span class="result-num purple" id="stat-golos-sofridos">0</span>
     <div class="result-label">SOFR.</div>
@@ -110,42 +110,42 @@ body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
   <div style="flex:1"></div>
   <div class="half-filters">
     <button class="hf-btn active" id="filter-half-all" onclick="setStatHalfFilter('all',this)">Todo</button>
-    <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1ªP</button>
-    <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2ªP</button>
+    <button class="hf-btn" id="filter-half-1" onclick="setStatHalfFilter(1,this)">1??P</button>
+    <button class="hf-btn" id="filter-half-2" onclick="setStatHalfFilter(2,this)">2??P</button>
   </div>
 </div>
 
 <!-- Grid 2x2 -->
 <div class="dash-grid">
 
-  <!-- Eficácia -->
+  <!-- Efic??cia -->
   <div class="dash-card">
-    <div class="dash-card-title">📈 Eficácia</div>
+    <div class="dash-card-title">???? Efic??cia</div>
     <div class="eff-row">
       <div class="eff-item">
         <div class="eff-label">Cruzamentos</div>
         <div class="eff-big" id="stat-cruz-pct">0%</div>
         <div class="eff-bar-bg"><div class="eff-bar" id="stat-cruz-bar" style="width:0%"></div></div>
-        <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos · <span id="stat-cruz-errado">0</span> falhados</div>
+        <div class="eff-sub"><span id="stat-cruz-certo">0</span> certos ?? <span id="stat-cruz-errado">0</span> falhados</div>
       </div>
       <div class="eff-item">
         <div class="eff-label">Remates</div>
         <div class="eff-big" id="stat-remates-pct">0%</div>
         <div class="eff-bar-bg"><div class="eff-bar" id="stat-remates-bar" style="width:0%"></div></div>
-        <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza · <span id="stat-remates-errado">0</span> fora</div>
+        <div class="eff-sub"><span id="stat-remates-certo">0</span> baliza ?? <span id="stat-remates-errado">0</span> fora</div>
       </div>
     </div>
   </div>
 
-  <!-- Ações por tipo -->
+  <!-- A????es por tipo -->
   <div class="dash-card">
-    <div class="dash-card-title">📊 Ações</div>
+    <div class="dash-card-title">???? A????es</div>
     <div id="action-chart" class="action-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
   </div>
 
   <!-- Mapa de calor -->
   <div class="dash-card">
-    <div class="dash-card-title">🗺️ Zonas</div>
+    <div class="dash-card-title">??????? Zonas</div>
     <div class="heatmap-mini">
       <div class="hm-row">
         <div class="hm-cell" id="hm-0" onclick="showZoneDetail('Ataque Esq.')">0</div>
@@ -167,32 +167,32 @@ body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
 
   <!-- Top jogadores -->
   <div class="dash-card">
-    <div class="dash-card-title">👥 Mais Envolve.</div>
+    <div class="dash-card-title">???? Mais Envolve.</div>
     <div id="top-players-list" class="player-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span></div>
   </div>
 
 </div>
 
-<!-- Adversário -->
+<!-- Advers??rio -->
 <div class="dash-card" style="margin-top:6px;">
-  <div class="dash-card-title" style="color:#ff6b6b;">🟥 Adversário</div>
+  <div class="dash-card-title" style="color:#ff6b6b;">???? Advers??rio</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-    <button class="opp-quick-btn" onclick="addOppQuick('Canto')">🏳️ Canto</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Remate à Baliza')">🎯 Remate</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">⚽ Sofrido</button>
-    <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">🤕 Falta</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Canto')">??????? Canto</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Remate ?? Baliza')">???? Remate</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Golo Sofrido')">??? Sofrido</button>
+    <button class="opp-quick-btn" onclick="addOppQuick('Falta Sofrida')">???? Falta</button>
   </div>
-  <div id="opp-actions-list" class="opp-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span></div>
+  <div id="opp-actions-list" class="opp-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma a????o</span></div>
 </div>
 
-<!-- Histórico -->
+<!-- Hist??rico -->
 <div class="dash-card" style="margin-top:6px;">
-  <div class="dash-card-title">📁 Histórico</div>
+  <div class="dash-card-title">???? Hist??rico</div>
   <div id="match-history-list" class="history-list"><span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhum jogo guardado</span></div>
 </div>
 
 <!-- Offline -->
-<div id="offline-status" style="display:none;text-align:center;padding:8px;color:#ff4a4a;font-size:11px;margin-top:8px;background:rgba(255,74,74,.08);border-radius:8px;">📴 Sem internet — dados guardados localmente</div>
+<div id="offline-status" style="display:none;text-align:center;padding:8px;color:#ff4a4a;font-size:11px;margin-top:8px;background:rgba(255,74,74,.08);border-radius:8px;">???? Sem internet ??? dados guardados localmente</div>
 </div>
 
 <div id="toast"></div>
@@ -202,8 +202,8 @@ body{background:#0c1610;color:#fff;min-height:100vh;padding:10px;font-size:14px}
 const defaultPlayers = [
   {num:1,name:"GR"},{num:2,name:"Defesa D."},{num:3,name:"Defesa E."},
   {num:4,name:"Central 1"},{num:5,name:"Central 2"},{num:6,name:"Trinco"},
-  {num:8,name:"Médio"},{num:10,name:"Médio Of."},{num:7,name:"Extremo D."},
-  {num:11,name:"Extremo E."},{num:9,name:"Ponta Lança"},
+  {num:8,name:"M??dio"},{num:10,name:"M??dio Of."},{num:7,name:"Extremo D."},
+  {num:11,name:"Extremo E."},{num:9,name:"Ponta Lan??a"},
   {num:12,name:"Suplente 12"},{num:13,name:"Suplente 13"},{num:14,name:"Suplente 14"},
   {num:15,name:"Suplente 15"},{num:16,name:"Suplente 16"},{num:17,name:"Suplente 17"},{num:18,name:"Suplente 18"}
 ];
@@ -260,12 +260,12 @@ function selectPlayer(num) {
 }
 
 // ACTION BUTTONS
-let actionsHTML = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Registar ação:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+let actionsHTML = '<div style="margin-top:10px;"><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;">Registar a????o:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
 const actions = [
   {name:'Passe Falhado',score:-1,color:'#ff4a4a'},
   {name:'Cruzamento Certo',score:1,color:'#3ddc84'},
   {name:'Cruzamento Falhado',score:-1,color:'#ff4a4a'},
-  {name:'Remate à Baliza',score:1,color:'#3ddc84'},
+  {name:'Remate ?? Baliza',score:1,color:'#3ddc84'},
   {name:'Remate Fora',score:-1,color:'#ff4a4a'},
   {name:'Desarme Certo',score:1,color:'#3ddc84'},
   {name:'Perda de Bola',score:-1,color:'#ff4a4a'},
@@ -284,7 +284,7 @@ document.body.insertAdjacentHTML('beforeend', actionsHTML);
 document.body.insertAdjacentHTML('beforeend', `
 <div id="zone-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;flex-direction:column;justify-content:center;align-items:center;padding:20px;">
   <div style="background:#16241b;border:1px solid rgba(61,220,132,.3);border-radius:12px;padding:20px;max-width:320px;width:100%;">
-    <div id="zone-title" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center;">Onde foi a ação?</div>
+    <div id="zone-title" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center;">Onde foi a a????o?</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
       <button class="zone-btn" onclick="recordAction('Ataque Esq.')">Ataque Esq.</button>
       <button class="zone-btn" onclick="recordAction('Ataque Centro')">Ataque Centro</button>
@@ -318,7 +318,7 @@ function recordAction(zone) {
   selectedPlayer = null;
   document.querySelectorAll('[id^="btn-p"]').forEach(b => {b.style.background='#16241b';b.style.color='#fff';});
   updateStats();
-  showToast('✅ ação registada');
+  showToast('??? a????o registada');
 }
 
 // STATS ENGINE
@@ -344,7 +344,7 @@ function updateStats() {
   document.getElementById('stat-cruz-certo').textContent = cruzC;
   document.getElementById('stat-cruz-errado').textContent = cruzF;
 
-  const remC = filtered.filter(l => l.action === 'Remate à Baliza').length;
+  const remC = filtered.filter(l => l.action === 'Remate ?? Baliza').length;
   const remF = filtered.filter(l => l.action === 'Remate Fora').length;
   const remPct = remC + remF > 0 ? Math.round((remC / (remC + remF)) * 100) : 0;
   document.getElementById('stat-remates-pct').textContent = remPct + '%';
@@ -367,7 +367,7 @@ function renderHeatmap() {
     const c = zCounts[z] || 0;
     const el = document.getElementById('hm-' + i);
     if (el) {
-      el.textContent = c || '·';
+      el.textContent = c || '??';
       el.style.background = c > 0 ? `rgba(255,74,74,${0.2 + (c/maxC)*0.8})` : 'rgba(255,255,255,.06)';
       el.style.color = c > 0 ? '#fff' : 'rgba(255,255,255,.3)';
     }
@@ -375,14 +375,14 @@ function renderHeatmap() {
 }
 
 function renderActionChart() {
-  const types = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate à Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
+  const types = ['Passe Falhado','Cruzamento Certo','Cruzamento Falhado','Remate ?? Baliza','Remate Fora','Desarme Certo','Perda de Bola','Falta Sofrida','Golo Marcado'];
   const counts = {};
   types.forEach(t => { counts[t] = logs.filter(l => l.action === t).length; });
   const max = Math.max(1, ...Object.values(counts));
   const filtered = logs;
   const html = types.filter(t => counts[t] > 0).map(t => {
     const pct = (counts[t] / max) * 100;
-    const color = t.includes('Certo') || t === 'Remate à Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? '#3ddc84' : (t === 'Falta Sofrida' ? '#ffb84a' : '#ff4a4a');
+    const color = t.includes('Certo') || t === 'Remate ?? Baliza' || t === 'Desarme Certo' || t === 'Golo Marcado' ? '#3ddc84' : (t === 'Falta Sofrida' ? '#ffb84a' : '#ff4a4a');
     return `<div class="act-row"><span class="act-name">${t}</span><div class="act-bar-bg"><div class="act-bar" style="width:${pct}%;background:${color}"></div></div><span class="act-count">${counts[t]}</span></div>`;
   }).join('');
   document.getElementById('action-chart').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Sem dados</span>';
@@ -419,7 +419,7 @@ function renderOppActions() {
       <span class="opp-zone">${o.zone}</span>
     </div>
   `).join('');
-  document.getElementById('opp-actions-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma ação</span>';
+  document.getElementById('opp-actions-list').innerHTML = html || '<span style="color:rgba(255,255,255,.3);font-size:11px;">Nenhuma a????o</span>';
 }
 
 // HISTORY
@@ -430,7 +430,7 @@ function saveMatchToHistory() {
   if (history.length > 20) history.pop();
   localStorage.setItem('ls_match_history', JSON.stringify(history));
   renderMatchHistory();
-  showToast('💾 Jogo guardado!');
+  showToast('???? Jogo guardado!');
 }
 
 function renderMatchHistory() {
@@ -448,7 +448,7 @@ function renderMatchHistory() {
 function showZoneDetail(zone) {
   const perdas = logs.filter(l => l.zone === zone && ['Perda de Bola','Passe Falhado','Cruzamento Falhado'].includes(l.action));
   if (perdas.length === 0) { showToast(zone + ': sem perdas'); return; }
-  alert(zone + ' — ' + perdas.length + ' perdas:\n' + perdas.map(p => p.min + "' " + p.player + ': ' + p.action).join('\n'));
+  alert(zone + ' ??? ' + perdas.length + ' perdas:\n' + perdas.map(p => p.min + "' " + p.player + ': ' + p.action).join('\n'));
 }
 
 // EXCEL EXPORT
@@ -463,14 +463,14 @@ function exportDirectExcel() {
     oppLogs.forEach(o => { dataRows.push(['',o.min,'','',o.action,o.zone,o.half||'']); });
   }
   const resumoRows = [
-    ['RESUMO SÃO MANÇOS',dateStr],
+    ['RESUMO S??O MAN??OS',dateStr],
     ['Golos Marcados',logs.filter(l=>l.action==='Golo Marcado').length],
     ['Golos Sofridos',oppLogs.filter(o=>o.action==='Golo Sofrido').length],
     ['Cruzamentos Certos',logs.filter(l=>l.action==='Cruzamento Certo').length],
     ['Cruzamentos Falhados',logs.filter(l=>l.action==='Cruzamento Falhado').length],
-    ['Remates à Baliza',logs.filter(l=>l.action==='Remate à Baliza').length],
+    ['Remates ?? Baliza',logs.filter(l=>l.action==='Remate ?? Baliza').length],
     ['Remates Fora',logs.filter(l=>l.action==='Remate Fora').length],
-    ['',''],['Jogador','Total Ações']
+    ['',''],['Jogador','Total A????es']
   ];
   const pCounts = {};
   logs.forEach(l => { pCounts[l.player] = (pCounts[l.player]||0)+1; });
@@ -484,7 +484,7 @@ function exportDirectExcel() {
   XLSX.utils.book_append_sheet(wb, ws1, 'Base de Dados');
   XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
   XLSX.writeFile(wb, `SaoMancos_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast('📊 Excel descarregado!');
+  showToast('???? Excel descarregado!');
 }
 
 // TOAST
@@ -504,11 +504,11 @@ function checkOnlineStatus() {
 // Demo data for testing
 if (logs.length === 0) {
   logs = [
-    {id:1,min:5,half:1,player:'Médio',num:8,action:'Passe Falhado',score:-1,zone:'Meio Centro'},
+    {id:1,min:5,half:1,player:'M??dio',num:8,action:'Passe Falhado',score:-1,zone:'Meio Centro'},
     {id:2,min:12,half:1,player:'Extremo D.',num:7,action:'Cruzamento Certo',score:1,zone:'Ataque Dir.'},
-    {id:3,min:23,half:1,player:'Ponta Lança',num:9,action:'Remate à Baliza',score:1,zone:'Ataque Centro'},
+    {id:3,min:23,half:1,player:'Ponta Lan??a',num:9,action:'Remate ?? Baliza',score:1,zone:'Ataque Centro'},
     {id:4,min:31,half:1,player:'Trinco',num:6,action:'Desarme Certo',score:1,zone:'Defesa Centro'},
-    {id:5,min:45,half:1,player:'Ponta Lança',num:9,action:'Golo Marcado',score:1,zone:'Ataque Centro'}
+    {id:5,min:45,half:1,player:'Ponta Lan??a',num:9,action:'Golo Marcado',score:1,zone:'Ataque Centro'}
   ];
   oppLogs = [{id:1,min:38,action:'Golo Sofrido',zone:'Ataque Centro',half:1}];
   updateStats();

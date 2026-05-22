@@ -1,7 +1,7 @@
 {
-  "name": "São Manços — Estatísticas",
-  "short_name": "São Manços",
-  "description": "App de estatísticas de jogo de futebol — registo ao vivo, análise, heatmaps",
+  "name": "S??o Man??os ??? Estat??sticas",
+  "short_name": "S??o Man??os",
+  "description": "App de estat??sticas de jogo de futebol ??? registo ao vivo, an??lise, heatmaps",
   "start_url": "/estatisticas-live.html",
   "display": "standalone",
   "background_color": "#0c1610",

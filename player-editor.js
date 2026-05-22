@@ -1,5 +1,5 @@
 /**
- * player-editor.js — Inline player label editor
+ * player-editor.js ??? Inline player label editor
  *
  * Double-clicking a selected player opens a small floating input
  * directly above the player token to rename it (label or number).
@@ -40,16 +40,16 @@ export function openPlayerEditor(playerId, playerEl) {
   const currentToken = getPlayerToken(player);
 
   editor.innerHTML = `
-    <div class="pe-title">Editar ${isOpp ? 'Adversário' : 'Jogador'}</div>
+    <div class="pe-title">Editar ${isOpp ? 'Advers??rio' : 'Jogador'}</div>
     <div class="pe-row">
-      <label class="pe-lbl">Número</label>
+      <label class="pe-lbl">N??mero</label>
       <input class="pe-input" id="pe-number" type="number" min="1" max="99"
-        value="${player.n}" aria-label="Número da camisola">
+        value="${player.n}" aria-label="N??mero da camisola">
     </div>
     <div class="pe-row">
       <label class="pe-lbl">Nome no Plantel</label>
       <input class="pe-input" id="pe-name" type="text"
-        placeholder="Ex: Gonçalo Ramos" value="${player.name || ''}" aria-label="Nome completo">
+        placeholder="Ex: Gon??alo Ramos" value="${player.name || ''}" aria-label="Nome completo">
     </div>
     <div class="pe-row">
       <label class="pe-lbl">Nome no Token</label>
