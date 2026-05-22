@@ -102,9 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Sessão anterior restaurada');
     }
   } else {
-    loadFormation('4-3-3 ATK');
-    spawnBall();
-    spawnFieldBalls();
+    // Start clean — no demo data, no default formation
+    clearPlayerEls('pitch', ['pl-opp','pl-opp-gk']);
+    State.players = [];
+    State.fmt = '';
+    State.tShapes = []; State.tDraw = [];
+    State.opp = [];
+    State.ball = { x: 50, y: 50 };
+    const ballEl = document.getElementById('ball');
+    if (ballEl) ballEl.style.left = '50%';
+    if (ballEl) ballEl.style.top = '50%';
+    document.getElementById('fsel').value = '';
+    document.getElementById('ball')?.remove();
+    renderShapes('t');
     renderNotesList(openNote);
   }
 
@@ -582,19 +592,28 @@ function placeSimpleArrow(pct, w) {
 }
 
 function clearAllShapes() {
-  const w = State.view === 'box' ? 'b' : State.view === 'pbox' ? 'p' : 't';
-  if (State.view === 'tactic' && !State.tShapes.length) return;
-  if (State.view === 'box'    && !State.bShapes.length) return;
-  if (State.view === 'pbox'   && !State.pShapes.length) return;
-
   pushHistory();
-  if (w === 't') { State.tShapes = []; State.tDraw = []; }
-  else if (w === 'b') { State.bShapes = State.bShapes.filter(s => s._bp); State.bDraw = []; bpZoneId = null; bpBallId = null; }
-  else { State.pShapes = []; State.pDraw = []; }
+  if (State.view === 'tactic') {
+    State.tShapes = []; State.tDraw = [];
+    clearPlayerEls('pitch', ['pl-opp','pl-opp-gk']);
+    State.players = [];
+    State.fmt = '';
+    document.getElementById('ball')?.remove();
+    State.ball = { x: 50, y: 50 };
+    document.getElementById('fsel').value = '';
+  } else if (State.view === 'box') {
+    State.bShapes = State.bShapes.filter(s => s._bp); State.bDraw = [];
+    clearPlayerEls('box-pitch', []);
+    bpZoneId = null; bpBallId = null;
+  } else {
+    State.pShapes = []; State.pDraw = [];
+    clearPlayerEls('pbox-pitch', []);
+  }
 
-  document.querySelectorAll(`.slbl[data-w="${w}"]`).forEach(l => l.remove());
-  renderShapes(w);
+  document.querySelectorAll(`.slbl[data-w="${State.view === 'box' ? 'b' : State.view === 'pbox' ? 'p' : 't'}"]`).forEach(l => l.remove());
+  renderShapes(State.view === 'box' ? 'b' : State.view === 'pbox' ? 'p' : 't');
   setMode('none');
+  scheduleAutosave();
 }
 
 // ─── Undo / Redo ──────────────────────────────────────────────────────────────
