@@ -1,18 +1,19 @@
 {
-  "name": "São Manços — Estatísticas",
-  "short_name": "São Manços",
-  "description": "App de estatísticas de jogo de futebol — registo ao vivo, análise, heatmaps",
-  "start_url": "/estatisticas-live.html",
+  "name": "Tactical Lab",
+  "short_name": "Tactical Lab",
+  "description": "Quadro tático de futebol — formações, animações e notas",
+  "start_url": "/tactical.html",
   "display": "standalone",
-  "background_color": "#0c1610",
-  "theme_color": "#3ddc84",
-  "orientation": "portrait",
+  "background_color": "#080d14",
+  "theme_color": "#0c1610",
+  "orientation": "any",
+  "categories": ["sports", "productivity"],
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512.png",
