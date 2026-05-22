@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/tactical.html", "headers": { "Cache-Control": "no-cache" } },
+    { "src": "/(.*)", "headers": { "Cache-Control": "no-cache" } }
+  ]
+}
