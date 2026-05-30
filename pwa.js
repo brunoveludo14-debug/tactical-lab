@@ -64,7 +64,7 @@ export function initInstallPrompt() {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _deferredPrompt = e;
-    setTimeout(() => banner.classList.add('show'), 3000);
+    setTimeout(() => banner.classList.add('show'), 1500);
   });
 
   installBtn.addEventListener('click', async () => {

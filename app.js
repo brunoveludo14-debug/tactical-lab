@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initServiceWorker();
   initInstallPrompt();
   initOnlineStatus();
+  initOnboardingTour();
 
   // Seed templates on first run
   seedTemplates();
@@ -2754,4 +2755,78 @@ function drawQRCode(canvas, text) {
     } catch { /* ignore malformed */ }
   }
 })();
+
+// ─── Onboarding Tour ──────────────────────────────────────────────────────────
+
+const TOUR_STEPS = [
+  {
+    step: 'PASSO 1 DE 3',
+    icon: '⚽',
+    title: 'Coloca os jogadores',
+    desc: 'Seleciona uma formação na barra superior e arrasta cada jogador para a posição desejada no campo.',
+  },
+  {
+    step: 'PASSO 2 DE 3',
+    icon: '✏️',
+    title: 'Desenha movimentos',
+    desc: 'Duplo-clique num jogador e arrasta para criar setas de movimento. Usa a toolbar para polígonos e zonas.',
+  },
+  {
+    step: 'PASSO 3 DE 3',
+    icon: '🎬',
+    title: 'Anima e partilha',
+    desc: 'Grava fotogramas para criar animações. Exporta como PNG, MP4 ou GIF. Partilha via link ou QR Code.',
+  },
+];
+
+export function initOnboardingTour() {
+  if (localStorage.getItem('tl_tour_done')) return;
+
+  const overlay = document.getElementById('tour-overlay');
+  const card    = document.getElementById('tour-card');
+  if (!overlay || !card) return;
+
+  let step = 0;
+
+  function updateTour() {
+    const t = TOUR_STEPS[step];
+    document.getElementById('tour-step-label').textContent = t.step;
+    document.getElementById('tour-icon').textContent       = t.icon;
+    document.getElementById('tour-title').textContent      = t.title;
+    document.getElementById('tour-desc').textContent       = t.desc;
+    document.getElementById('tour-next').textContent       = step < 2 ? 'Próximo →' : 'Começar!';
+    [0,1,2].forEach(i => {
+      const d = document.getElementById('td-' + i);
+      if (d) d.classList.toggle('active', i === step);
+    });
+  }
+
+  document.getElementById('tour-next')?.addEventListener('click', () => {
+    step++;
+    if (step >= TOUR_STEPS.length) {
+      overlay.classList.remove('show');
+      localStorage.setItem('tl_tour_done', '1');
+    } else {
+      updateTour();
+    }
+  });
+
+  document.getElementById('tour-skip')?.addEventListener('click', () => {
+    overlay.classList.remove('show');
+    localStorage.setItem('tl_tour_done', '1');
+  });
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.remove('show');
+      localStorage.setItem('tl_tour_done', '1');
+    }
+  });
+
+  // Show tour after a short delay
+  setTimeout(() => {
+    updateTour();
+    overlay.classList.add('show');
+  }, 1200);
+}
 
