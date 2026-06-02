@@ -108,18 +108,16 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Sessão anterior restaurada');
     }
   } else {
-    // Start clean — no demo data, no default formation
+    // Load default formation and spawn ball as a visual tutorial
     clearPlayerEls('pitch', ['pl-opp','pl-opp-gk']);
     State.players = [];
     State.fmt = '';
     State.tShapes = []; State.tDraw = [];
     State.opp = [];
     State.ball = { x: 50, y: 50 };
-    const ballEl = document.getElementById('ball');
-    if (ballEl) ballEl.style.left = '50%';
-    if (ballEl) ballEl.style.top = '50%';
-    document.getElementById('fsel').value = '';
-    document.getElementById('ball')?.remove();
+    document.getElementById('fsel').value = '4-3-3 ATK';
+    loadFormation('4-3-3 ATK');
+    spawnBall();
     renderShapes('t');
     renderNotesList(openNote);
   }

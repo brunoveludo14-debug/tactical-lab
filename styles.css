@@ -1024,7 +1024,7 @@ body.field-fullscreen #app{gap:0;}
   position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
   background:var(--s1);border:1px solid rgba(61,220,132,.4);border-radius:14px;
   padding:16px 20px;max-width:320px;width:calc(100vw - 32px);
-  z-index:250;opacity:0;pointer-events:none;
+  z-index:9999;opacity:0;pointer-events:none;
   transition:opacity .35s,transform .35s;
   box-shadow:0 8px 32px rgba(0,0,0,.5);
 }
