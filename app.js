@@ -741,14 +741,25 @@ function loadFormation(name) {
   const pts = FMTS[name];
   if (!pts) return;
   State.fmt     = name;
+  const oldLen = State.players ? State.players.length : 0;
   State.players = pts.map((d, i) => ({ id: i + 1, x: d.x, y: d.y, n: d.n, name: PNAMES[i], isGk: i === 0 }));
 
-  clearPlayerEls('pitch', ['pl-opp','pl-opp-gk']);
   State.players.forEach((pl, i) => {
-    const el = createPlayerEl(`tp${pl.id}`, pl.n, pl.isGk ? 'gk' : 'f', pl.name, pl.x, pl.y, i, 68, 105);
-    attachPlayerEvents(el, pl.id, 't', 'pitch', 68, 105);
-    document.getElementById('pitch').appendChild(el);
+    let el = document.getElementById(`tp${pl.id}`);
+    if (el) {
+      el.style.left = `${(pl.x / 68) * 100}%`;
+      el.style.top  = `${(pl.y / 105) * 100}%`;
+    } else {
+      el = createPlayerEl(`tp${pl.id}`, pl.n, pl.isGk ? 'gk' : 'f', pl.name, pl.x, pl.y, i, 68, 105);
+      attachPlayerEvents(el, pl.id, 't', 'pitch', 68, 105);
+      document.getElementById('pitch').appendChild(el);
+    }
   });
+
+  for (let i = State.players.length + 1; i <= oldLen; i++) {
+    const el = document.getElementById(`tp${i}`);
+    if (el) el.remove();
+  }
 
   selectPlayer('t', null);
   document.getElementById('fsel').value = name;
@@ -758,14 +769,16 @@ function loadFormation(name) {
 
 function loadOppFormation(name) {
   State.fmtOpp = name;
-  document.querySelectorAll('#pitch .pl-opp, #pitch .pl-opp-gk').forEach(e => e.remove());
-  State.opp = [];
-  if (!name) return;
+  if (!name) {
+    document.querySelectorAll('#pitch .pl-opp, #pitch .pl-opp-gk').forEach(e => e.remove());
+    State.opp = [];
+    return;
+  }
 
   const pts = FMTS[name];
   if (!pts) return;
 
-  // mirrorMode: show opponent from same side (not mirrored)
+  const oldLen = State.opp ? State.opp.length : 0;
   State.opp = pts.map((d, i) => ({
     id: `o${i + 1}`,
     x: d.x,
@@ -774,10 +787,21 @@ function loadOppFormation(name) {
   }));
 
   State.opp.forEach((pl, i) => {
-    const el = createPlayerEl(`tp${pl.id}`, pl.n, pl.isGk ? 'opp-gk' : 'opp', pl.name, pl.x, pl.y, i, 68, 105);
-    attachPlayerEvents(el, pl.id, 't', 'pitch', 68, 105);
-    document.getElementById('pitch').appendChild(el);
+    let el = document.getElementById(`tp${pl.id}`);
+    if (el) {
+      el.style.left = `${(pl.x / 68) * 100}%`;
+      el.style.top  = `${(pl.y / 105) * 100}%`;
+    } else {
+      el = createPlayerEl(`tp${pl.id}`, pl.n, pl.isGk ? 'opp-gk' : 'opp', pl.name, pl.x, pl.y, i, 68, 105);
+      attachPlayerEvents(el, pl.id, 't', 'pitch', 68, 105);
+      document.getElementById('pitch').appendChild(el);
+    }
   });
+
+  for (let i = State.opp.length + 1; i <= oldLen; i++) {
+    const el = document.getElementById(`tpo${i}`);
+    if (el) el.remove();
+  }
 
   selectPlayer('t', null);
   scheduleAutosave();
@@ -840,6 +864,9 @@ function startBallDrag(e) {
   ballDragging = true;
   const ball = document.getElementById('ball');
   if (ball) { ball.style.cursor = 'grabbing'; ball.style.transition = 'none'; }
+  const t = e.touches ? e.touches[0] : e;
+  _dragVelocity = { vx: 0, vy: 0, lastX: t.clientX, lastY: t.clientY, lastT: performance.now() };
+  if (!window._ballRot) window._ballRot = 0;
 }
 
 // ─── Player events ────────────────────────────────────────────────────────────
@@ -998,7 +1025,25 @@ function onDrag(e) {
     const px = Math.max(0, Math.min(100, ((cx - r.left) / r.width)  * 100));
     const py = Math.max(0, Math.min(100, ((cy - r.top)  / r.height) * 100));
     const ball = document.getElementById('ball');
-    if (ball) { ball.style.left = `${px}%`; ball.style.top = `${py}%`; }
+    
+    const now = performance.now();
+    const dt = now - _dragVelocity.lastT;
+    if (dt > 0) {
+      const alpha = 0.3;
+      _dragVelocity.vx = alpha * ((cx - _dragVelocity.lastX) / dt) + (1 - alpha) * _dragVelocity.vx;
+      _dragVelocity.vy = alpha * ((cy - _dragVelocity.lastY) / dt) + (1 - alpha) * _dragVelocity.vy;
+    }
+    const dist = Math.sqrt((cx - _dragVelocity.lastX)**2 + (cy - _dragVelocity.lastY)**2);
+    window._ballRot = (window._ballRot || 0) + dist * 2;
+
+    _dragVelocity.lastX = cx;
+    _dragVelocity.lastY = cy;
+    _dragVelocity.lastT = now;
+
+    if (ball) { 
+      ball.style.left = `${px}%`; ball.style.top = `${py}%`; 
+      ball.style.transform = `translate(-50%,-50%) rotate(${window._ballRot}deg)`;
+    }
     State.ball = { x: px, y: py };
     return;
   }
@@ -1049,7 +1094,28 @@ function endDrag(e) {
   if (ballDragging) {
     ballDragging = false;
     const ball = document.getElementById('ball');
-    if (ball) { ball.style.cursor = 'grab'; ball.style.transition = ''; }
+    if (ball) { 
+      ball.style.cursor = 'grab'; 
+      const speed = Math.sqrt(_dragVelocity.vx ** 2 + _dragVelocity.vy ** 2);
+      if (speed > 0.15) {
+        const r = document.getElementById('pitch').getBoundingClientRect();
+        const INERTIA_FACTOR = 180;
+        const inertiaX = (_dragVelocity.vx * INERTIA_FACTOR / r.width) * 100;
+        const inertiaY = (_dragVelocity.vy * INERTIA_FACTOR / r.height) * 100;
+        let nx = Math.max(0, Math.min(100, State.ball.x + inertiaX));
+        let ny = Math.max(0, Math.min(100, State.ball.y + inertiaY));
+        State.ball = { x: nx, y: ny };
+        window._ballRot += speed * 400;
+        ball.style.transition = 'left .6s cubic-bezier(.16,1,.3,1), top .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1)';
+        ball.style.left = `${nx}%`;
+        ball.style.top = `${ny}%`;
+        ball.style.transform = `translate(-50%,-50%) rotate(${window._ballRot}deg)`;
+        setTimeout(() => { if(ball) ball.style.transition = ''; }, 650);
+      } else {
+        ball.style.transition = '';
+      }
+    }
+    _dragVelocity = { vx: 0, vy: 0, lastX: 0, lastY: 0, lastT: 0 };
     scheduleAutosave();
   }
 
