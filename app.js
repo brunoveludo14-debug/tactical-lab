@@ -2829,14 +2829,16 @@ document.querySelectorAll('.tb-tab').forEach(btn => {
       //   pitch_el_h / pitch_el_w = PITCH_RATIO → pitch_el_w = pitch_el_h / PITCH_RATIO
       //   visual width  = pitch_el_h  ≤ vw
       //   visual height = pitch_el_w  ≤ vh  →  pitch_el_h / PITCH_RATIO ≤ vh
-      const pitchElH = Math.min(vw, vh * PITCH_RATIO);
-      const pitchElW = pitchElH / PITCH_RATIO;
+      // Force stretch to fill screen in fullscreen landscape to avoid empty green space
+      const pitchElH = vw;
+      const pitchElW = vh;
       pitch.style.width  = pitchElW + 'px';
       pitch.style.height = pitchElH + 'px';
       pitch.style.position = 'absolute';
       pitch.style.top = '50%';
       pitch.style.left = '50%';
       pitch.style.transform = 'translate(-50%, -50%) rotate(-90deg)';
+      document.querySelectorAll('#pitch svg').forEach(svg => svg.setAttribute('preserveAspectRatio', 'none'));
       pitch.style.transformOrigin = 'center center';
       pitch.style.maxWidth  = 'none';
       pitch.style.maxHeight = 'none';
@@ -2850,6 +2852,7 @@ document.querySelectorAll('.tb-tab').forEach(btn => {
       pitch.style.top = '50%';
       pitch.style.left = '50%';
       pitch.style.transform = 'translate(-50%, -50%)';
+      document.querySelectorAll('#pitch svg').forEach(svg => svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'));
       pitch.style.transformOrigin = '';
       pitch.style.maxWidth  = 'none';
       pitch.style.maxHeight = 'none';
@@ -2859,6 +2862,7 @@ document.querySelectorAll('.tb-tab').forEach(btn => {
   function clearFsPitchLayout() {
     const pitch = document.getElementById('pitch');
     if (!pitch) return;
+    document.querySelectorAll('#pitch svg').forEach(svg => svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'));
     pitch.style.width  = '';
     pitch.style.height = '';
     pitch.style.position = '';
