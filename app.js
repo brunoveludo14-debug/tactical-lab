@@ -602,8 +602,8 @@ function clearAllShapes() {
     clearPlayerEls('pitch', ['pl-opp','pl-opp-gk']);
     State.players = [];
     State.fmt = '';
-    document.getElementById('ball')?.remove();
     State.ball = { x: 50, y: 50 };
+    spawnBall();
     document.getElementById('fsel').value = '';
   } else if (State.view === 'box') {
     State.bShapes = State.bShapes.filter(s => s._bp); State.bDraw = [];
@@ -2833,7 +2833,10 @@ document.querySelectorAll('.tb-tab').forEach(btn => {
       const pitchElW = pitchElH / PITCH_RATIO;
       pitch.style.width  = pitchElW + 'px';
       pitch.style.height = pitchElH + 'px';
-      pitch.style.transform = 'rotate(-90deg)';
+      pitch.style.position = 'absolute';
+      pitch.style.top = '50%';
+      pitch.style.left = '50%';
+      pitch.style.transform = 'translate(-50%, -50%) rotate(-90deg)';
       pitch.style.transformOrigin = 'center center';
       pitch.style.maxWidth  = 'none';
       pitch.style.maxHeight = 'none';
@@ -2843,7 +2846,10 @@ document.querySelectorAll('.tb-tab').forEach(btn => {
       const pitchElH = pitchElW * PITCH_RATIO;
       pitch.style.width  = pitchElW + 'px';
       pitch.style.height = pitchElH + 'px';
-      pitch.style.transform = 'none';
+      pitch.style.position = 'absolute';
+      pitch.style.top = '50%';
+      pitch.style.left = '50%';
+      pitch.style.transform = 'translate(-50%, -50%)';
       pitch.style.transformOrigin = '';
       pitch.style.maxWidth  = 'none';
       pitch.style.maxHeight = 'none';
@@ -2855,6 +2861,9 @@ document.querySelectorAll('.tb-tab').forEach(btn => {
     if (!pitch) return;
     pitch.style.width  = '';
     pitch.style.height = '';
+    pitch.style.position = '';
+    pitch.style.top = '';
+    pitch.style.left = '';
     pitch.style.transform = '';
     pitch.style.transformOrigin = '';
     pitch.style.maxWidth  = '';
