@@ -50,6 +50,12 @@ let lastTapId     = null;
 let lastTapTime   = 0;
 let arrowDir      = null;
 
+// ─── Enhanced drag UX state ───────────────────────────────────────────────────
+let _dragVelocity = { vx: 0, vy: 0, lastX: 0, lastY: 0, lastT: 0 };
+let _ghostTrailPoints = [];  // [{x, y, t}]
+let _ghostTrailRAF = null;
+const SNAP_THRESHOLD_PCT = 3.5;  // % of pitch — magnetic pull radius
+
 // ─── Initialisation ───────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -930,6 +936,14 @@ function startPlayerDrag(e, id, w, pitchId, vw, vh) {
              : State.bPlayers;
   DG = { id, w, pfx, pitchId, vw, vh, list };
   el?.classList.add('drag');
+  el?.classList.remove('landing');
+
+  // Init velocity tracking
+  const cx0 = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy0 = e.touches ? e.touches[0].clientY : e.clientY;
+  _dragVelocity = { vx: 0, vy: 0, lastX: cx0, lastY: cy0, lastT: performance.now() };
+  _ghostTrailPoints = [];
+  _startGhostTrail(pitchId);
 }
 
 let ROT_DG = null;
@@ -998,6 +1012,7 @@ function onDrag(e) {
   }
 
   if (!DG) return;
+  if (e.cancelable) e.preventDefault();  // prevent scroll while dragging
   const r  = document.getElementById(DG.pitchId).getBoundingClientRect();
   const px = Math.max(0, Math.min(100, ((cx - r.left) / r.width)  * 100));
   const py = Math.max(0, Math.min(100, ((cy - r.top)  / r.height) * 100));
@@ -1008,6 +1023,21 @@ function onDrag(e) {
     const el = document.getElementById(DG.pfx + DG.id);
     if (el) { el.style.left = `${px}%`; el.style.top = `${py}%`; }
   }
+
+  // Track velocity for inertia
+  const now = performance.now();
+  const dt = now - _dragVelocity.lastT;
+  if (dt > 0) {
+    const alpha = 0.3; // smoothing factor
+    _dragVelocity.vx = alpha * ((cx - _dragVelocity.lastX) / dt) + (1 - alpha) * _dragVelocity.vx;
+    _dragVelocity.vy = alpha * ((cy - _dragVelocity.lastY) / dt) + (1 - alpha) * _dragVelocity.vy;
+  }
+  _dragVelocity.lastX = cx;
+  _dragVelocity.lastY = cy;
+  _dragVelocity.lastT = now;
+
+  // Record ghost trail point
+  _ghostTrailPoints.push({ x: px, y: py, t: now });
 }
 
 function endDrag(e) {
@@ -1049,9 +1079,228 @@ function endDrag(e) {
   if (DG) {
     const el = document.getElementById(DG.pfx + DG.id);
     if (el) el.classList.remove('drag');
+
+    // ── Inertia + Magnetic Snap ──
+    const pitchEl = document.getElementById(DG.pitchId);
+    const r = pitchEl?.getBoundingClientRect();
+    const p = DG.list.find(x => x.id === DG.id);
+
+    if (p && el && r) {
+      let curPx = parseFloat(el.style.left) || 0;
+      let curPy = parseFloat(el.style.top) || 0;
+
+      // Apply inertia: project position forward based on velocity
+      const speed = Math.sqrt(_dragVelocity.vx ** 2 + _dragVelocity.vy ** 2);
+      const INERTIA_FACTOR = 120; // how far inertia projects (in px equivalent)
+      if (speed > 0.15) {
+        const inertiaX = (_dragVelocity.vx * INERTIA_FACTOR / r.width) * 100;
+        const inertiaY = (_dragVelocity.vy * INERTIA_FACTOR / r.height) * 100;
+        curPx = Math.max(0, Math.min(100, curPx + inertiaX));
+        curPy = Math.max(0, Math.min(100, curPy + inertiaY));
+      }
+
+      // Magnetic snap: check if near any formation grid position
+      const snapTarget = _findSnapTarget(curPx, curPy, DG.id, DG.w);
+      if (snapTarget) {
+        curPx = snapTarget.x;
+        curPy = snapTarget.y;
+        // Snap pulse visual
+        el.classList.add('snap-pulse');
+        setTimeout(() => el.classList.remove('snap-pulse'), 450);
+      }
+
+      // Animate to final position with landing class
+      el.classList.add('landing');
+      el.style.left = `${curPx}%`;
+      el.style.top  = `${curPy}%`;
+
+      // Update state
+      const vb = pctVb(curPx, curPy, DG.vw, DG.vh);
+      p.x = vb.x;
+      p.y = vb.y;
+
+      // Remove landing class after animation completes
+      setTimeout(() => el?.classList.remove('landing'), 500);
+    }
+
+    // Fade out ghost trail
+    _fadeOutGhostTrail(DG.pitchId);
+
     DG = null;
+    _dragVelocity = { vx: 0, vy: 0, lastX: 0, lastY: 0, lastT: 0 };
     scheduleAutosave();
   }
+}
+
+// ─── Ghost Trail system ───────────────────────────────────────────────────────
+
+function _getGhostCanvas(pitchId) {
+  const pitch = document.getElementById(pitchId);
+  if (!pitch) return null;
+  let cv = pitch.querySelector('.ghost-trail-canvas');
+  if (!cv) {
+    cv = document.createElement('canvas');
+    cv.className = 'ghost-trail-canvas';
+    cv.setAttribute('aria-hidden', 'true');
+    pitch.appendChild(cv);
+  }
+  cv.width  = pitch.offsetWidth * (window.devicePixelRatio || 1);
+  cv.height = pitch.offsetHeight * (window.devicePixelRatio || 1);
+  cv.style.width  = pitch.offsetWidth + 'px';
+  cv.style.height = pitch.offsetHeight + 'px';
+  return cv;
+}
+
+function _startGhostTrail(pitchId) {
+  if (_ghostTrailRAF) cancelAnimationFrame(_ghostTrailRAF);
+  const cv = _getGhostCanvas(pitchId);
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+
+  function draw() {
+    if (!DG) return;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    const now = performance.now();
+    const TRAIL_DURATION = 600; // ms — how long trail dots last
+    const w = cv.width / dpr;
+    const h = cv.height / dpr;
+
+    // Filter out old points
+    _ghostTrailPoints = _ghostTrailPoints.filter(pt => now - pt.t < TRAIL_DURATION);
+
+    // Draw trail as fading circles with connecting line
+    if (_ghostTrailPoints.length > 1) {
+      // Draw connecting line
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(57,224,122,.2)';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      _ghostTrailPoints.forEach((pt, i) => {
+        const x = (pt.x / 100) * w;
+        const y = (pt.y / 100) * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Draw fading dots
+      for (let i = 0; i < _ghostTrailPoints.length; i += 3) {
+        const pt = _ghostTrailPoints[i];
+        const age = (now - pt.t) / TRAIL_DURATION;
+        const alpha = Math.max(0, 0.45 * (1 - age));
+        const radius = 3.5 * (1 - age * 0.5);
+        const x = (pt.x / 100) * w;
+        const y = (pt.y / 100) * h;
+
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(57,224,122,${alpha})`;
+        ctx.fill();
+      }
+    }
+
+    ctx.restore();
+    _ghostTrailRAF = requestAnimationFrame(draw);
+  }
+
+  _ghostTrailRAF = requestAnimationFrame(draw);
+}
+
+function _fadeOutGhostTrail(pitchId) {
+  if (_ghostTrailRAF) cancelAnimationFrame(_ghostTrailRAF);
+  const pitch = document.getElementById(pitchId);
+  const cv = pitch?.querySelector('.ghost-trail-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let opacity = 1;
+
+  function fade() {
+    opacity -= 0.06;
+    if (opacity <= 0) {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      _ghostTrailPoints = [];
+      return;
+    }
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.globalAlpha = opacity;
+
+    const w = cv.width / dpr;
+    const h = cv.height / dpr;
+
+    if (_ghostTrailPoints.length > 1) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(57,224,122,.2)';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      _ghostTrailPoints.forEach((pt, i) => {
+        const x = (pt.x / 100) * w;
+        const y = (pt.y / 100) * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    }
+
+    ctx.restore();
+    requestAnimationFrame(fade);
+  }
+  requestAnimationFrame(fade);
+}
+
+// ─── Magnetic Snap system ─────────────────────────────────────────────────────
+
+function _findSnapTarget(pxPct, pyPct, dragId, w) {
+  // Only snap for main tactics view players
+  if (w !== 't') return null;
+
+  // Build candidate positions from all OTHER players in current formation
+  // Also consider original formation positions as snap targets
+  const fmtName = State.fmt;
+  const fmtPts  = fmtName ? FMTS[fmtName] : null;
+  const candidates = [];
+
+  if (fmtPts) {
+    fmtPts.forEach((pt, i) => {
+      const id = i + 1;
+      if (id === dragId) return; // don't snap to own original position
+      const xPct = (pt.x / 68) * 100;
+      const yPct = (pt.y / 105) * 100;
+      candidates.push({ x: xPct, y: yPct });
+    });
+  }
+
+  // Also snap to common tactical grid positions (center, penalty spot, etc.)
+  const gridSnaps = [
+    { x: 50, y: 50 },    // center
+    { x: 50, y: (13/105)*100 },   // penalty spot top
+    { x: 50, y: (92/105)*100 },   // penalty spot bottom
+    { x: 50, y: (52.5/105)*100 }, // halfway line center
+  ];
+  candidates.push(...gridSnaps);
+
+  // Find nearest within threshold
+  let best = null;
+  let bestDist = SNAP_THRESHOLD_PCT;
+
+  for (const c of candidates) {
+    const dx = pxPct - c.x;
+    const dy = pyPct - c.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = c;
+    }
+  }
+
+  return best;
 }
 
 // ─── Swipe-arrow mode ─────────────────────────────────────────────────────────

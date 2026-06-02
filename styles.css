@@ -156,6 +156,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 /* PLAYERS */
 .pl{position:absolute;transform:translate(-50%,-50%);z-index:8;cursor:grab;transition:left .3s cubic-bezier(.16,1,.3,1),top .3s cubic-bezier(.16,1,.3,1);}
 .pl.drag{cursor:grabbing;transition:none;z-index:15;}
+/* Smooth landing after drag release */
+.pl.landing{transition:left .45s cubic-bezier(.34,1.56,.64,1),top .45s cubic-bezier(.34,1.56,.64,1);z-index:14;}
 .pl-ring{position:absolute;inset:-6px;border-radius:50%;pointer-events:none;background:rgba(61,220,132,.18);opacity:0;transition:opacity .2s;}
 .pl.sel .pl-ring{opacity:1;animation:pring 1.4s ease-in-out infinite;}
 .pl-tok{
@@ -167,7 +169,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   border:2px solid rgba(255,255,255,.2);
 }
 .pl:hover .pl-tok{transform:scale(1.14);}
-.pl.drag .pl-tok,.pl.sel .pl-tok{transform:scale(1.2);}
+.pl.sel .pl-tok{transform:scale(1.2);}
+/* Enhanced drag lift — scale up + elevated shadow + slight rotation for life */
+.pl.drag .pl-tok{
+  transform:scale(1.35);
+  box-shadow:
+    0 0 20px rgba(57,224,122,.5),
+    0 8px 24px rgba(0,0,0,.6),
+    0 12px 40px rgba(0,0,0,.35) !important;
+  border-color:rgba(255,255,255,.55) !important;
+  transition:transform .15s cubic-bezier(.16,1,.3,1),box-shadow .15s;
+}
+.pl.drag .pl-nm{opacity:1;}
+/* Landing bounce for the token */
+.pl.landing .pl-tok{
+  transform:scale(1.0);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s;
+}
 .pl.sel .pl-tok{border-color:rgba(255,255,255,.65);}
 .pl-gk .pl-tok{background:#4db8ff;color:#011827;border-color:rgba(77,184,255,.5);box-shadow:0 0 14px rgba(77,184,255,.55),0 2px 6px rgba(0,0,0,.5);}
 .pl-f  .pl-tok{background:#39e07a;color:#011a0c;border-color:rgba(57,224,122,.55);box-shadow:0 0 14px rgba(57,224,122,.45),0 2px 6px rgba(0,0,0,.5);}
@@ -638,6 +656,20 @@ body.force-portrait  #toolbar.tb-hidden{ display:none !important; }
 #swipe-canvas{
   position:absolute;inset:0;width:100%;height:100%;
   pointer-events:none;z-index:12;
+}
+/* Ghost trail canvas — shows drag trajectory */
+.ghost-trail-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:6;
+}
+/* Magnetic snap pulse animation */
+@keyframes snapPulse{
+  0%{box-shadow:0 0 0 0 rgba(57,224,122,.6);}
+  70%{box-shadow:0 0 0 10px rgba(57,224,122,0);}
+  100%{box-shadow:0 0 0 0 rgba(57,224,122,0);}
+}
+.pl.snap-pulse .pl-tok{
+  animation:snapPulse .4s ease-out;
 }
 /* Double-tap hint label on player */
 .pl-dtap{
