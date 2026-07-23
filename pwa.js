@@ -1,0 +1,108 @@
+/**
+ * pwa.js — PWA support: service worker, install prompt, online/offline detection
+ *
+ * Called once from app.js after DOMContentLoaded.
+ * Does not depend on State.
+ */
+
+import { showToast } from './modules/ui.js';
+
+'use strict';
+
+// ─── Service Worker ───────────────────────────────────────────────────────────
+
+export function initServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.register('./sw.js', { scope: './' })
+    .then(reg => {
+      // When a new SW is waiting, show the update toast
+      if (reg.waiting) notifyUpdate(reg.waiting);
+
+      reg.addEventListener('updatefound', () => {
+        const incoming = reg.installing;
+        incoming.addEventListener('statechange', () => {
+          if (incoming.state === 'installed' && navigator.serviceWorker.controller) {
+            notifyUpdate(incoming);
+          }
+        });
+      });
+    })
+    .catch(err => console.warn('[pwa] SW registration failed:', err));
+
+  // Reload page after the new SW takes control
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
+
+function notifyUpdate(worker) {
+  const toast = document.getElementById('update-toast');
+  if (!toast) return;
+  toast.classList.add('show');
+
+  document.getElementById('update-btn')?.addEventListener('click', () => {
+    worker.postMessage({ type: 'SKIP_WAITING' });
+    toast.classList.remove('show');
+  }, { once: true });
+}
+
+// ─── Install prompt ───────────────────────────────────────────────────────────
+
+let _deferredPrompt = null;
+
+export function initInstallPrompt() {
+  const banner     = document.getElementById('install-banner');
+  const installBtn = document.getElementById('install-btn');
+  const dismissBtn = document.getElementById('install-dismiss');
+  if (!banner || !installBtn || !dismissBtn) return;
+
+  const isDismissed  = localStorage.getItem('tl_install_dismissed');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                    || navigator.standalone === true;
+
+  if (isDismissed || isStandalone) return;
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredPrompt = e;
+    setTimeout(() => banner.classList.add('show'), 3000);
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!_deferredPrompt) return;
+    _deferredPrompt.prompt();
+    const { outcome } = await _deferredPrompt.userChoice;
+    _deferredPrompt = null;
+    banner.classList.remove('show');
+    if (outcome === 'accepted') {
+      showToast('App instalada! ✓');
+    }
+  });
+
+  dismissBtn.addEventListener('click', () => {
+    banner.classList.remove('show');
+    localStorage.setItem('tl_install_dismissed', '1');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    banner.classList.remove('show');
+  });
+}
+
+// ─── Online / Offline detection ───────────────────────────────────────────────
+
+export function initOnlineStatus() {
+  function update() {
+    document.body.classList.toggle('offline', !navigator.onLine);
+    const dot  = document.getElementById('offline-dot');
+    const live  = document.querySelector('.ldot');
+    const ltxt  = document.querySelector('.ltxt');
+    if (dot)  dot.style.display  = navigator.onLine ? 'none' : 'block';
+    if (live) live.style.display = navigator.onLine ? 'block' : 'none';
+    if (ltxt) ltxt.textContent   = navigator.onLine ? 'Live' : 'Offline';
+  }
+  window.addEventListener('online',  update);
+  window.addEventListener('offline', update);
+  update();
+}
