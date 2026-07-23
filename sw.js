@@ -3,7 +3,7 @@
  * Cache-first para assets estáticos, network-first para HTML.
  */
 
-const CACHE_NAME = 'tactical-lab-v1';
+const CACHE_NAME = 'tactical-lab-v2';
 
 const STATIC_ASSETS = [
   './tactical.html',
@@ -22,6 +22,7 @@ const STATIC_ASSETS = [
   './modules/auth.js',
   './modules/ui.js',
   './modules/export.js',
+  './modules/qrcode.min.js',
   './manifest.json'
 ];
 

@@ -2,7 +2,7 @@
   "name": "Tactical Lab",
   "short_name": "TacticalLab",
   "description": "Quadro tático de futebol — formações, animações e notas",
-  "start_url": "./index.html",
+  "start_url": "./tactical.html",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "any",
@@ -30,14 +30,14 @@
       "name": "Táticas",
       "short_name": "Táticas",
       "description": "Abrir vista tática",
-      "url": "./index.html#tactic",
+      "url": "./tactical.html#tactic",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Notas",
       "short_name": "Notas",
       "description": "Abrir notas",
-      "url": "./index.html#notes",
+      "url": "./tactical.html#notes",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ],
