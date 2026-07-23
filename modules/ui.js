@@ -1,6 +1,8 @@
 import { saveSession, getSaves, loadSession, deleteSession } from '../storage.js';
 import { renderSaveList } from '../render.js';
-import { rebuildAllFromState } from '../app.js';
+
+let _onLoadCallback = null;
+export function setOnLoadCallback(cb) { _onLoadCallback = cb; }
 
 // --- Toasts ---
 let _toastTimeout;
@@ -18,6 +20,47 @@ export function showToast(msg, duration = 2200) {
   _toastTimeout = setTimeout(() => {
     t.classList.remove('show');
   }, duration);
+}
+
+// --- Custom Prompt ---
+export function askPrompt(title, defaultText = '') {
+  return new Promise(resolve => {
+    const ov = document.getElementById('prompt-overlay');
+    const input = document.getElementById('prompt-input-el');
+    const titleEl = document.getElementById('prompt-title-el');
+    const btnCancel = document.getElementById('prompt-cancel');
+    const btnConfirm = document.getElementById('prompt-confirm');
+    if (!ov || !input || !titleEl) { resolve(null); return; }
+
+    titleEl.textContent = title;
+    input.value = defaultText;
+
+    const cleanup = () => {
+      ov.style.opacity = '0';
+      setTimeout(() => ov.style.display = 'none', 200);
+      btnCancel.removeEventListener('click', onCancel);
+      btnConfirm.removeEventListener('click', onConfirm);
+      input.removeEventListener('keydown', onKey);
+    };
+
+    const onCancel = () => { cleanup(); resolve(null); };
+    const onConfirm = () => { cleanup(); resolve(input.value); };
+    const onKey = (e) => {
+      if (e.key === 'Enter') onConfirm();
+      if (e.key === 'Escape') onCancel();
+    };
+
+    btnCancel.addEventListener('click', onCancel);
+    btnConfirm.addEventListener('click', onConfirm);
+    input.addEventListener('keydown', onKey);
+
+    ov.style.display = 'flex';
+    // Trigger reflow
+    void ov.offsetWidth;
+    ov.style.opacity = '1';
+    input.focus();
+    if (defaultText) input.select();
+  });
 }
 
 // --- Modals ---
@@ -78,7 +121,7 @@ export function refreshSaveList() {
   renderSaveList(getSaves(), (id) => {
     const err = loadSession(id);
     if (err) { showToast(`Erro: ${err}`); return; }
-    rebuildAllFromState();
+    if (_onLoadCallback) _onLoadCallback();
     closeModal();
     showToast('Sessão carregada');
   }, (id) => {

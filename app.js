@@ -1,4 +1,4 @@
-﻿/**
+/**
  * app.js — Main application controller
  *
  * Wires all events, coordinates modules, implements business logic.
@@ -39,7 +39,7 @@ import { getLibrary, savePlay, deletePlay, loadPlay, seedTemplates, buildShareUR
 import { openPlayerEditor, closePlayerEditor } from './player-editor.js';
 import { openPlayerFit, getOverallScore, getPlayerRating } from './playerfit.js';
 
-import { showToast, bindModal, openSaveModal, openLoadModal, closeModal } from './modules/ui.js';
+import { showToast, bindModal, openSaveModal, openLoadModal, closeModal, setOnLoadCallback, askPrompt } from './modules/ui.js';
 import { exportGIF, exportMP4 } from './modules/export.js';
 // ─── Shape counters (not in State — derived on restore) ───────────────────────
 let tSC = 0, bSC = 0, pSC = 0;
@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if(overlay) overlay.style.display = 'none';
 
   loadClubConfig();
+  setOnLoadCallback(rebuildAllFromState);
   bindTopbar();
   bindToolbar();
   bindPitchEvents();
@@ -582,7 +583,7 @@ function bindPitchEvents() {
   });
 }
 
-function pitchClick(e, w) {
+async function pitchClick(e, w) {
   if (State.mode === 'none' || State.mode === 'eraser') {
     if (!e.target.closest('.pl') && e.target.id !== 'ball') {
       cancelSwipe();
@@ -594,7 +595,11 @@ function pitchClick(e, w) {
   const { id: pitchId, vw, vh } = PITCH[w];
   const pct = getPct(e, pitchId);
   const pt  = pctVb(pct.x, pct.y, vw, vh);
-  if (State.mode === 'text') { const txt = prompt('Insira o texto:'); if (txt && txt.trim()) { pushHistory(); commitShape(w, 'text', [pt], { label: txt.trim() }); setMode('none'); } return; }
+  if (State.mode === 'text') { 
+    const txt = await askPrompt('Insira o texto:'); 
+    if (txt && txt.trim()) { pushHistory(); commitShape(w, 'text', [pt], { label: txt.trim() }); setMode('none'); } 
+    return; 
+  }
   const drawArr = w === 't' ? State.tDraw : w === 'b' ? State.bDraw : State.pDraw;
   drawArr.push(pt);
   renderDrawPreview(w, State.mode, drawArr);
@@ -2096,7 +2101,7 @@ function renderLibrary(filter) {
       e.stopPropagation();
       const url = buildShareURL(Number(btn.dataset.libShare));
       if (url) {
-        navigator.clipboard?.writeText(url).then(() => showToast('Link copiado!')).catch(() => prompt('Copia este link:', url));
+        navigator.clipboard?.writeText(url).then(() => showToast('Link copiado!')).catch(() => askPrompt('Copia este link:', url));
       }
     });
   });
@@ -2332,8 +2337,8 @@ function renderCustomFmtList() {
   });
 
   // Save current formation
-  document.getElementById('cfmt-save-now')?.addEventListener('click', () => {
-    const name = prompt('Nome da formação:');
+  document.getElementById('cfmt-save-now')?.addEventListener('click', async () => {
+    const name = await askPrompt('Nome da formação:');
     if (!name?.trim()) return;
     const positions = State.players.map(p => ({ x: p.x, y: p.y, n: p.n }));
     State.customFmts.push({ name: name.trim(), positions });
@@ -2616,7 +2621,17 @@ function drawQRCode(canvas, text) {
   function openShare() {
     const url = generateShareURL();
     if (input) input.value = url;
-    if (qrCanvas) drawQRCode(qrCanvas, url);
+    if (qrCanvas) {
+      qrCanvas.innerHTML = ''; // clear previous
+      new QRCode(qrCanvas, {
+        text: url,
+        width: 180,
+        height: 180,
+        colorDark: "#3ddc84", // using tactical lab's accent color
+        colorLight: "#0c1610", // background color
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    }
     overlay.classList.add('active');
   }
 

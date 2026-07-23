@@ -61,72 +61,82 @@ export const CalendarModule = (function() {
           <div class="cal-grid" id="cal-grid"></div>
         </div>
       </div>
+    `;
 
-      <!-- Sidebar Form -->
-      <div class="cal-sidebar" id="cal-sidebar" style="display:none;">
-        <div class="cal-sidebar-header">
-          <span id="cal-sb-title">Detalhes do Evento</span>
-          <button class="cal-close-btn" id="cal-btn-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>
-        <div class="cal-sidebar-body">
-          <div class="cal-form-group">
-            <label class="cal-form-label">Data</label>
-            <input type="date" class="cal-form-input" id="cal-ev-date">
+    // Sidebar Form (now Modal) - Move outside view to avoid CSS transform constraint
+    let modalOverlay = document.getElementById('cal-modal-overlay');
+    if (!modalOverlay) {
+      modalOverlay = document.createElement('div');
+      modalOverlay.className = 'cal-modal-overlay';
+      modalOverlay.id = 'cal-modal-overlay';
+      modalOverlay.style.display = 'none';
+      document.body.appendChild(modalOverlay);
+    }
+    modalOverlay.innerHTML = `
+        <div class="cal-modal">
+          <div class="cal-modal-header">
+            <span id="cal-sb-title">Detalhes do Evento</span>
+            <button class="cal-close-btn" id="cal-btn-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
-          <div class="cal-form-group">
-            <label class="cal-form-label">Tipo de Evento</label>
-            <div class="cal-type-selector">
-              <button class="cal-type-btn active t-treino" data-type="treino">Treino</button>
-              <button class="cal-type-btn t-jogo" data-type="jogo">Jogo</button>
-              <button class="cal-type-btn t-pre" data-type="pre">Pré-época</button>
+          <div class="cal-modal-body">
+            <div class="cal-form-group">
+              <label class="cal-form-label">Data</label>
+              <input type="date" class="cal-form-input" id="cal-ev-date">
             </div>
-          </div>
-          <div class="cal-form-group">
-            <label class="cal-form-label">Título</label>
-            <input type="text" class="cal-form-input" id="cal-ev-title" placeholder="Ex: Treino Tático">
-          </div>
-          <div style="display: flex; gap: 12px;">
-            <div class="cal-form-group" style="flex: 1;">
-              <label class="cal-form-label">Início</label>
-              <input type="time" class="cal-form-input" id="cal-ev-time" value="10:00">
-            </div>
-            <div class="cal-form-group" style="flex: 1;">
-              <label class="cal-form-label">Duração (m)</label>
-              <input type="number" class="cal-form-input" id="cal-ev-dur" value="90">
-            </div>
-          </div>
-          <div class="cal-form-group" style="margin-top: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <label class="cal-form-label" style="margin: 0;">Conteúdo</label>
-              <div class="ai-container">
-                <button class="ai-btn" id="cal-btn-ai" title="Assistente IA">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                  </svg>
-                  ✨ Sugestões Gemini IA
-                </button>
-                <div class="ai-dropdown" id="cal-ai-dropdown">
-                  <div class="ai-dd-header">Planos Recomendados</div>
-                  <div class="ai-dd-body" id="cal-ai-opts"></div>
-                </div>
+            <div class="cal-form-group">
+              <label class="cal-form-label">Tipo de Evento</label>
+              <div class="cal-type-selector">
+                <button class="cal-type-btn active t-treino" data-type="treino">Treino</button>
+                <button class="cal-type-btn t-jogo" data-type="jogo">Jogo</button>
+                <button class="cal-type-btn t-pre" data-type="pre">Pré-época</button>
               </div>
             </div>
-            <textarea id="cal-ev-content" class="cal-form-textarea" placeholder="Detalhes do exercício, observações..."></textarea>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="cal-btn-outline" id="cal-btn-delete" style="color:var(--red); border-color:rgba(232,85,85,0.3); display:none; padding:14px; flex-shrink:0;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-            </button>
-            <button class="cal-btn-primary" id="cal-btn-save" style="justify-content:center; padding: 14px; flex:1; font-size: 14px;">Guardar Evento</button>
+            <div class="cal-form-group">
+              <label class="cal-form-label">Título</label>
+              <input type="text" class="cal-form-input" id="cal-ev-title" placeholder="Ex: Treino Tático">
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <div class="cal-form-group" style="flex: 1;">
+                <label class="cal-form-label">Início</label>
+                <input type="time" class="cal-form-input" id="cal-ev-time" value="10:00">
+              </div>
+              <div class="cal-form-group" style="flex: 1;">
+                <label class="cal-form-label">Duração (m)</label>
+                <input type="number" class="cal-form-input" id="cal-ev-dur" value="90">
+              </div>
+            </div>
+            <div class="cal-form-group" style="margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label class="cal-form-label" style="margin: 0;">Conteúdo</label>
+                <div class="ai-container">
+                  <button class="ai-btn" id="cal-btn-ai" title="Assistente IA">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                    ✨ Sugestões Gemini IA
+                  </button>
+                  <div class="ai-dropdown" id="cal-ai-dropdown">
+                    <div class="ai-dd-header">Planos Recomendados</div>
+                    <div class="ai-dd-body" id="cal-ai-opts"></div>
+                  </div>
+                </div>
+              </div>
+              <textarea id="cal-ev-content" class="cal-form-textarea" placeholder="Detalhes do exercício, observações..."></textarea>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="cal-btn-outline" id="cal-btn-delete" style="color:var(--red); border-color:rgba(232,85,85,0.3); display:none; padding:14px; flex-shrink:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              </button>
+              <button class="cal-btn-primary" id="cal-btn-save" style="justify-content:center; padding: 14px; flex:1; font-size: 14px;">Guardar Evento</button>
+            </div>
           </div>
         </div>
-      </div>
     `;
 
     // Cache els
     els.grid = document.getElementById('cal-grid');
     els.moTxt = document.getElementById('cal-mo-txt');
-    els.sb = document.getElementById('cal-sidebar');
+    els.sb = document.getElementById('cal-modal-overlay');
     els.sbTitle = document.getElementById('cal-sb-title');
     
     // AI Dropdown setup

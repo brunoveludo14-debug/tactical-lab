@@ -1821,14 +1821,27 @@ body.field-fullscreen #pitch {
   .logo-name { font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
   .vsep { width: 1px; height: 24px; background: var(--b2); }
   
-  .nav-group { display: flex; gap: 8px; }
-  .top-btn {
-    padding: 10px 18px; border-radius: 10px; border: none; background: transparent; color: var(--t2);
-    font-family: var(--font-ui); font-size: 14px; font-weight: 500; cursor: pointer;
-    transition: all 0.2s;
+  .nav-group { 
+    display: flex; 
+    gap: 4px; 
+    background: rgba(0,0,0,0.25);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--b1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
   }
-  .top-btn:hover { color: var(--t1); background: var(--s2); }
-  .top-btn.active { background: var(--s3); color: var(--acc); box-shadow: 0 0 0 1px rgba(61,220,132,.2); font-weight: 600; }
+  .top-btn {
+    padding: 8px 16px; border-radius: 8px; border: none; background: transparent; color: var(--t2);
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .top-btn:hover { color: var(--t1); background: rgba(255,255,255,0.05); }
+  .top-btn.active { 
+    background: var(--s2); 
+    color: var(--t1); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px var(--b2); 
+    font-weight: 600; 
+  }
 
   /* Main Layout */
   #main-area {
@@ -1961,44 +1974,7 @@ body.field-fullscreen #pitch {
   .ev-jogo   { background: var(--blu-bg); color: var(--blu); border: 1px solid rgba(91,191,255,.15); }
   .ev-pre    { background: var(--yel-bg); color: var(--yel); border: 1px solid rgba(240,192,64,.15); }
 
-  /* Sidebar details */
-  .cal-sidebar {
-    width: 360px;
-    background: var(--s1);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--b1);
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    position: relative;
-  }
-  .sidebar-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--b1);
-    font-family: var(--font-heading);
-    font-size: 16px;
-    font-weight: 700;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .close-btn { background: transparent; border: none; color: var(--t2); cursor: pointer; border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-  .close-btn:hover { background: var(--s2); color: var(--t1); }
-  
-  .sidebar-body {
-    flex: 1;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-  }
-  
-  .sidebar-body::-webkit-scrollbar { width: 4px; }
-  .sidebar-body::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
+
 
   /* Form Elements */
   .form-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
@@ -2281,32 +2257,64 @@ body.field-fullscreen #pitch {
 .ev-jogo { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
 .ev-pre { background: rgba(234,179,8,0.2); color: #facc15; border: 1px solid rgba(234,179,8,0.3); }
 
-/* Sidebar */
-.cal-sidebar {
-  width: 420px;
+/* Calendar Modal */
+.cal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cal-modal {
+  width: 440px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
   background: var(--s1);
   border: 1px solid var(--b2);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.cal-sidebar-header {
-  padding: 20px;
+.cal-modal-header {
+  padding: 16px 20px;
   background: var(--s2);
-  animation: gradientShift 3s ease infinite;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 20px;
+  border-bottom: 1px solid var(--b2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 16px;
   font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--t1);
 }
+.cal-close-btn { 
+  background: transparent; 
+  border: none; 
+  color: var(--t2); 
+  cursor: pointer; 
+  border-radius: 8px; 
+  width: 28px; 
+  height: 28px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  transition: 0.2s; 
+}
+.cal-close-btn:hover { background: rgba(255,255,255,0.1); color: var(--t1); }
+.cal-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .ai-btn:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 6px 20px rgba(217, 70, 239, 0.6);
@@ -2429,7 +2437,7 @@ body.field-fullscreen #pitch {
   #main-area { flex-direction: column !important; gap: 12px !important; height: auto !important; overflow: visible !important; }
   #view-calendar { flex-direction: column !important; padding: 10px !important; gap: 12px !important; overflow-y: auto !important; }
   .cal-container { min-height: 450px; flex: none !important; }
-  .cal-sidebar { width: 100% !important; max-width: none !important; flex: none !important; margin-bottom: 20px; }
+  .cal-modal { width: 95% !important; margin: 0 auto; max-height: 85vh; }
   .cal-header { padding: 12px 16px !important; flex-wrap: wrap; gap: 10px; }
   .cal-month-title { font-size: 18px !important; gap: 10px !important; }
   .cal-nav-btn { width: 32px !important; height: 32px !important; }
