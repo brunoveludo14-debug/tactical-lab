@@ -97,7 +97,7 @@ export const State = {
   pPlayers:[], pShapes:[], pDraw:[], pPlayerCounts:{ att:0, def:0, gk:0, oppAtt:0, oppDef:0, total:0 },
   pBall:{ x:34, y:26 },
   notes:[], curNote:null,
-  keyframes:[], kfAnimating:false, showTrails:false,
+  keyframes:[], kfAnimating:false, showTrails:false, autoRecord:false,
   tSel:null, bSel:null, pbSel:null,
   selectedShape: null,  // { w, id } currently selected shape
   customFmts: [],       // array of { name, positions[] }

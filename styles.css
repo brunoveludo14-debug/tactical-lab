@@ -110,6 +110,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 }
 .tb.active .kf-badge{background:rgba(57,224,122,.2);color:var(--acc);}
 
+#btn-auto-record.active {
+  background: rgba(255, 60, 60, 0.1);
+  color: #ff3c3c;
+  box-shadow: 0 0 0 1px rgba(255, 60, 60, 0.3), 0 2px 8px rgba(255, 60, 60, 0.2);
+  animation: pulseRecord 2s infinite;
+}
+@keyframes pulseRecord {
+  0% { box-shadow: 0 0 0 1px rgba(255, 60, 60, 0.3); }
+  50% { box-shadow: 0 0 0 2px rgba(255, 60, 60, 0.6), 0 0 8px rgba(255, 60, 60, 0.4); }
+  100% { box-shadow: 0 0 0 1px rgba(255, 60, 60, 0.3); }
+}
+
 /* Mode indicator strip */
 #mode-bar{
   height:30px;min-height:30px;

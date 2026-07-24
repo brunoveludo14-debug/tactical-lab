@@ -351,6 +351,14 @@ function bindToolbar() {
     captureKF();
     renderTimeline();
   });
+  const btnAutoRec = document.getElementById('btn-auto-record');
+  if (btnAutoRec) {
+    btnAutoRec.addEventListener('click', () => {
+      State.autoRecord = !State.autoRecord;
+      btnAutoRec.classList.toggle('active', State.autoRecord);
+      showToast(State.autoRecord ? 'Modo Auto-Gravação ativado' : 'Modo Auto-Gravação desativado');
+    });
+  }
   document.getElementById('btn-play')?.addEventListener('click', () => {
     State.animSpeed = parseInt(document.getElementById('kf-speed')?.value || 800);
     playKF();
@@ -1125,6 +1133,7 @@ function endDrag(e) {
     const ball = document.getElementById('ball');
     if (ball) { ball.style.cursor = 'grab'; ball.style.transition = ''; }
     scheduleAutosave();
+    if (State.autoRecord) { setTimeout(() => { captureKF(); renderTimeline(); }, 50); }
   }
 
   if (swipeDraw) {
@@ -1203,6 +1212,7 @@ function endDrag(e) {
     DG = null;
     _dragVelocity = { vx: 0, vy: 0, lastX: 0, lastY: 0, lastT: 0 };
     scheduleAutosave();
+    if (State.autoRecord) { setTimeout(() => { captureKF(); renderTimeline(); }, 50); }
   }
 }
 

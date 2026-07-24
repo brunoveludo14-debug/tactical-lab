@@ -110,7 +110,34 @@ export async function playKF() {
   if (ball) ball.style.transition = transStr;
 
   for (const kf of State.keyframes) {
-    let currentDuration = duration * (kf.speedMult || 1);
+    let maxDist = 0;
+    const calcDist = (list, kpList) => {
+      (kpList || []).forEach(kp => {
+        const p = list.find(x => x.id === kp.id);
+        if (p) {
+          const xp = kp.xp !== undefined ? kp.xp : (p.x / 68) * 100;
+          const yp = kp.yp !== undefined ? kp.yp : (p.y / 105) * 100;
+          const px = (p.x / 68) * 100;
+          const py = (p.y / 105) * 100;
+          const d = Math.sqrt((xp - px)**2 + (yp - py)**2);
+          if (d > maxDist) maxDist = d;
+        }
+      });
+    };
+    calcDist(State.players, kf.players);
+    calcDist(State.opp, kf.opp);
+    if (kf.ball && ball) {
+      const px = parseFloat(ball.style.left) || 50;
+      const py = parseFloat(ball.style.top) || 50;
+      const d = Math.sqrt((kf.ball.x - px)**2 + (kf.ball.y - py)**2);
+      if (d > maxDist) maxDist = d;
+    }
+
+    let distScale = maxDist / 15; // 15% of pitch as baseline duration
+    distScale = Math.max(0.4, Math.min(1.8, distScale));
+    if (maxDist < 0.5) distScale = 0.5;
+
+    let currentDuration = duration * (kf.speedMult || 1) * distScale;
     let currentTransStr = `left ${currentDuration}ms ${easing}, top ${currentDuration}ms ${easing}`;
     document.querySelectorAll('#pitch .pl, #ball').forEach(el => el.style.transition = currentTransStr);
     kf.players.forEach(kp => {

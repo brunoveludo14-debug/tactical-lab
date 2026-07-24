@@ -145,15 +145,54 @@ export function renderShapes(w, overrideShapes = null) {
   // Ghosting effect for previous keyframe
   if (w === 't' && State.activeKfIdx > 0 && State.keyframes && State.keyframes[State.activeKfIdx - 1]) {
     const prevKf = State.keyframes[State.activeKfIdx - 1];
-    const drawGhost = (p, color) => {
+    
+    // Draw connections from ghost to current position first (so lines are behind)
+    const drawLine = (p, curP, color) => {
+      if (!curP) return;
+      const px1 = (p.xp !== undefined ? p.xp : 0) * (vw / 100);
+      const py1 = (p.yp !== undefined ? p.yp : 0) * (vh / 100);
+      const px2 = (curP.x !== undefined ? curP.x : 0);
+      const py2 = (curP.y !== undefined ? curP.y : 0);
+      
+      const line = ns('line');
+      sa(line, { x1: px1, y1: py1, x2: px2, y2: py2, stroke: color, 'stroke-width': '0.3', 'stroke-dasharray': '0.5,1', opacity: '0.4' });
+      svg.appendChild(line);
+    };
+
+    const drawGhost = (p, color, n, isGk) => {
       const px = (p.xp !== undefined ? p.xp : 0) * (vw / 100);
       const py = (p.yp !== undefined ? p.yp : 0) * (vh / 100);
-      const ghost = ns('circle');
-      sa(ghost, { cx: px, cy: py, r: '2.5', fill: color, opacity: '0.4' });
-      svg.appendChild(ghost);
+      const ghostGroup = ns('g');
+      
+      const ghostCirc = ns('circle');
+      sa(ghostCirc, { cx: px, cy: py, r: '1.4', fill: color, opacity: '0.35', stroke: 'rgba(255,255,255,0.2)', 'stroke-width': '0.2' });
+      ghostGroup.appendChild(ghostCirc);
+
+      const text = ns('text');
+      sa(text, { x: px, y: py + 0.35, fill: 'rgba(255,255,255,0.6)', 'font-size': '1.3', 'text-anchor': 'middle', 'font-family': 'monospace', 'font-weight': 'bold', opacity: '0.6' });
+      text.textContent = n || '';
+      ghostGroup.appendChild(text);
+
+      svg.appendChild(ghostGroup);
     };
-    prevKf.players.forEach(p => drawGhost(p, '#3ddc84'));
-    (prevKf.opp || []).forEach(p => drawGhost(p, '#ff6b4a'));
+    
+    prevKf.players.forEach(p => {
+      const cur = State.players.find(x => x.id === p.id);
+      if (cur) drawLine(p, cur, cur.isGk ? '#5bbfff' : '#3ddc84');
+    });
+    (prevKf.opp || []).forEach(p => {
+      const cur = State.opp.find(x => x.id === p.id);
+      if (cur) drawLine(p, cur, cur.isGk ? '#ff9f1c' : '#ff6b4a');
+    });
+
+    prevKf.players.forEach(p => {
+      const cur = State.players.find(x => x.id === p.id);
+      drawGhost(p, cur?.isGk ? '#5bbfff' : '#3ddc84', cur?.n, cur?.isGk);
+    });
+    (prevKf.opp || []).forEach(p => {
+      const cur = State.opp.find(x => x.id === p.id);
+      drawGhost(p, cur?.isGk ? '#ff9f1c' : '#ff6b4a', cur?.n, cur?.isGk);
+    });
   }
 
   shapes.forEach(s => {
