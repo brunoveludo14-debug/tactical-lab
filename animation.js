@@ -1,5 +1,4 @@
 /**
-import { showToast } from './modules/ui.js';
  * animation.js — Keyframe capture, playback, trail drawing, PNG export
  */
 
@@ -8,6 +7,7 @@ import { showToast } from './modules/ui.js';
 import { State, PITCH }          from './state.js';
 import { pushHistory }           from './state.js';
 import { vbPct, movePlayerEl, renderShapes } from './render.js';
+import { showToast } from './modules/ui.js';
 
 // ─── Keyframe capture ─────────────────────────────────────────────────────────
 
