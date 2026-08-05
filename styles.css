@@ -2453,14 +2453,15 @@ body.field-fullscreen #pitch {
   #pitch-wrap { flex: 1; min-height: 250px; display: flex; align-items: stretch; justify-content: center; }
 
   /* CALENDAR MOBILE FIXES */
-  #main-area { flex-direction: column !important; gap: 12px !important; height: auto !important; overflow: visible !important; }
-  #view-calendar { flex-direction: column !important; padding: 10px !important; gap: 12px !important; overflow-y: auto !important; }
+  #main-area { flex-direction: column !important; gap: 12px !important; height: auto !important; overflow: hidden !important; }
+  #view-calendar { flex-direction: column !important; padding: 5px !important; gap: 8px !important; overflow: hidden !important; }
   .cal-container { min-height: 450px; flex: none !important; }
-  .cal-modal { width: 95% !important; margin: 0 auto; max-height: 85vh; }
+  .cal-modal { width: 95% !important; max-width: 95vw !important; margin: 0 auto; max-height: 85vh; overflow-x: hidden; }
   .cal-header { padding: 12px 16px !important; flex-wrap: wrap; gap: 10px; }
-  .cal-month-title { font-size: 18px !important; gap: 10px !important; }
+  .cal-month-title { font-size: 16px !important; gap: 8px !important; }
   .cal-nav-btn { width: 32px !important; height: 32px !important; }
-  .cal-grid-wrapper { padding: 10px !important; }
+  .cal-grid-wrapper { padding: 5px !important; overflow-x: auto !important; }
+  .cal-grid { min-width: 600px !important; }
   .cal-day { min-height: 80px !important; padding: 6px !important; }
   .cal-weekday { font-size: 10px !important; }
   .event-pill { padding: 4px 6px !important; font-size: 10px !important; }
