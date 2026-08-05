@@ -497,8 +497,8 @@ function setMode(mode, triggerBtn = null) {
   renderDrawPreview('b', mode, []);
   renderDrawPreview('p', mode, []);
 
-  // Clear all toolbar active states and re-set
-  document.querySelectorAll('.tb').forEach(b => b.classList.remove('active'));
+  // Clear toolbar active states (except for toggle buttons)
+  document.querySelectorAll('.tb:not(#btn-mirror):not(#btn-toggle-plantel):not(#btn-auto-record):not(#btn-trails):not(#btn-grid)').forEach(b => b.classList.remove('active'));
   if (triggerBtn) triggerBtn.classList.add('active');
   else document.getElementById('t-sel')?.classList.add('active');
 
