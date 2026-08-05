@@ -366,14 +366,14 @@ function bindToolbar() {
   document.getElementById('btn-trails')?.addEventListener('click', toggleTrails);
   
   // Tactical grid toggle
-  document.getElementById('btn-grid')?.addEventListener('click', function() {
+  document.querySelectorAll('.btn-grid-toggle').forEach(btn => btn.addEventListener('click', function() {
     const grid = document.getElementById('tactical-zones');
     if (!grid) return;
     const visible = grid.style.display !== 'none';
     grid.style.display = visible ? 'none' : '';
-    this.classList.toggle('active', !visible);
+    document.querySelectorAll('.btn-grid-toggle').forEach(b => b.classList.toggle('active', !visible));
     showToast(!visible ? 'Grelha tática ativada' : 'Grelha tática desativada');
-  });
+  }));
   
   document.getElementById('btn-clear-kf')?.addEventListener('click', async () => {
     if (State.keyframes.length) {
@@ -498,7 +498,7 @@ function setMode(mode, triggerBtn = null) {
   renderDrawPreview('p', mode, []);
 
   // Clear toolbar active states (except for toggle buttons)
-  document.querySelectorAll('.tb:not(#btn-mirror):not(#btn-toggle-plantel):not(#btn-auto-record):not(#btn-trails):not(#btn-grid)').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tb:not(#btn-mirror):not(#btn-toggle-plantel):not(#btn-auto-record):not(#btn-trails):not(.btn-grid-toggle)').forEach(b => b.classList.remove('active'));
   if (triggerBtn) triggerBtn.classList.add('active');
   else document.getElementById('t-sel')?.classList.add('active');
 
