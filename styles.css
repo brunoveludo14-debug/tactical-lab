@@ -2429,17 +2429,14 @@ body.field-fullscreen #pitch {
   
   /* Toolbar Mobile */
   #toolbar { 
-    flex-wrap: nowrap !important; 
-    overflow-x: auto !important; 
-    overflow-y: hidden !important; 
-    scrollbar-width: none; 
+    flex-wrap: wrap !important; 
+    overflow: visible !important; 
     height: auto !important;
-    min-height: 60px !important; 
-    padding: 4px 8px !important; 
-    justify-content: flex-start !important; 
-    gap: 6px !important;
+    min-height: auto !important; 
+    padding: 6px !important; 
+    justify-content: center !important; 
+    gap: 4px !important;
   }
-  #toolbar::-webkit-scrollbar { display: none; }
   .tb span { display: none !important; }
   .tb { min-width: 44px !important; padding: 10px 8px !important; flex-shrink: 0 !important; }
   .tb svg { width: 20px !important; height: 20px !important; }

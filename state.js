@@ -123,7 +123,11 @@ function snapshot() {
     keyframes:State.keyframes.map(kf=>({
       players:kf.players.map(p=>({...p})),
       opp:(kf.opp||[]).map(p=>({...p})),
-      ball:kf.ball?{...kf.ball}:null
+      ball:kf.ball?{...kf.ball}:null,
+      tShapes:kf.tShapes?kf.tShapes.map(s=>({...s,points:[...s.points]})):[],
+      bShapes:kf.bShapes?kf.bShapes.map(s=>({...s,points:[...s.points]})):[],
+      pShapes:kf.pShapes?kf.pShapes.map(s=>({...s,points:[...s.points]})):[],
+      speedMult:kf.speedMult||1
     })),
   };
 }
@@ -143,7 +147,11 @@ function applySnapshot(s) {
   State.keyframes=s.keyframes.map(kf=>({
     players:kf.players.map(p=>({...p})),
     opp:(kf.opp||[]).map(p=>({...p})),
-    ball:kf.ball?{...kf.ball}:null
+    ball:kf.ball?{...kf.ball}:null,
+    tShapes:kf.tShapes?kf.tShapes.map(x=>({...x,points:[...x.points]})):[],
+    bShapes:kf.bShapes?kf.bShapes.map(x=>({...x,points:[...x.points]})):[],
+    pShapes:kf.pShapes?kf.pShapes.map(x=>({...x,points:[...x.points]})):[],
+    speedMult:kf.speedMult||1
   }));
 }
 
