@@ -79,35 +79,35 @@ export const CalendarModule = (function() {
             <button class="cal-close-btn" id="cal-btn-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <div class="cal-modal-body">
-            <div class="cal-form-group">
-              <label class="cal-form-label">Data</label>
-              <input type="date" class="cal-form-input" id="cal-ev-date">
+            <div class="form-group">
+              <label class="form-label">Data</label>
+              <input type="date" class="form-input" id="cal-ev-date">
             </div>
-            <div class="cal-form-group">
-              <label class="cal-form-label">Tipo de Evento</label>
+            <div class="form-group">
+              <label class="form-label">Tipo de Evento</label>
               <div class="cal-type-selector">
                 <button class="cal-type-btn active t-treino" data-type="treino">Treino</button>
                 <button class="cal-type-btn t-jogo" data-type="jogo">Jogo</button>
                 <button class="cal-type-btn t-pre" data-type="pre">Pré-época</button>
               </div>
             </div>
-            <div class="cal-form-group">
-              <label class="cal-form-label">Título</label>
-              <input type="text" class="cal-form-input" id="cal-ev-title" placeholder="Ex: Treino Tático">
+            <div class="form-group">
+              <label class="form-label">Título</label>
+              <input type="text" class="form-input" id="cal-ev-title" placeholder="Ex: Treino Tático">
             </div>
             <div style="display: flex; gap: 12px;">
-              <div class="cal-form-group" style="flex: 1;">
-                <label class="cal-form-label">Início</label>
-                <input type="time" class="cal-form-input" id="cal-ev-time" value="10:00">
+              <div class="form-group" style="flex: 1;">
+                <label class="form-label">Início</label>
+                <input type="time" class="form-input" id="cal-ev-time" value="10:00">
               </div>
-              <div class="cal-form-group" style="flex: 1;">
-                <label class="cal-form-label">Duração (m)</label>
-                <input type="number" class="cal-form-input" id="cal-ev-dur" value="90">
+              <div class="form-group" style="flex: 1;">
+                <label class="form-label">Duração (m)</label>
+                <input type="number" class="form-input" id="cal-ev-dur" value="90">
               </div>
             </div>
-            <div class="cal-form-group" style="margin-top: 8px;">
+            <div class="form-group" style="margin-top: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label class="cal-form-label" style="margin: 0;">Conteúdo</label>
+                <label class="form-label" style="margin: 0;">Conteúdo</label>
                 <div class="ai-container">
                   <button class="ai-btn" id="cal-btn-ai" title="Assistente IA">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -121,7 +121,7 @@ export const CalendarModule = (function() {
                   </div>
                 </div>
               </div>
-              <textarea id="cal-ev-content" class="cal-form-textarea" placeholder="Detalhes do exercício, observações..."></textarea>
+              <textarea id="cal-ev-content" class="form-textarea" placeholder="Detalhes do exercício, observações..."></textarea>
             </div>
             <div style="display:flex; gap:8px;">
               <button class="cal-btn-outline" id="cal-btn-delete" style="color:var(--red); border-color:rgba(232,85,85,0.3); display:none; padding:14px; flex-shrink:0;">
