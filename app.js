@@ -364,6 +364,17 @@ function bindToolbar() {
     playKF();
   });
   document.getElementById('btn-trails')?.addEventListener('click', toggleTrails);
+  
+  // Tactical grid toggle
+  document.getElementById('btn-grid')?.addEventListener('click', function() {
+    const grid = document.getElementById('tactical-zones');
+    if (!grid) return;
+    const visible = grid.style.display !== 'none';
+    grid.style.display = visible ? 'none' : '';
+    this.classList.toggle('active', !visible);
+    showToast(!visible ? 'Grelha tática ativada' : 'Grelha tática desativada');
+  });
+  
   document.getElementById('btn-clear-kf')?.addEventListener('click', async () => {
     if (State.keyframes.length) {
       const ok = await customConfirm('Limpar fotogramas', 'Tens a certeza que queres eliminar todos os fotogramas?');
@@ -657,6 +668,8 @@ function commitShape(w, type, points, overrides = {}) {
   else State.pShapes.push(sh);
   renderShapes(w);
   scheduleAutosave();
+  // Auto-record: capture keyframe after drawing a shape
+  if (State.autoRecord) { setTimeout(() => { captureKF(); renderTimeline(); }, 80); }
 }
 
 function placeSimpleArrow(pct, w) {

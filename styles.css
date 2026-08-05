@@ -122,6 +122,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   100% { box-shadow: 0 0 0 1px rgba(255, 60, 60, 0.3); }
 }
 
+#btn-grid.active {
+  background: rgba(255, 230, 100, 0.1);
+  color: #ffe664;
+  box-shadow: 0 0 0 1px rgba(255, 230, 100, 0.3), 0 2px 8px rgba(255, 230, 100, 0.15);
+}
+
+#tactical-zones {
+  transition: opacity .4s ease;
+}
+
 /* Mode indicator strip */
 #mode-bar{
   height:30px;min-height:30px;
